@@ -127,6 +127,10 @@
                 <button onclick="showSection('feed')" class="px-3.5 py-1.5 rounded-xl bg-slate-900/80 border border-slate-800 text-gray-300 hover:text-white text-xs font-semibold transition-all">
                     <i class="fa-solid fa-house ml-1"></i> الرئيسية
                 </button>
+                <button onclick="showSection('chat')" class="px-3.5 py-1.5 rounded-xl bg-purple-600/30 border border-purple-500/40 text-purple-300 hover:text-white text-xs font-semibold transition-all relative">
+                    <i class="fa-solid fa-comments ml-1"></i> الدردشة
+                    <span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-pink-500 rounded-full animate-ping"></span>
+                </button>
                 <button onclick="showSection('profile')" class="px-3.5 py-1.5 rounded-xl bg-indigo-600/30 border border-indigo-500/40 text-indigo-300 hover:text-white text-xs font-semibold transition-all">
                     <i class="fa-solid fa-user ml-1"></i> ملفي
                 </button>
@@ -163,7 +167,7 @@
                         </div>
                     </div>
                 </div>
-                <p class="text-xs text-gray-200">أهلاً بكم في أول منشور حقيقي على منصة Sovexa المتطورة! 🚀✨</p>
+                <p class="text-xs text-gray-200">أهلاً لكم في أول منشور حقيقي على منصة Sovexa المتطورة! 🚀✨</p>
                 <div class="rounded-xl overflow-hidden border border-slate-800">
                     <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80" class="w-full max-h-72 object-cover" alt="Post">
                 </div>
@@ -173,12 +177,70 @@
     </div>
 
 
-    <!-- ==================== PART 3: PROFILE VIEW ==================== -->
+    <!-- ==================== PART 3: CHAT VIEW ==================== -->
+    <div id="chatSection" class="relative z-10 hidden min-h-[calc(100vh-80px)] pb-10">
+        <div class="max-w-4xl mx-auto px-4 pt-4">
+            <div class="glass-card rounded-3xl border border-slate-800 overflow-hidden grid grid-cols-1 md:grid-cols-3 h-[75vh]">
+                
+                <!-- Chat Sidebar (Friends List) -->
+                <div class="border-b md:border-b-0 md:border-l border-slate-800 p-4 bg-slate-950/50 flex flex-col">
+                    <h3 class="text-sm font-bold text-white mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-comments text-purple-400"></i> المحادثات
+                    </h3>
+                    <div class="space-y-2 overflow-y-auto flex-1 pr-1">
+                        <div onclick="selectChat('فريق Sovexa')" class="flex items-center gap-3 p-2.5 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 cursor-pointer hover:bg-indigo-600/30 transition-all">
+                            <div class="relative w-10 h-10 rounded-full bg-gradient-to-tr from-purple-500 to-indigo-500 flex items-center justify-center text-white font-bold text-xs">
+                                S
+                                <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-400 rounded-full border-2 border-slate-950"></span>
+                            </div>
+                            <div>
+                                <h4 class="text-xs font-bold text-white">فريق دعم Sovexa</h4>
+                                <p class="text-[10px] text-gray-400 truncate">مرحباً بك في شات Sovexa!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Box -->
+                <div class="md:col-span-2 flex flex-col h-full bg-slate-900/40">
+                    <!-- Chat Header -->
+                    <div class="p-3.5 border-b border-slate-800 flex items-center justify-between bg-slate-950/60">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-white font-bold text-xs" id="chatPartnerLetter">S</div>
+                            <div>
+                                <h4 class="text-xs font-bold text-white" id="chatPartnerName">فريق دعم Sovexa</h4>
+                                <span class="text-[9px] text-emerald-400">متصل الآن</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chat Messages List -->
+                    <div class="flex-1 p-4 overflow-y-auto space-y-3" id="chatMessages">
+                        <div class="flex justify-start">
+                            <div class="max-w-[75%] p-3 rounded-2xl bg-slate-800 text-gray-200 text-xs leading-relaxed rounded-tr-none">
+                                أهلاً بك في ميزة الدردشة الخاصة بـ Sovexa! 💬 يمكنك الآن التواصل مع أصدقائك بحرية وسلاسة.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chat Input -->
+                    <form id="chatForm" class="p-3 border-t border-slate-800 flex items-center gap-2 bg-slate-950/60">
+                        <input type="text" id="chatInput" placeholder="اكتب رسالتك..." required class="flex-1 bg-slate-900 border border-slate-700 focus:border-purple-500 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none">
+                        <button type="submit" class="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:opacity-90 text-white text-xs font-bold rounded-xl transition-all flex items-center gap-1">
+                            <i class="fa-solid fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ==================== PART 4: PROFILE VIEW ==================== -->
     <div id="profileSection" class="relative z-10 hidden min-h-screen pb-20">
         <div class="max-w-3xl mx-auto px-4 pt-4">
-            
             <div class="glass-card rounded-3xl overflow-hidden border border-slate-800 relative shadow-2xl mb-4">
-                
                 <div class="h-36 sm:h-48 w-full bg-gradient-to-r from-indigo-900 via-purple-900 to-slate-900 relative">
                     <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1200&auto=format&fit=crop&q=80" class="w-full h-full object-cover opacity-60" alt="Cover">
                 </div>
@@ -226,12 +288,11 @@
 
                 </div>
             </div>
-
         </div>
     </div>
 
 
-    <!-- ==================== PART 4: EDIT PROFILE MODAL ==================== -->
+    <!-- EDIT PROFILE MODAL -->
     <div id="editProfileModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md hidden transition-all duration-300">
         <div class="w-full max-w-md glass-modal p-6 rounded-3xl shadow-2xl border border-slate-700 relative">
             <div class="flex items-center justify-between pb-4 border-b border-slate-800">
@@ -267,11 +328,11 @@
     </div>
 
 
-    <!-- ==================== FIREBASE & LOGIC ==================== -->
+    <!-- FIREBASE & CHAT LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyCJm_0O6NzS0UYnoYAv5MUIp-QR9xGN18Q",
@@ -289,16 +350,42 @@
 
         let currentUser = null;
 
-        // UI View Toggle
+        // Routing Section Controller
         window.showSection = (sectionName) => {
-            if (sectionName === 'feed') {
-                document.getElementById('feedSection').classList.remove('hidden');
-                document.getElementById('profileSection').classList.add('hidden');
-            } else if (sectionName === 'profile') {
-                document.getElementById('profileSection').classList.remove('hidden');
-                document.getElementById('feedSection').classList.add('hidden');
-            }
+            document.getElementById('feedSection').classList.add('hidden');
+            document.getElementById('profileSection').classList.add('hidden');
+            document.getElementById('chatSection').classList.add('hidden');
+
+            if (sectionName === 'feed') document.getElementById('feedSection').classList.remove('hidden');
+            else if (sectionName === 'profile') document.getElementById('profileSection').classList.remove('hidden');
+            else if (sectionName === 'chat') document.getElementById('chatSection').classList.remove('hidden');
         };
+
+        // Select Chat Partner
+        window.selectChat = (partnerName) => {
+            document.getElementById('chatPartnerName').innerText = partnerName;
+            document.getElementById('chatPartnerLetter').innerText = partnerName.charAt(0);
+        };
+
+        // Chat Send Message
+        document.getElementById('chatForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const chatMessages = document.getElementById('chatMessages');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'flex justify-end';
+            msgDiv.innerHTML = `
+                <div class="max-w-[75%] p-3 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-xs leading-relaxed rounded-tl-none">
+                    ${text}
+                </div>
+            `;
+            chatMessages.appendChild(msgDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            input.value = '';
+        });
 
         // Modal Controller
         window.toggleEditModal = (show) => {
@@ -312,7 +399,7 @@
             }
         };
 
-        // Check Auth & Fetch Data
+        // Auth Listener
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUser = user;
@@ -323,7 +410,6 @@
                 const emailPrefix = user.email ? user.email.split('@')[0] : 'user';
                 document.getElementById('profileEmail').innerText = '@' + emailPrefix;
 
-                // Load User Data from Firestore
                 const userDocRef = doc(db, "users", user.uid);
                 const userDocSnap = await getDoc(userDocRef);
 
@@ -337,13 +423,13 @@
                 }
 
                 updateProfileUI(displayName, bio);
-
             } else {
                 currentUser = null;
                 document.getElementById('loginSection').classList.remove('hidden');
                 document.getElementById('mainHeader').classList.add('hidden');
                 document.getElementById('feedSection').classList.add('hidden');
                 document.getElementById('profileSection').classList.add('hidden');
+                document.getElementById('chatSection').classList.add('hidden');
             }
         });
 
@@ -354,7 +440,7 @@
             document.getElementById('profileBio').innerText = bio;
         }
 
-        // Save Profile Changes
+        // Profile Form Update
         document.getElementById('editProfileForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!currentUser) return;
@@ -366,10 +452,7 @@
             saveBtn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> جاري الحفظ...';
 
             try {
-                // Update Firebase Auth Profile
                 await updateProfile(currentUser, { displayName: newName });
-
-                // Save to Firestore Database
                 await setDoc(doc(db, "users", currentUser.uid), {
                     displayName: newName,
                     bio: newBio,
