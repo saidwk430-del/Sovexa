@@ -429,7 +429,7 @@
 
 
     <!-- ============================================== -->
-    <!-- FIREBASE & FOLLOW/UNFOLLOW REALTIME LOGIC -->
+    <!-- FIREBASE & DELETE POST REALTIME LOGIC -->
     <!-- ============================================== -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -561,6 +561,19 @@
             }
         };
 
+        // Delete Post Function
+        window.deletePost = async (postId) => {
+            if (!confirm("هل أنت تأكد من أنك تريد حذف هذا المنشور؟")) return;
+
+            try {
+                await deleteDoc(doc(db, "posts", postId));
+                showToast("تم حذف المنشور بنجاح. 🗑️");
+            } catch (err) {
+                console.error("Delete Post Error: ", err);
+                alert("حدث خطأ أثناء حذف المنشور.");
+            }
+        };
+
         // Realtime Posts Listener
         function listenToRealtimePosts() {
             const postsQuery = query(collection(db, "posts"), orderBy("createdAt", "desc"));
@@ -582,6 +595,8 @@
                     const postId = docSnap.id;
                     const letter = (post.userName || 'S').charAt(0).toUpperCase();
 
+                    const isOwner = currentUser && currentUser.uid === post.userId;
+
                     const avatarHTML = post.userPhoto ? 
                         `<img src="${post.userPhoto}" class="w-10 h-10 rounded-full object-cover border border-indigo-500/30" alt="Avatar">` :
                         `<div class="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-500 to-pink-500 flex items-center justify-center text-white font-bold text-xs">${letter}</div>`;
@@ -592,8 +607,21 @@
                         </div>
                     ` : '';
 
+                    const deleteMenuHTML = isOwner ? `
+                        <div class="relative group">
+                            <button class="w-7 h-7 rounded-lg hover:bg-slate-800 text-gray-400 hover:text-white flex items-center justify-center transition-all">
+                                <i class="fa-solid fa-ellipsis-vertical text-xs"></i>
+                            </button>
+                            <div class="hidden group-hover:block absolute left-0 top-7 glass-modal p-1.5 rounded-xl border border-slate-700 shadow-xl z-20 w-28">
+                                <button onclick="deletePost('${postId}')" class="w-full text-right px-2 py-1 text-[11px] text-red-400 hover:bg-red-500/10 rounded-lg flex items-center gap-1.5 transition-all">
+                                    <i class="fa-solid fa-trash-can"></i> حذف المنشور
+                                </button>
+                            </div>
+                        </div>
+                    ` : '';
+
                     const postCard = document.createElement('article');
-                    postCard.className = 'glass-card p-4 rounded-2xl border border-slate-800 space-y-3';
+                    postCard.className = 'glass-card p-4 rounded-2xl border border-slate-800 space-y-3 relative';
                     postCard.innerHTML = `
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-3 cursor-pointer" onclick="viewUserProfileByUid('${post.userId}')">
@@ -603,6 +631,7 @@
                                     <p class="text-[10px] text-gray-400">الآن • <i class="fa-solid fa-globe"></i></p>
                                 </div>
                             </div>
+                            ${deleteMenuHTML}
                         </div>
 
                         ${post.text ? `<p class="text-xs text-gray-200 leading-relaxed">${post.text}</p>` : ''}
@@ -836,27 +865,4 @@
             if (filtered.length === 0) {
                 resultsBox.innerHTML = '<p class="text-[11px] text-gray-400 p-2 text-center">لا توجد نتائج مطابقة</p>';
             } else {
-                resultsBox.innerHTML = filtered.map(u => `
-                    <div class="flex items-center justify-between p-2 rounded-xl bg-slate-900/80 hover:bg-slate-800 transition-all">
-                        <div class="flex items-center gap-2.5">
-                            <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 to-pink-500 flex items-center justify-center text-white text-xs font-bold overflow-hidden">
-                                ${u.photoURL ? `<img src="${u.photoURL}" class="w-full h-full object-cover">` : (u.displayName || u.email).charAt(0).toUpperCase()}
-                            </div>
-                            <div>
-                                <h5 class="text-xs font-bold text-white">${u.displayName || 'مستخدم Sovexa'}</h5>
-                                <p class="text-[10px] text-gray-400">@${u.email.split('@')[0]}</p>
-                            </div>
-                        </div>
-                        <button onclick="viewUserProfileByUid('${u.uid}')" class="px-3 py-1 bg-indigo-600/30 border border-indigo-500/40 hover:bg-indigo-600 text-indigo-300 hover:text-white text-[10px] font-semibold rounded-lg transition-all">
-                            عرض الملف
-                        </button>
-                    </div>
-                `).join('');
-            }
-            resultsBox.classList.remove('hidden');
-        };
-
-        // Profile View & Follow System
-        window.viewUserProfileByUid = async (uid) => {
-            document.getElementById('searchResults').classList.add('hidden');
-            document.getE
+                resul
