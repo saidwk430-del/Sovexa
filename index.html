@@ -265,15 +265,15 @@
                     <h3 class="text-sm font-bold text-white mb-3 flex items-center gap-2">
                         <i class="fa-solid fa-comments text-purple-400"></i> المحادثات
                     </h3>
-                    <div class="space-y-2 overflow-y-auto flex-1 pr-1">
+                    <div class="space-y-2 overflow-y-auto flex-1 pr-1" id="chatUsersList">
                         <div class="flex items-center gap-3 p-2.5 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 cursor-pointer hover:bg-indigo-600/30 transition-all">
                             <div class="relative w-10 h-10 rounded-full bg-gradient-to-tr from-purple-500 to-indigo-500 flex items-center justify-center text-white font-bold text-xs">
                                 S
                                 <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-400 rounded-full border-2 border-slate-950"></span>
                             </div>
                             <div>
-                                <h4 class="text-xs font-bold text-white">فريق دعم Sovexa</h4>
-                                <p class="text-[10px] text-gray-400 truncate">مرحباً بك في شات Sovexa!</p>
+                                <h4 class="text-xs font-bold text-white">الدردشة العامة (Sovexa Public)</h4>
+                                <p class="text-[10px] text-gray-400 truncate">تحدث مع الجميع مجاناً</p>
                             </div>
                         </div>
                     </div>
@@ -282,24 +282,20 @@
                 <div class="md:col-span-2 flex flex-col h-full bg-slate-900/40">
                     <div class="p-3.5 border-b border-slate-800 flex items-center justify-between bg-slate-950/60">
                         <div class="flex items-center gap-2.5">
-                            <div class="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-white font-bold text-xs">S</div>
+                            <div class="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-white font-bold text-xs" id="chatPartnerLetter">S</div>
                             <div>
-                                <h4 class="text-xs font-bold text-white">فريق دعم Sovexa</h4>
-                                <span class="text-[9px] text-emerald-400">متصل الآن</span>
+                                <h4 class="text-xs font-bold text-white" id="chatPartnerName">الدردشة العامة Sovexa</h4>
+                                <span class="text-[9px] text-emerald-400">مباشر الآن</span>
                             </div>
                         </div>
                     </div>
 
                     <div class="flex-1 p-4 overflow-y-auto space-y-3" id="chatMessages">
-                        <div class="flex justify-start">
-                            <div class="max-w-[75%] p-3 rounded-2xl bg-slate-800 text-gray-200 text-xs leading-relaxed rounded-tr-none">
-                                أهلاً بك في شات Sovexa! 💬
-                            </div>
-                        </div>
+                        <div class="text-center text-gray-400 text-xs py-4">جاري تحميل الرسائل...</div>
                     </div>
 
                     <form id="chatForm" class="p-3 border-t border-slate-800 flex items-center gap-2 bg-slate-950/60">
-                        <input type="text" id="chatInput" placeholder="اكتب رسالتك..." required class="flex-1 bg-slate-900 border border-slate-700 focus:border-purple-500 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none">
+                        <input type="text" id="chatInput" placeholder="اكتب رسالتك العامة..." required class="flex-1 bg-slate-900 border border-slate-700 focus:border-purple-500 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none">
                         <button type="submit" class="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:opacity-90 text-white text-xs font-bold rounded-xl transition-all flex items-center gap-1">
                             <i class="fa-solid fa-paper-plane"></i>
                         </button>
@@ -402,7 +398,7 @@
 
 
     <!-- ============================================== -->
-    <!-- FIREBASE & IMGBB FULL LOGIC WITH FIRESTORE LIKES/COMMENTS -->
+    <!-- FIREBASE & CHAT REALTIME INTEGRATION -->
     <!-- ============================================== -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -466,7 +462,7 @@
             document.getElementById('imagePreview').src = '';
         };
 
-        // Create & Publish Post (With ImgBB Integration)
+        // Create & Publish Post
         window.createNewPost = async () => {
             const textInput = document.getElementById('postInput');
             const postText = textInput.value.trim();
@@ -512,7 +508,7 @@
             }
         };
 
-        // Realtime Posts & Interactions Listener
+        // Realtime Posts Listener
         function listenToRealtimePosts() {
             const postsQuery = query(collection(db, "posts"), orderBy("createdAt", "desc"));
             onSnapshot(postsQuery, (snapshot) => {
@@ -587,15 +583,12 @@
                     `;
                     postsContainer.appendChild(postCard);
 
-                    // Listen to Like status for current user
                     checkUserLikeStatus(postId);
-                    // Listen to Comments sub-collection live
                     listenToPostComments(postId);
                 });
             });
         }
 
-        // Realtime Like Status Check
         async function checkUserLikeStatus(postId) {
             if (!currentUser) return;
             const likeRef = doc(db, "posts", postId, "likes", currentUser.uid);
@@ -612,7 +605,6 @@
             });
         }
 
-        // Realtime Comments Listener for each post
         function listenToPostComments(postId) {
             const commentsQuery = query(collection(db, "posts", postId, "comments"), orderBy("createdAt", "asc"));
             onSnapshot(commentsQuery, (snapshot) => {
@@ -640,7 +632,6 @@
             });
         }
 
-        // Toggle Firestore Likes Function
         window.toggleLike = async (postId) => {
             if (!currentUser) {
                 showToast("يرجى تسجيل الدخول أولاً للإعجاب بالمنشورات!");
@@ -671,7 +662,6 @@
             }
         };
 
-        // Add Firestore Comment Function
         window.addComment = async (e, postId) => {
             e.preventDefault();
             if (!currentUser) {
@@ -701,6 +691,65 @@
                 alert("حدث خطأ أثناء إضافة التعليق.");
             }
         };
+
+        // ================= CHAT REALTIME LOGIC =================
+        function listenToRealtimeChat() {
+            const chatQuery = query(collection(db, "global_chat"), orderBy("createdAt", "asc"));
+            onSnapshot(chatQuery, (snapshot) => {
+                const chatMessages = document.getElementById('chatMessages');
+                chatMessages.innerHTML = '';
+
+                if (snapshot.empty) {
+                    chatMessages.innerHTML = '<div class="text-center text-gray-400 text-xs py-4">لا توجد رسائل بعد، أرسل أول رسالة! 💬</div>';
+                    return;
+                }
+
+                snapshot.forEach((docSnap) => {
+                    const msg = docSnap.data();
+                    const isMe = currentUser && msg.userId === currentUser.uid;
+
+                    const msgDiv = document.createElement('div');
+                    msgDiv.className = `flex ${isMe ? 'justify-end' : 'justify-start'}`;
+
+                    msgDiv.innerHTML = `
+                        <div class="max-w-[80%] p-3 rounded-2xl ${isMe ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-tl-none' : 'bg-slate-800 text-gray-200 rounded-tr-none'} text-xs leading-relaxed border border-white/5 shadow-md">
+                            <div class="text-[10px] font-bold ${isMe ? 'text-purple-200' : 'text-indigo-400'} mb-1">${msg.userName || 'مستخدم'}</div>
+                            <p>${msg.text}</p>
+                        </div>
+                    `;
+                    chatMessages.appendChild(msgDiv);
+                });
+
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            });
+        }
+
+        // Send Chat Message
+        document.getElementById('chatForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!currentUser) {
+                showToast("يرجى تسجيل الدخول لإرسال الرسائل!");
+                return;
+            }
+
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const userName = currentUser.displayName || currentUser.email.split('@')[0];
+
+            try {
+                await addDoc(collection(db, "global_chat"), {
+                    userId: currentUser.uid,
+                    userName: userName,
+                    text: text,
+                    createdAt: serverTimestamp()
+                });
+                input.value = '';
+            } catch (err) {
+                console.error("Chat Error:", err);
+            }
+        });
 
         // Toggle Notifications Box
         window.toggleNotifications = () => {
@@ -802,26 +851,6 @@
             else if (sectionName === 'chat') document.getElementById('chatSection').classList.remove('hidden');
         };
 
-        // Chat Send Message
-        document.getElementById('chatForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const input = document.getElementById('chatInput');
-            const text = input.value.trim();
-            if (!text) return;
-
-            const chatMessages = document.getElementById('chatMessages');
-            const msgDiv = document.createElement('div');
-            msgDiv.className = 'flex justify-end';
-            msgDiv.innerHTML = `
-                <div class="max-w-[75%] p-3 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-xs leading-relaxed rounded-tl-none">
-                    ${text}
-                </div>
-            `;
-            chatMessages.appendChild(msgDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-            input.value = '';
-        });
-
         // Profile Modal
         window.toggleEditModal = (show) => {
             const modal = document.getElementById('editProfileModal');
@@ -858,30 +887,4 @@
                 document.getElementById('profileEmail').innerText = '@' + emailPrefix;
 
                 const userDocRef = doc(db, "users", user.uid);
-                const userDocSnap = await getDoc(userDocRef);
-
-                let displayName = user.displayName || emailPrefix;
-                let bio = "مرحباً بكم في ملفي الشخصي على Sovexa! 🚀";
-
-                if (userDocSnap.exists()) {
-                    const data = userDocSnap.data();
-                    if (data.displayName) displayName = data.displayName;
-                    if (data.bio) bio = data.bio;
-                }
-
-                updateProfileUI(displayName, bio);
-                loadUsersForSearch();
-                listenToRealtimePosts();
-            } else {
-                currentUser = null;
-                document.getElementById('loginSection').classList.remove('hidden');
-                document.getElementById('mainHeader').classList.add('hidden');
-                document.getElementById('feedSection').classList.add('hidden');
-                document.getElementById('profileSection').classList.add('hidden');
-                document.getElementById('chatSection').classList.add('hidden');
-            }
-        });
-
-        function updateProfileUI(name, bio) {
-            const letter = name.charAt(0).toUpperCase();
-            document.querySelectorAll('.userAvatarLetter').forEach(el => el.innerText 
+                const userDocSn
