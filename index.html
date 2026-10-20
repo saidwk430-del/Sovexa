@@ -21,6 +21,12 @@
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.08);
         }
+        .glass-modal {
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
         .glass-nav {
             background: rgba(11, 15, 23, 0.85);
             backdrop-filter: blur(20px);
@@ -103,7 +109,7 @@
     </div>
 
 
-    <!-- ==================== MAIN NAVBAR (For Feed & Profile) ==================== -->
+    <!-- ==================== MAIN NAVBAR ==================== -->
     <header id="mainHeader" class="sticky top-0 z-50 w-full glass-nav px-4 py-2.5 hidden">
         <div class="max-w-4xl mx-auto flex items-center justify-between gap-4">
             <div class="flex items-center gap-3">
@@ -136,7 +142,6 @@
     <div id="feedSection" class="relative z-10 hidden min-h-screen pb-20">
         <div class="max-w-3xl mx-auto px-4 pt-4 space-y-4">
             
-            <!-- Create Post Box -->
             <section class="glass-card p-4 rounded-2xl border border-slate-800">
                 <div class="flex items-center gap-3 pb-3 border-b border-slate-800/80">
                     <button onclick="showSection('profile')" class="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-600 to-pink-500 flex items-center justify-center text-white font-bold userAvatarLetter">S</button>
@@ -148,7 +153,6 @@
                 </div>
             </section>
 
-            <!-- Sample Post -->
             <article class="glass-card p-4 rounded-2xl border border-slate-800 space-y-3">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-3">
@@ -173,62 +177,49 @@
     <div id="profileSection" class="relative z-10 hidden min-h-screen pb-20">
         <div class="max-w-3xl mx-auto px-4 pt-4">
             
-            <!-- Profile Card Header -->
             <div class="glass-card rounded-3xl overflow-hidden border border-slate-800 relative shadow-2xl mb-4">
                 
-                <!-- Cover Image -->
                 <div class="h-36 sm:h-48 w-full bg-gradient-to-r from-indigo-900 via-purple-900 to-slate-900 relative">
                     <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1200&auto=format&fit=crop&q=80" class="w-full h-full object-cover opacity-60" alt="Cover">
-                    <button class="absolute top-3 left-3 px-3 py-1.5 bg-slate-950/70 hover:bg-slate-950 text-white text-[11px] font-medium rounded-xl border border-white/10 backdrop-blur-md transition-all flex items-center gap-1.5">
-                        <i class="fa-solid fa-camera"></i> تغيير الغلاف
-                    </button>
                 </div>
 
-                <!-- Avatar & Info Box -->
                 <div class="px-5 pb-5 relative">
                     <div class="flex flex-col sm:flex-row sm:items-end justify-between -mt-14 sm:-mt-16 mb-4 gap-4">
-                        <!-- Avatar -->
                         <div class="relative w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 p-[3px] shadow-2xl">
                             <div class="w-full h-full rounded-[13px] bg-slate-950 flex items-center justify-center text-3xl font-black text-white outfit-font userAvatarLetter" id="profileAvatarLetter">
                                 S
                             </div>
                         </div>
 
-                        <!-- Action Buttons -->
                         <div class="flex items-center gap-2.5">
-                            <button class="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:opacity-90 text-white text-xs font-semibold rounded-xl shadow-lg transition-all flex items-center gap-1.5">
+                            <button onclick="toggleEditModal(true)" class="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:opacity-90 text-white text-xs font-semibold rounded-xl shadow-lg transition-all flex items-center gap-1.5">
                                 <i class="fa-solid fa-pen-to-square"></i> تعديل الملف
-                            </button>
-                            <button class="px-3 py-2 bg-slate-900 border border-slate-700 text-gray-300 hover:text-white text-xs rounded-xl transition-all">
-                                <i class="fa-solid fa-share-nodes"></i>
                             </button>
                         </div>
                     </div>
 
-                    <!-- Name & Bio -->
                     <div>
-                        <h2 class="text-xl font-bold text-white flex items-center gap-2" id="profileName">
-                            مستخدم Sovexa
+                        <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                            <span id="profileName">مستخدم Sovexa</span>
                             <i class="fa-solid fa-circle-check text-indigo-400 text-sm"></i>
                         </h2>
                         <p class="text-xs text-indigo-300 font-mono mt-0.5" id="profileEmail">user@sovexa.com</p>
-                        <p class="text-xs text-gray-300 mt-2.5 leading-relaxed max-w-xl">
+                        <p class="text-xs text-gray-300 mt-2.5 leading-relaxed max-w-xl" id="profileBio">
                             مرحباً بكم في ملفي الشخصي على Sovexa! 🚀 استكشف منشوراتي وتواصل معي.
                         </p>
                     </div>
 
-                    <!-- Stats Row -->
                     <div class="grid grid-cols-3 gap-2 mt-5 py-3 px-4 bg-slate-900/60 rounded-2xl border border-slate-800 text-center">
                         <div>
-                            <span class="block font-bold text-base text-white">12</span>
+                            <span class="block font-bold text-base text-white">0</span>
                             <span class="text-[10px] text-gray-400">المنشورات</span>
                         </div>
                         <div class="border-x border-slate-800">
-                            <span class="block font-bold text-base text-white">1.2k</span>
+                            <span class="block font-bold text-base text-white">0</span>
                             <span class="text-[10px] text-gray-400">المتابعون</span>
                         </div>
                         <div>
-                            <span class="block font-bold text-base text-white">350</span>
+                            <span class="block font-bold text-base text-white">0</span>
                             <span class="text-[10px] text-gray-400">يتابع</span>
                         </div>
                     </div>
@@ -236,41 +227,51 @@
                 </div>
             </div>
 
-            <!-- Profile Tabs -->
-            <div class="flex items-center gap-2 border-b border-slate-800 mb-4 px-1">
-                <button class="pb-2.5 px-3 text-xs font-bold text-indigo-400 border-b-2 border-indigo-500">
-                    <i class="fa-solid fa-layer-group ml-1"></i> المنشورات
-                </button>
-                <button class="pb-2.5 px-3 text-xs font-semibold text-gray-400 hover:text-gray-200">
-                    <i class="fa-solid fa-image ml-1"></i> الصور
-                </button>
-                <button class="pb-2.5 px-3 text-xs font-semibold text-gray-400 hover:text-gray-200">
-                    <i class="fa-solid fa-heart ml-1"></i> الإعجابات
-                </button>
-            </div>
-
-            <!-- User Posts Container -->
-            <div class="space-y-4">
-                <article class="glass-card p-4 rounded-2xl border border-slate-800 space-y-3">
-                    <div class="flex items-center gap-3">
-                        <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-indigo-500 to-pink-500 flex items-center justify-center text-white font-bold userAvatarLetter">S</div>
-                        <div>
-                            <h4 class="font-bold text-xs text-white" id="postAuthorName">مستخدم Sovexa</h4>
-                            <p class="text-[10px] text-gray-400">منذ ساعة • <i class="fa-solid fa-globe"></i></p>
-                        </div>
-                    </div>
-                    <p class="text-xs text-gray-200">قمنا بتحديث صفحة الملف الشخصي بنجاح! ما رأيكم بالتصميم الجديد لـ Sovexa؟ 🔥💎</p>
-                </article>
-            </div>
-
         </div>
     </div>
 
 
-    <!-- ==================== FIREBASE & ROUTING LOGIC ==================== -->
+    <!-- ==================== PART 4: EDIT PROFILE MODAL ==================== -->
+    <div id="editProfileModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md hidden transition-all duration-300">
+        <div class="w-full max-w-md glass-modal p-6 rounded-3xl shadow-2xl border border-slate-700 relative">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+                <h3 class="text-base font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-user-pen text-indigo-400"></i> تعديل الملف الشخصي
+                </h3>
+                <button onclick="toggleEditModal(false)" class="text-gray-400 hover:text-white transition-colors">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <form id="editProfileForm" class="space-y-4 mt-4">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 mb-1">الاسم المعروض</label>
+                    <input type="text" id="editNameInput" required placeholder="أدخل اسمك" class="w-full bg-slate-900 border border-slate-700 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 mb-1">السيرة الذاتية (Bio)</label>
+                    <textarea id="editBioInput" rows="3" placeholder="اكتب نبذة قصيرة عنك..." class="w-full bg-slate-900 border border-slate-700 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none resize-none"></textarea>
+                </div>
+
+                <div class="flex items-center justify-end gap-2.5 pt-2">
+                    <button type="button" onclick="toggleEditModal(false)" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-gray-300 text-xs font-semibold rounded-xl transition-all">
+                        إلغاء
+                    </button>
+                    <button type="submit" id="saveProfileBtn" class="px-5 py-2 bg-gradient-to-r from-indigo-600 to-pink-600 hover:opacity-90 text-white text-xs font-bold rounded-xl shadow-lg transition-all flex items-center gap-2">
+                        <span>حفظ التغييرات</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- ==================== FIREBASE & LOGIC ==================== -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyCJm_0O6NzS0UYnoYAv5MUIp-QR9xGN18Q",
@@ -284,49 +285,109 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        const db = getFirestore(app);
 
-        // Sections Elements
-        const loginSection = document.getElementById('loginSection');
-        const mainHeader = document.getElementById('mainHeader');
-        const feedSection = document.getElementById('feedSection');
-        const profileSection = document.getElementById('profileSection');
+        let currentUser = null;
 
-        // Navigation Controller
+        // UI View Toggle
         window.showSection = (sectionName) => {
             if (sectionName === 'feed') {
-                feedSection.classList.remove('hidden');
-                profileSection.classList.add('hidden');
+                document.getElementById('feedSection').classList.remove('hidden');
+                document.getElementById('profileSection').classList.add('hidden');
             } else if (sectionName === 'profile') {
-                profileSection.classList.remove('hidden');
-                feedSection.classList.add('hidden');
+                document.getElementById('profileSection').classList.remove('hidden');
+                document.getElementById('feedSection').classList.add('hidden');
             }
         };
 
-        // Check Auth State
-        onAuthStateChanged(auth, (user) => {
+        // Modal Controller
+        window.toggleEditModal = (show) => {
+            const modal = document.getElementById('editProfileModal');
+            if (show) {
+                modal.classList.remove('hidden');
+                document.getElementById('editNameInput').value = document.getElementById('profileName').innerText;
+                document.getElementById('editBioInput').value = document.getElementById('profileBio').innerText;
+            } else {
+                modal.classList.add('hidden');
+            }
+        };
+
+        // Check Auth & Fetch Data
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
-                loginSection.classList.add('hidden');
-                mainHeader.classList.remove('hidden');
-                feedSection.classList.remove('hidden');
+                currentUser = user;
+                document.getElementById('loginSection').classList.add('hidden');
+                document.getElementById('mainHeader').classList.remove('hidden');
+                document.getElementById('feedSection').classList.remove('hidden');
 
-                // Update UI User Data
-                const displayName = user.displayName || user.email.split('@')[0];
-                const letter = displayName.charAt(0).toUpperCase();
+                const emailPrefix = user.email ? user.email.split('@')[0] : 'user';
+                document.getElementById('profileEmail').innerText = '@' + emailPrefix;
 
-                document.querySelectorAll('.userAvatarLetter').forEach(el => el.innerText = letter);
-                document.getElementById('profileName').childNodes[0].nodeValue = displayName + ' ';
-                document.getElementById('profileEmail').innerText = '@' + user.email.split('@')[0];
-                document.getElementById('postAuthorName').innerText = displayName;
+                // Load User Data from Firestore
+                const userDocRef = doc(db, "users", user.uid);
+                const userDocSnap = await getDoc(userDocRef);
+
+                let displayName = user.displayName || emailPrefix;
+                let bio = "مرحباً بكم في ملفي الشخصي على Sovexa! 🚀";
+
+                if (userDocSnap.exists()) {
+                    const data = userDocSnap.data();
+                    if (data.displayName) displayName = data.displayName;
+                    if (data.bio) bio = data.bio;
+                }
+
+                updateProfileUI(displayName, bio);
 
             } else {
-                loginSection.classList.remove('hidden');
-                mainHeader.classList.add('hidden');
-                feedSection.classList.add('hidden');
-                profileSection.classList.add('hidden');
+                currentUser = null;
+                document.getElementById('loginSection').classList.remove('hidden');
+                document.getElementById('mainHeader').classList.add('hidden');
+                document.getElementById('feedSection').classList.add('hidden');
+                document.getElementById('profileSection').classList.add('hidden');
             }
         });
 
-        // Email Auth Form
+        function updateProfileUI(name, bio) {
+            const letter = name.charAt(0).toUpperCase();
+            document.querySelectorAll('.userAvatarLetter').forEach(el => el.innerText = letter);
+            document.getElementById('profileName').innerText = name;
+            document.getElementById('profileBio').innerText = bio;
+        }
+
+        // Save Profile Changes
+        document.getElementById('editProfileForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!currentUser) return;
+
+            const newName = document.getElementById('editNameInput').value;
+            const newBio = document.getElementById('editBioInput').value;
+            const saveBtn = document.getElementById('saveProfileBtn');
+
+            saveBtn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> جاري الحفظ...';
+
+            try {
+                // Update Firebase Auth Profile
+                await updateProfile(currentUser, { displayName: newName });
+
+                // Save to Firestore Database
+                await setDoc(doc(db, "users", currentUser.uid), {
+                    displayName: newName,
+                    bio: newBio,
+                    email: currentUser.email,
+                    updatedAt: new Date()
+                }, { merge: true });
+
+                updateProfileUI(newName, newBio);
+                toggleEditModal(false);
+                alert("تم تحديث معلومات الملف الشخصي بنجاح! 🎉");
+            } catch (error) {
+                alert("حدث خطأ أثناء الحفظ: " + error.message);
+            } finally {
+                saveBtn.innerHTML = '<span>حفظ التغييرات</span>';
+            }
+        });
+
+        // Email Auth
         document.getElementById('emailForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('emailInput').value;
@@ -353,7 +414,7 @@
             try {
                 await signInWithPopup(auth, provider);
             } catch (error) {
-                alert('فشل الدخول بحساب Google: ' + error.message);
+                alert('فشل الدخول: ' + error.message);
             }
         });
 
@@ -363,8 +424,7 @@
         };
     </script>
 
-
-    <!-- Background Canvas Animation -->
+    <!-- Canvas Animation -->
     <script>
         const canvas = document.getElementById('bgCanvas');
         const ctx = canvas.getContext('2d');
