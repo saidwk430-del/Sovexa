@@ -402,12 +402,12 @@
 
 
     <!-- ============================================== -->
-    <!-- FIREBASE & IMGBB IMAGE UPLOAD INTEGRATION -->
+    <!-- FIREBASE & IMGBB FULL LOGIC WITH FIRESTORE LIKES/COMMENTS -->
     <!-- ============================================== -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, getDocs, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, deleteDoc, updateDoc, increment, collection, getDocs, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyCJm_0O6NzS0UYnoYAv5MUIp-QR9xGN18Q",
@@ -483,13 +483,11 @@
             try {
                 let mediaUrl = null;
 
-                // 1. Upload to ImgBB if image selected
                 if (selectedImageFile) {
                     showToast("جاري رفع الصورة إلى Sovexa Cloud... ☁️");
                     mediaUrl = await window.uploadImageToImgBB(selectedImageFile);
                 }
 
-                // 2. Save Post Document to Firestore
                 const userName = currentUser ? (currentUser.displayName || currentUser.email.split('@')[0]) : 'مستخدم Sovexa';
                 await addDoc(collection(db, "posts"), {
                     userId: currentUser ? currentUser.uid : "anonymous",
@@ -514,7 +512,7 @@
             }
         };
 
-        // Realtime Posts Listener & Glassmorphism Rendering
+        // Realtime Posts & Interactions Listener
         function listenToRealtimePosts() {
             const postsQuery = query(collection(db, "posts"), orderBy("createdAt", "desc"));
             onSnapshot(postsQuery, (snapshot) => {
@@ -561,8 +559,8 @@
                         ${mediaHTML}
 
                         <div class="flex items-center justify-between pt-2 border-t border-slate-800/80 text-xs">
-                            <button onclick="toggleLike(this)" class="flex items-center gap-2 text-gray-400 hover:text-pink-500 transition-all font-semibold py-1 px-3 rounded-lg hover:bg-slate-900">
-                                <i class="fa-regular fa-heart text-sm"></i>
+                            <button id="likeBtn-${postId}" onclick="toggleLike('${postId}')" class="flex items-center gap-2 text-gray-400 hover:text-pink-500 transition-all font-semibold py-1 px-3 rounded-lg hover:bg-slate-900">
+                                <i class="fa-regular fa-heart text-sm" id="likeIcon-${postId}"></i>
                                 <span>إعجاب</span>
                                 <span class="like-count bg-slate-800 text-[10px] px-1.5 py-0.5 rounded-full text-white">${post.likesCount || 0}</span>
                             </button>
@@ -570,7 +568,7 @@
                             <button onclick="toggleComments('comments-${postId}')" class="flex items-center gap-2 text-gray-400 hover:text-indigo-400 transition-all font-semibold py-1 px-3 rounded-lg hover:bg-slate-900">
                                 <i class="fa-regular fa-comment text-sm"></i>
                                 <span>التعليقات</span>
-                                <span class="bg-slate-800 text-[10px] px-1.5 py-0.5 rounded-full text-white comment-count">0</span>
+                                <span class="bg-slate-800 text-[10px] px-1.5 py-0.5 rounded-full text-white comment-count" id="commentCount-${postId}">0</span>
                             </button>
 
                             <button onclick="showToast('تم نسخ رابط المنشور للمشاركة! 🚀')" class="flex items-center gap-2 text-gray-400 hover:text-emerald-400 transition-all font-semibold py-1 px-3 rounded-lg hover:bg-slate-900">
@@ -580,17 +578,129 @@
                         </div>
 
                         <div id="comments-${postId}" class="hidden pt-3 border-t border-slate-800/50 space-y-3">
-                            <div class="space-y-2 max-h-48 overflow-y-auto comments-list"></div>
-                            <form onsubmit="addComment(event, 'comments-${postId}')" class="flex items-center gap-2 pt-1">
+                            <div class="space-y-2 max-h-48 overflow-y-auto comments-list" id="commentsList-${postId}"></div>
+                            <form onsubmit="addComment(event, '${postId}')" class="flex items-center gap-2 pt-1">
                                 <input type="text" placeholder="اكتب تعليقاً..." required class="flex-1 bg-slate-900 border border-slate-700 focus:border-indigo-500 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none">
                                 <button type="submit" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl transition-all">إرسال</button>
                             </form>
                         </div>
                     `;
                     postsContainer.appendChild(postCard);
+
+                    // Listen to Like status for current user
+                    checkUserLikeStatus(postId);
+                    // Listen to Comments sub-collection live
+                    listenToPostComments(postId);
                 });
             });
         }
+
+        // Realtime Like Status Check
+        async function checkUserLikeStatus(postId) {
+            if (!currentUser) return;
+            const likeRef = doc(db, "posts", postId, "likes", currentUser.uid);
+            onSnapshot(likeRef, (docSnap) => {
+                const likeBtn = document.getElementById(`likeBtn-${postId}`);
+                const likeIcon = document.getElementById(`likeIcon-${postId}`);
+                if (docSnap.exists() && likeBtn && likeIcon) {
+                    likeIcon.className = 'fa-solid fa-heart text-pink-500 text-sm';
+                    likeBtn.classList.add('text-pink-500');
+                } else if (likeBtn && likeIcon) {
+                    likeIcon.className = 'fa-regular fa-heart text-sm';
+                    likeBtn.classList.remove('text-pink-500');
+                }
+            });
+        }
+
+        // Realtime Comments Listener for each post
+        function listenToPostComments(postId) {
+            const commentsQuery = query(collection(db, "posts", postId, "comments"), orderBy("createdAt", "asc"));
+            onSnapshot(commentsQuery, (snapshot) => {
+                const commentsList = document.getElementById(`commentsList-${postId}`);
+                const countBadge = document.getElementById(`commentCount-${postId}`);
+                if (!commentsList) return;
+
+                commentsList.innerHTML = '';
+                if (countBadge) countBadge.innerText = snapshot.size;
+
+                snapshot.forEach((docSnap) => {
+                    const c = docSnap.data();
+                    const letter = (c.userName || 'U').charAt(0).toUpperCase();
+                    const item = document.createElement('div');
+                    item.className = 'flex items-start gap-2.5 bg-slate-900/60 p-2.5 rounded-xl border border-slate-800';
+                    item.innerHTML = `
+                        <div class="w-7 h-7 rounded-full bg-gradient-to-tr from-indigo-500 to-pink-500 flex items-center justify-center text-white text-[10px] font-bold">${letter}</div>
+                        <div>
+                            <h5 class="text-[11px] font-bold text-white">${c.userName || 'مستخدم Sovexa'}</h5>
+                            <p class="text-[11px] text-gray-300">${c.text}</p>
+                        </div>
+                    `;
+                    commentsList.appendChild(item);
+                });
+            });
+        }
+
+        // Toggle Firestore Likes Function
+        window.toggleLike = async (postId) => {
+            if (!currentUser) {
+                showToast("يرجى تسجيل الدخول أولاً للإعجاب بالمنشورات!");
+                return;
+            }
+
+            const postRef = doc(db, "posts", postId);
+            const likeRef = doc(db, "posts", postId, "likes", currentUser.uid);
+
+            try {
+                const likeDoc = await getDoc(likeRef);
+
+                if (likeDoc.exists()) {
+                    await deleteDoc(likeRef);
+                    await updateDoc(postRef, { likesCount: increment(-1) });
+                    showToast("تم إلغاء الإعجاب.");
+                } else {
+                    await setDoc(likeRef, {
+                        userId: currentUser.uid,
+                        userName: currentUser.displayName || currentUser.email.split('@')[0],
+                        createdAt: serverTimestamp()
+                    });
+                    await updateDoc(postRef, { likesCount: increment(1) });
+                    showToast("أبديت إعجابك بالمنشور! ❤️");
+                }
+            } catch (error) {
+                console.error("خطأ في الإعجاب:", error);
+            }
+        };
+
+        // Add Firestore Comment Function
+        window.addComment = async (e, postId) => {
+            e.preventDefault();
+            if (!currentUser) {
+                showToast("يرجى تسجيل الدخول أولاً للتعليق!");
+                return;
+            }
+
+            const form = e.target;
+            const input = form.querySelector('input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const userName = currentUser.displayName || currentUser.email.split('@')[0];
+
+            try {
+                await addDoc(collection(db, "posts", postId, "comments"), {
+                    userId: currentUser.uid,
+                    userName: userName,
+                    text: text,
+                    createdAt: serverTimestamp()
+                });
+
+                input.value = '';
+                showToast("تمت إضافة تعليقك بنجاح! 💬");
+            } catch (error) {
+                console.error("خطأ في إضافة التعليق:", error);
+                alert("حدث خطأ أثناء إضافة التعليق.");
+            }
+        };
 
         // Toggle Notifications Box
         window.toggleNotifications = () => {
@@ -675,57 +785,10 @@
             showToast("تم تسجيل الخروج، يمكنك تسجيل الدخول بحساب جديد!");
         };
 
-        // Interactive Like Toggle
-        window.toggleLike = (btn) => {
-            const icon = btn.querySelector('i');
-            const countSpan = btn.querySelector('.like-count');
-            let count = parseInt(countSpan.innerText);
-
-            if (icon.classList.contains('fa-regular')) {
-                icon.className = 'fa-solid fa-heart text-pink-500 text-sm animate-bounce';
-                btn.classList.add('text-pink-500');
-                countSpan.innerText = count + 1;
-                showToast("أبديت إعجابك بالمنشور! ❤️");
-            } else {
-                icon.className = 'fa-regular fa-heart text-sm';
-                btn.classList.remove('text-pink-500');
-                countSpan.innerText = count - 1;
-            }
-        };
-
         // Comments Toggle
         window.toggleComments = (id) => {
             const box = document.getElementById(id);
             box.classList.toggle('hidden');
-        };
-
-        // Add Comment
-        window.addComment = (e, containerId) => {
-            e.preventDefault();
-            const form = e.target;
-            const input = form.querySelector('input');
-            const text = input.value.trim();
-            if (!text) return;
-
-            const name = currentUser ? (currentUser.displayName || currentUser.email.split('@')[0]) : 'مستخدم Sovexa';
-            const letter = name.charAt(0).toUpperCase();
-
-            const commentsList = document.querySelector(`#${containerId} .comments-list`);
-            const newComment = document.createElement('div');
-            newComment.className = 'flex items-start gap-2.5 bg-slate-900/60 p-2.5 rounded-xl border border-slate-800';
-            newComment.innerHTML = `
-                <div class="w-7 h-7 rounded-full bg-gradient-to-tr from-indigo-500 to-pink-500 flex items-center justify-center text-white text-[10px] font-bold">${letter}</div>
-                <div>
-                    <h5 class="text-[11px] font-bold text-white">${name}</h5>
-                    <p class="text-[11px] text-gray-300">${text}</p>
-                </div>
-            `;
-            commentsList.appendChild(newComment);
-            input.value = '';
-
-            const countSpan = form.closest('article').querySelector('.comment-count');
-            countSpan.innerText = parseInt(countSpan.innerText) + 1;
-            showToast("تم إضافة تعليقك بنجاح! 💬");
         };
 
         // Navigation
@@ -808,7 +871,7 @@
 
                 updateProfileUI(displayName, bio);
                 loadUsersForSearch();
-                listenToRealtimePosts(); // Start listening to posts
+                listenToRealtimePosts();
             } else {
                 currentUser = null;
                 document.getElementById('loginSection').classList.remove('hidden');
@@ -821,71 +884,4 @@
 
         function updateProfileUI(name, bio) {
             const letter = name.charAt(0).toUpperCase();
-            document.querySelectorAll('.userAvatarLetter').forEach(el => el.innerText = letter);
-            document.getElementById('profileName').innerText = name;
-            document.getElementById('menuUserName').innerText = name;
-            document.getElementById('profileBio').innerText = bio;
-        }
-
-        document.getElementById('editProfileForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if (!currentUser) return;
-
-            const newName = document.getElementById('editNameInput').value;
-            const newBio = document.getElementById('editBioInput').value;
-            const saveBtn = document.getElementById('saveProfileBtn');
-
-            saveBtn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> جاري الحفظ...';
-
-            try {
-                await updateProfile(currentUser, { displayName: newName });
-                await setDoc(doc(db, "users", currentUser.uid), {
-                    displayName: newName,
-                    bio: newBio,
-                    email: currentUser.email,
-                    updatedAt: new Date()
-                }, { merge: true });
-
-                updateProfileUI(newName, newBio);
-                toggleEditModal(false);
-                showToast("تم تحديث معلومات الملف الشخصي بنجاح! 🎉");
-            } catch (error) {
-                alert("حدث خطأ أثناء الحفظ: " + error.message);
-            } finally {
-                saveBtn.innerHTML = '<span>حفظ التغييرات</span>';
-            }
-        });
-
-        // Email Auth
-        document.getElementById('emailForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('emailInput').value;
-            const password = document.getElementById('passwordInput').value;
-
-            try {
-                await signInWithEmailAndPassword(auth, email, password);
-            } catch (error) {
-                if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
-                    try {
-                        await createUserWithEmailAndPassword(auth, email, password);
-                    } catch (signUpError) {
-                        alert('خطأ: ' + signUpError.message);
-                    }
-                } else {
-                    alert('خطأ: ' + error.message);
-                }
-            }
-        });
-
-        // Google Auth
-        const provider = new GoogleAuthProvider();
-        document.getElementById('googleLoginBtn').addEventListener('click', async () => {
-            try {
-                await signInWithPopup(auth, provider);
-            } catch (error) {
-                alert('فشل الدخول: ' + error.message);
-            }
-        });
-
-        // Logout
-        window.logo
+            document.querySelectorAll('.userAvatarLetter').forEach(el => el.innerText 
