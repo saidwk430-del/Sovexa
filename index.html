@@ -261,7 +261,7 @@
     </div>
 
 
-    <!-- ==================== PART 3: CHAT VIEW ==================== -->
+    <!-- ==================== PART 3: CHAT VIEW WITH IMAGE UPLOAD ==================== -->
     <div id="chatSection" class="relative z-10 hidden min-h-[calc(100vh-80px)] pb-10">
         <div class="max-w-4xl mx-auto px-4 pt-4">
             <div class="glass-card rounded-3xl border border-slate-800 overflow-hidden grid grid-cols-1 md:grid-cols-3 h-[75vh]">
@@ -298,9 +298,24 @@
                         <div class="text-center text-gray-400 text-xs py-4">جاري تحميل الرسائل...</div>
                     </div>
 
+                    <!-- Chat Image Preview Bar inside form if selected -->
+                    <div id="chatImagePreviewContainer" class="hidden px-4 py-2 bg-slate-950/80 border-t border-slate-800 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <img id="chatImagePreview" src="" class="w-10 h-10 object-cover rounded-lg border border-slate-700" alt="معاينة الشات">
+                            <span class="text-[11px] text-purple-300">تم اختيار صورة للإرسال</span>
+                        </div>
+                        <button type="button" onclick="removeChatSelectedImage()" class="w-6 h-6 rounded-full bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white flex items-center justify-center text-xs transition-all">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+
                     <form id="chatForm" class="p-3 border-t border-slate-800 flex items-center gap-2 bg-slate-950/60">
-                        <input type="text" id="chatInput" placeholder="اكتب رسالتك العامة..." required class="flex-1 bg-slate-900 border border-slate-700 focus:border-purple-500 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none">
-                        <button type="submit" class="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:opacity-90 text-white text-xs font-bold rounded-xl transition-all flex items-center gap-1">
+                        <input type="file" id="chatFileInput" accept="image/*" class="hidden" onchange="handleChatImageSelection(event)">
+                        <button type="button" onclick="document.getElementById('chatFileInput').click()" class="w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 text-purple-400 flex items-center justify-center text-xs transition-all border border-slate-700">
+                            <i class="fa-solid fa-image"></i>
+                        </button>
+                        <input type="text" id="chatInput" placeholder="اكتب رسالتك العامة..." class="flex-1 bg-slate-900 border border-slate-700 focus:border-purple-500 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none">
+                        <button type="submit" id="chatSubmitBtn" class="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:opacity-90 text-white text-xs font-bold rounded-xl transition-all flex items-center gap-1">
                             <i class="fa-solid fa-paper-plane"></i>
                         </button>
                     </form>
@@ -429,7 +444,7 @@
 
 
     <!-- ============================================== -->
-    <!-- FIREBASE & DELETE POST REALTIME LOGIC -->
+    <!-- FIREBASE & CHAT IMAGE SHARING LOGIC -->
     <!-- ============================================== -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -456,6 +471,7 @@
         let selectedImageFile = null;
         let selectedAvatarFile = null;
         let selectedCoverFile = null;
+        let selectedChatImageFile = null;
 
         // Toast Notification Function
         window.showToast = (msg) => {
@@ -512,6 +528,27 @@
             document.getElementById('imagePreview').src = '';
         };
 
+        // Chat Image Selection & Preview
+        window.handleChatImageSelection = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                selectedChatImageFile = file;
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    document.getElementById('chatImagePreview').src = event.target.result;
+                    document.getElementById('chatImagePreviewContainer').classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+
+        window.removeChatSelectedImage = () => {
+            selectedChatImageFile = null;
+            document.getElementById('chatFileInput').value = '';
+            document.getElementById('chatImagePreviewContainer').classList.add('hidden');
+            document.getElementById('chatImagePreview').src = '';
+        };
+
         // Create Post
         window.createNewPost = async () => {
             const textInput = document.getElementById('postInput');
@@ -561,7 +598,7 @@
             }
         };
 
-        // Delete Post Function
+        // Delete Post
         window.deletePost = async (postId) => {
             if (!confirm("هل أنت تأكد من أنك تريد حذف هذا المنشور؟")) return;
 
@@ -776,7 +813,7 @@
             }
         };
 
-        // CHAT REALTIME LOGIC
+        // CHAT REALTIME & IMAGE SHARING LOGIC
         function listenToRealtimeChat() {
             const chatQuery = query(collection(db, "global_chat"), orderBy("createdAt", "asc"));
             onSnapshot(chatQuery, (snapshot) => {
@@ -792,77 +829,14 @@
                     const msg = docSnap.data();
                     const isMe = currentUser && msg.userId === currentUser.uid;
 
+                    const msgImageHTML = msg.mediaUrl ? `
+                        <div class="mt-2 rounded-xl overflow-hidden border border-white/10">
+                            <img src="${msg.mediaUrl}" class="max-w-full max-h-60 object-cover" alt="Chat Image">
+                        </div>
+                    ` : '';
+
                     const msgDiv = document.createElement('div');
                     msgDiv.className = `flex ${isMe ? 'justify-end' : 'justify-start'}`;
 
                     msgDiv.innerHTML = `
-                        <div class="max-w-[80%] p-3 rounded-2xl ${isMe ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-tl-none' : 'bg-slate-800 text-gray-200 rounded-tr-none'} text-xs leading-relaxed border border-white/5 shadow-md">
-                            <div class="text-[10px] font-bold ${isMe ? 'text-purple-200' : 'text-indigo-400'} mb-1">${msg.userName || 'مستخدم'}</div>
-                            <p>${msg.text}</p>
-                        </div>
-                    `;
-                    chatMessages.appendChild(msgDiv);
-                });
-
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            });
-        }
-
-        document.getElementById('chatForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if (!currentUser) {
-                showToast("يرجى تسجيل الدخول لإرسال الرسائل!");
-                return;
-            }
-
-            const input = document.getElementById('chatInput');
-            const text = input.value.trim();
-            if (!text) return;
-
-            const userName = currentUser.displayName || currentUser.email.split('@')[0];
-
-            try {
-                await addDoc(collection(db, "global_chat"), {
-                    userId: currentUser.uid,
-                    userName: userName,
-                    text: text,
-                    createdAt: serverTimestamp()
-                });
-                input.value = '';
-            } catch (err) {
-                console.error("Chat Error:", err);
-            }
-        });
-
-        // Notifications Box
-        window.toggleNotifications = () => {
-            const dropdown = document.getElementById('notifDropdown');
-            dropdown.classList.toggle('hidden');
-        };
-
-        window.clearNotifBadge = () => {
-            const badge = document.getElementById('notifBadge');
-            if (badge) badge.classList.add('hidden');
-            showToast('تم تحديث جميع الإشعارات كمقروءة.');
-        };
-
-        // Live Search
-        window.handleSearch = (queryVal) => {
-            const resultsBox = document.getElementById('searchResults');
-            const cleanQuery = queryVal.trim().toLowerCase();
-
-            if (!cleanQuery) {
-                resultsBox.classList.add('hidden');
-                resultsBox.innerHTML = '';
-                return;
-            }
-
-            const filtered = allUsers.filter(u => 
-                (u.displayName && u.displayName.toLowerCase().includes(cleanQuery)) ||
-                (u.email && u.email.toLowerCase().includes(cleanQuery))
-            );
-
-            if (filtered.length === 0) {
-                resultsBox.innerHTML = '<p class="text-[11px] text-gray-400 p-2 text-center">لا توجد نتائج مطابقة</p>';
-            } else {
-                resul
+                        <div class="max-w-[80%] p-3 rounded-2xl ${isMe ? 
