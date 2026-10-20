@@ -43,8 +43,6 @@
 
     <!-- ==================== PART 1: LOGIN VIEW ==================== -->
     <div id="loginSection" class="relative z-10 flex flex-col justify-between items-center min-h-screen p-4">
-        
-        <!-- Top Bar -->
         <header class="w-full p-4 flex justify-between items-center max-w-7xl mx-auto">
             <div class="flex items-center gap-2">
                 <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
@@ -52,9 +50,7 @@
             </div>
         </header>
 
-        <!-- Center Login Box -->
         <main class="flex flex-col items-center justify-center my-auto w-full max-w-md">
-            <!-- Logo -->
             <div class="mb-5 flex flex-col items-center">
                 <div class="w-24 h-24 rounded-3xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 p-[2px] shadow-2xl shadow-indigo-500/50">
                     <div class="w-full h-full rounded-[22px] bg-slate-950/80 backdrop-blur-xl flex items-center justify-center border border-white/20">
@@ -63,14 +59,12 @@
                 </div>
             </div>
 
-            <!-- Form Card -->
             <div class="w-full glass-card p-6 rounded-3xl shadow-2xl">
                 <div class="text-center mb-5">
                     <h2 class="text-xl font-bold text-white mb-1">مرحباً بك في Sovexa</h2>
                     <p class="text-xs text-gray-300">سجل الدخول للمتابعة إلى المنصة</p>
                 </div>
 
-                <!-- Google Login -->
                 <button id="googleLoginBtn" class="w-full py-2.5 px-4 bg-slate-900/90 hover:bg-slate-800 border border-gray-700 text-white font-medium text-xs rounded-xl transition-all flex items-center justify-center gap-3 shadow-md mb-4">
                     <svg class="w-4 h-4" viewBox="0 0 24 24">
                         <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.7 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.2 9 5 12 5z"/>
@@ -87,7 +81,6 @@
                     <div class="flex-grow border-t border-gray-700/80"></div>
                 </div>
 
-                <!-- Email Form -->
                 <form id="emailForm" class="space-y-3">
                     <div>
                         <label class="block text-[11px] font-semibold text-gray-300 mb-1">البريد الإلكتروني</label>
@@ -104,47 +97,49 @@
             </div>
         </main>
 
-        <footer class="w-py pb-6 text-center">
+        <footer class="w-full pb-6 text-center">
             <h1 class="outfit-font font-black text-2xl tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-white via-indigo-200 to-pink-300 uppercase">Sovexa</h1>
         </footer>
     </div>
 
 
-    <!-- ==================== PART 2: MAIN FEED VIEW (Hidden Initially) ==================== -->
-    <div id="feedSection" class="relative z-10 hidden min-h-screen pb-20">
-        
-        <!-- Top Navigation Bar -->
-        <header class="sticky top-0 z-50 w-full glass-nav px-4 py-2.5">
-            <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
-                <div class="flex items-center gap-3">
-                    <a href="#" class="flex items-center gap-2">
-                        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 p-[1.5px] shadow-lg">
-                            <div class="w-full h-full rounded-[10px] bg-slate-950 flex items-center justify-center">
-                                <span class="outfit-font font-black text-xl text-transparent bg-clip-text bg-gradient-to-tr from-indigo-400 to-pink-400">S</span>
-                            </div>
+    <!-- ==================== MAIN NAVBAR (For Feed & Profile) ==================== -->
+    <header id="mainHeader" class="sticky top-0 z-50 w-full glass-nav px-4 py-2.5 hidden">
+        <div class="max-w-4xl mx-auto flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <button onclick="showSection('feed')" class="flex items-center gap-2 focus:outline-none">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 p-[1.5px] shadow-lg">
+                        <div class="w-full h-full rounded-[10px] bg-slate-950 flex items-center justify-center">
+                            <span class="outfit-font font-black text-xl text-transparent bg-clip-text bg-gradient-to-tr from-indigo-400 to-pink-400">S</span>
                         </div>
-                        <span class="outfit-font font-black text-2xl tracking-wider text-white hidden sm:block glow-text">Sovexa</span>
-                    </a>
-                </div>
-
-                <div class="flex items-center gap-2.5">
-                    <button class="w-9 h-9 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-gray-300">
-                        <i class="fa-solid fa-bell text-xs"></i>
-                    </button>
-                    <button onclick="logout()" class="px-3 py-1.5 rounded-xl bg-red-500/20 text-red-400 text-xs font-semibold hover:bg-red-500/30 transition-colors">
-                        <i class="fa-solid fa-right-from-bracket ml-1"></i> خروج
-                    </button>
-                </div>
+                    </div>
+                    <span class="outfit-font font-black text-2xl tracking-wider text-white hidden sm:block glow-text">Sovexa</span>
+                </button>
             </div>
-        </header>
 
-        <!-- Main Content Feed Layout -->
+            <div class="flex items-center gap-2">
+                <button onclick="showSection('feed')" class="px-3.5 py-1.5 rounded-xl bg-slate-900/80 border border-slate-800 text-gray-300 hover:text-white text-xs font-semibold transition-all">
+                    <i class="fa-solid fa-house ml-1"></i> الرئيسية
+                </button>
+                <button onclick="showSection('profile')" class="px-3.5 py-1.5 rounded-xl bg-indigo-600/30 border border-indigo-500/40 text-indigo-300 hover:text-white text-xs font-semibold transition-all">
+                    <i class="fa-solid fa-user ml-1"></i> ملفي
+                </button>
+                <button onclick="logout()" class="px-3 py-1.5 rounded-xl bg-red-500/20 text-red-400 text-xs font-semibold hover:bg-red-500/30 transition-colors">
+                    <i class="fa-solid fa-right-from-bracket ml-1"></i> خروج
+                </button>
+            </div>
+        </div>
+    </header>
+
+
+    <!-- ==================== PART 2: MAIN FEED VIEW ==================== -->
+    <div id="feedSection" class="relative z-10 hidden min-h-screen pb-20">
         <div class="max-w-3xl mx-auto px-4 pt-4 space-y-4">
             
             <!-- Create Post Box -->
             <section class="glass-card p-4 rounded-2xl border border-slate-800">
                 <div class="flex items-center gap-3 pb-3 border-b border-slate-800/80">
-                    <div class="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white font-bold" id="userAvatarLetter">S</div>
+                    <button onclick="showSection('profile')" class="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-600 to-pink-500 flex items-center justify-center text-white font-bold userAvatarLetter">S</button>
                     <input type="text" placeholder="بماذا تفكر اليوم؟" class="w-full bg-slate-900/80 border border-slate-800 rounded-full px-4 py-2.5 text-xs text-white focus:outline-none">
                 </div>
                 <div class="flex items-center justify-between pt-3 text-xs">
@@ -174,7 +169,105 @@
     </div>
 
 
-    <!-- ==================== FIREBASE & AUTH LOGIC ==================== -->
+    <!-- ==================== PART 3: PROFILE VIEW ==================== -->
+    <div id="profileSection" class="relative z-10 hidden min-h-screen pb-20">
+        <div class="max-w-3xl mx-auto px-4 pt-4">
+            
+            <!-- Profile Card Header -->
+            <div class="glass-card rounded-3xl overflow-hidden border border-slate-800 relative shadow-2xl mb-4">
+                
+                <!-- Cover Image -->
+                <div class="h-36 sm:h-48 w-full bg-gradient-to-r from-indigo-900 via-purple-900 to-slate-900 relative">
+                    <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1200&auto=format&fit=crop&q=80" class="w-full h-full object-cover opacity-60" alt="Cover">
+                    <button class="absolute top-3 left-3 px-3 py-1.5 bg-slate-950/70 hover:bg-slate-950 text-white text-[11px] font-medium rounded-xl border border-white/10 backdrop-blur-md transition-all flex items-center gap-1.5">
+                        <i class="fa-solid fa-camera"></i> تغيير الغلاف
+                    </button>
+                </div>
+
+                <!-- Avatar & Info Box -->
+                <div class="px-5 pb-5 relative">
+                    <div class="flex flex-col sm:flex-row sm:items-end justify-between -mt-14 sm:-mt-16 mb-4 gap-4">
+                        <!-- Avatar -->
+                        <div class="relative w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 p-[3px] shadow-2xl">
+                            <div class="w-full h-full rounded-[13px] bg-slate-950 flex items-center justify-center text-3xl font-black text-white outfit-font userAvatarLetter" id="profileAvatarLetter">
+                                S
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="flex items-center gap-2.5">
+                            <button class="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:opacity-90 text-white text-xs font-semibold rounded-xl shadow-lg transition-all flex items-center gap-1.5">
+                                <i class="fa-solid fa-pen-to-square"></i> تعديل الملف
+                            </button>
+                            <button class="px-3 py-2 bg-slate-900 border border-slate-700 text-gray-300 hover:text-white text-xs rounded-xl transition-all">
+                                <i class="fa-solid fa-share-nodes"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Name & Bio -->
+                    <div>
+                        <h2 class="text-xl font-bold text-white flex items-center gap-2" id="profileName">
+                            مستخدم Sovexa
+                            <i class="fa-solid fa-circle-check text-indigo-400 text-sm"></i>
+                        </h2>
+                        <p class="text-xs text-indigo-300 font-mono mt-0.5" id="profileEmail">user@sovexa.com</p>
+                        <p class="text-xs text-gray-300 mt-2.5 leading-relaxed max-w-xl">
+                            مرحباً بكم في ملفي الشخصي على Sovexa! 🚀 استكشف منشوراتي وتواصل معي.
+                        </p>
+                    </div>
+
+                    <!-- Stats Row -->
+                    <div class="grid grid-cols-3 gap-2 mt-5 py-3 px-4 bg-slate-900/60 rounded-2xl border border-slate-800 text-center">
+                        <div>
+                            <span class="block font-bold text-base text-white">12</span>
+                            <span class="text-[10px] text-gray-400">المنشورات</span>
+                        </div>
+                        <div class="border-x border-slate-800">
+                            <span class="block font-bold text-base text-white">1.2k</span>
+                            <span class="text-[10px] text-gray-400">المتابعون</span>
+                        </div>
+                        <div>
+                            <span class="block font-bold text-base text-white">350</span>
+                            <span class="text-[10px] text-gray-400">يتابع</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Profile Tabs -->
+            <div class="flex items-center gap-2 border-b border-slate-800 mb-4 px-1">
+                <button class="pb-2.5 px-3 text-xs font-bold text-indigo-400 border-b-2 border-indigo-500">
+                    <i class="fa-solid fa-layer-group ml-1"></i> المنشورات
+                </button>
+                <button class="pb-2.5 px-3 text-xs font-semibold text-gray-400 hover:text-gray-200">
+                    <i class="fa-solid fa-image ml-1"></i> الصور
+                </button>
+                <button class="pb-2.5 px-3 text-xs font-semibold text-gray-400 hover:text-gray-200">
+                    <i class="fa-solid fa-heart ml-1"></i> الإعجابات
+                </button>
+            </div>
+
+            <!-- User Posts Container -->
+            <div class="space-y-4">
+                <article class="glass-card p-4 rounded-2xl border border-slate-800 space-y-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-indigo-500 to-pink-500 flex items-center justify-center text-white font-bold userAvatarLetter">S</div>
+                        <div>
+                            <h4 class="font-bold text-xs text-white" id="postAuthorName">مستخدم Sovexa</h4>
+                            <p class="text-[10px] text-gray-400">منذ ساعة • <i class="fa-solid fa-globe"></i></p>
+                        </div>
+                    </div>
+                    <p class="text-xs text-gray-200">قمنا بتحديث صفحة الملف الشخصي بنجاح! ما رأيكم بالتصميم الجديد لـ Sovexa؟ 🔥💎</p>
+                </article>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- ==================== FIREBASE & ROUTING LOGIC ==================== -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -192,24 +285,48 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
+        // Sections Elements
         const loginSection = document.getElementById('loginSection');
+        const mainHeader = document.getElementById('mainHeader');
         const feedSection = document.getElementById('feedSection');
+        const profileSection = document.getElementById('profileSection');
 
-        // Check Auth State (Auto Login Transition)
+        // Navigation Controller
+        window.showSection = (sectionName) => {
+            if (sectionName === 'feed') {
+                feedSection.classList.remove('hidden');
+                profileSection.classList.add('hidden');
+            } else if (sectionName === 'profile') {
+                profileSection.classList.remove('hidden');
+                feedSection.classList.add('hidden');
+            }
+        };
+
+        // Check Auth State
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 loginSection.classList.add('hidden');
+                mainHeader.classList.remove('hidden');
                 feedSection.classList.remove('hidden');
-                if(user.email) {
-                    document.getElementById('userAvatarLetter').innerText = user.email.charAt(0).toUpperCase();
-                }
+
+                // Update UI User Data
+                const displayName = user.displayName || user.email.split('@')[0];
+                const letter = displayName.charAt(0).toUpperCase();
+
+                document.querySelectorAll('.userAvatarLetter').forEach(el => el.innerText = letter);
+                document.getElementById('profileName').childNodes[0].nodeValue = displayName + ' ';
+                document.getElementById('profileEmail').innerText = '@' + user.email.split('@')[0];
+                document.getElementById('postAuthorName').innerText = displayName;
+
             } else {
-                feedSection.classList.add('hidden');
                 loginSection.classList.remove('hidden');
+                mainHeader.classList.add('hidden');
+                feedSection.classList.add('hidden');
+                profileSection.classList.add('hidden');
             }
         });
 
-        // Email Sign In / Sign Up
+        // Email Auth Form
         document.getElementById('emailForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('emailInput').value;
@@ -230,7 +347,7 @@
             }
         });
 
-        // Google Sign In
+        // Google Auth
         const provider = new GoogleAuthProvider();
         document.getElementById('googleLoginBtn').addEventListener('click', async () => {
             try {
@@ -240,14 +357,14 @@
             }
         });
 
-        // Logout Global Function
+        // Logout
         window.logout = async () => {
             await signOut(auth);
         };
     </script>
 
 
-    <!-- Background Animation -->
+    <!-- Background Canvas Animation -->
     <script>
         const canvas = document.getElementById('bgCanvas');
         const ctx = canvas.getContext('2d');
