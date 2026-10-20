@@ -129,7 +129,6 @@
                 </button>
                 <button onclick="showSection('chat')" class="px-3.5 py-1.5 rounded-xl bg-purple-600/30 border border-purple-500/40 text-purple-300 hover:text-white text-xs font-semibold transition-all relative">
                     <i class="fa-solid fa-comments ml-1"></i> الدردشة
-                    <span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-pink-500 rounded-full animate-ping"></span>
                 </button>
                 <button onclick="showSection('profile')" class="px-3.5 py-1.5 rounded-xl bg-indigo-600/30 border border-indigo-500/40 text-indigo-300 hover:text-white text-xs font-semibold transition-all">
                     <i class="fa-solid fa-user ml-1"></i> ملفي
@@ -157,6 +156,7 @@
                 </div>
             </section>
 
+            <!-- Interactive Post Card -->
             <article class="glass-card p-4 rounded-2xl border border-slate-800 space-y-3">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-3">
@@ -167,10 +167,50 @@
                         </div>
                     </div>
                 </div>
-                <p class="text-xs text-gray-200">أهلاً لكم في أول منشور حقيقي على منصة Sovexa المتطورة! 🚀✨</p>
+                <p class="text-xs text-gray-200">أهلاً بكم في المنشور الأول لـ Sovexa! جربوا التفاعل من خلال زري الإعجاب والتعليقات بالأسفل! 🚀✨</p>
                 <div class="rounded-xl overflow-hidden border border-slate-800">
                     <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80" class="w-full max-h-72 object-cover" alt="Post">
                 </div>
+
+                <!-- Interaction Action Buttons -->
+                <div class="flex items-center justify-between pt-2 border-t border-slate-800/80 text-xs">
+                    <button onclick="toggleLike(this)" class="flex items-center gap-2 text-gray-400 hover:text-pink-500 transition-all font-semibold py-1 px-3 rounded-lg hover:bg-slate-900">
+                        <i class="fa-regular fa-heart text-sm"></i>
+                        <span>إعجاب</span>
+                        <span class="like-count bg-slate-800 text-[10px] px-1.5 py-0.5 rounded-full text-white">12</span>
+                    </button>
+                    
+                    <button onclick="toggleComments('comments-1')" class="flex items-center gap-2 text-gray-400 hover:text-indigo-400 transition-all font-semibold py-1 px-3 rounded-lg hover:bg-slate-900">
+                        <i class="fa-regular fa-comment text-sm"></i>
+                        <span>التعليقات</span>
+                        <span class="bg-slate-800 text-[10px] px-1.5 py-0.5 rounded-full text-white comment-count">2</span>
+                    </button>
+
+                    <button class="flex items-center gap-2 text-gray-400 hover:text-emerald-400 transition-all font-semibold py-1 px-3 rounded-lg hover:bg-slate-900">
+                        <i class="fa-solid fa-share text-sm"></i>
+                        <span>مشاركة</span>
+                    </button>
+                </div>
+
+                <!-- Comments Box -->
+                <div id="comments-1" class="hidden pt-3 border-t border-slate-800/50 space-y-3">
+                    <div class="space-y-2 max-h-48 overflow-y-auto comments-list">
+                        <div class="flex items-start gap-2.5 bg-slate-900/60 p-2.5 rounded-xl border border-slate-800">
+                            <div class="w-7 h-7 rounded-full bg-pink-600 flex items-center justify-center text-white text-[10px] font-bold">س</div>
+                            <div>
+                                <h5 class="text-[11px] font-bold text-white">سارة محمد</h5>
+                                <p class="text-[11px] text-gray-300">تصميم الواجهة الخفيفة رائع جداً! بالتوفيق 🔥</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Add Comment Input -->
+                    <form onsubmit="addComment(event, 'comments-1')" class="flex items-center gap-2 pt-1">
+                        <input type="text" placeholder="اكتب تعليقاً..." required class="flex-1 bg-slate-900 border border-slate-700 focus:border-indigo-500 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none">
+                        <button type="submit" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl transition-all">إرسال</button>
+                    </form>
+                </div>
+
             </article>
 
         </div>
@@ -181,8 +221,6 @@
     <div id="chatSection" class="relative z-10 hidden min-h-[calc(100vh-80px)] pb-10">
         <div class="max-w-4xl mx-auto px-4 pt-4">
             <div class="glass-card rounded-3xl border border-slate-800 overflow-hidden grid grid-cols-1 md:grid-cols-3 h-[75vh]">
-                
-                <!-- Chat Sidebar (Friends List) -->
                 <div class="border-b md:border-b-0 md:border-l border-slate-800 p-4 bg-slate-950/50 flex flex-col">
                     <h3 class="text-sm font-bold text-white mb-3 flex items-center gap-2">
                         <i class="fa-solid fa-comments text-purple-400"></i> المحادثات
@@ -201,9 +239,7 @@
                     </div>
                 </div>
 
-                <!-- Chat Box -->
                 <div class="md:col-span-2 flex flex-col h-full bg-slate-900/40">
-                    <!-- Chat Header -->
                     <div class="p-3.5 border-b border-slate-800 flex items-center justify-between bg-slate-950/60">
                         <div class="flex items-center gap-2.5">
                             <div class="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-white font-bold text-xs" id="chatPartnerLetter">S</div>
@@ -214,7 +250,6 @@
                         </div>
                     </div>
 
-                    <!-- Chat Messages List -->
                     <div class="flex-1 p-4 overflow-y-auto space-y-3" id="chatMessages">
                         <div class="flex justify-start">
                             <div class="max-w-[75%] p-3 rounded-2xl bg-slate-800 text-gray-200 text-xs leading-relaxed rounded-tr-none">
@@ -223,7 +258,6 @@
                         </div>
                     </div>
 
-                    <!-- Chat Input -->
                     <form id="chatForm" class="p-3 border-t border-slate-800 flex items-center gap-2 bg-slate-950/60">
                         <input type="text" id="chatInput" placeholder="اكتب رسالتك..." required class="flex-1 bg-slate-900 border border-slate-700 focus:border-purple-500 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none">
                         <button type="submit" class="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:opacity-90 text-white text-xs font-bold rounded-xl transition-all flex items-center gap-1">
@@ -231,7 +265,6 @@
                         </button>
                     </form>
                 </div>
-
             </div>
         </div>
     </div>
@@ -328,11 +361,11 @@
     </div>
 
 
-    <!-- FIREBASE & CHAT LOGIC -->
+    <!-- FIREBASE & INTERACTIONS LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyCJm_0O6NzS0UYnoYAv5MUIp-QR9xGN18Q",
@@ -350,7 +383,59 @@
 
         let currentUser = null;
 
-        // Routing Section Controller
+        // Interactive Like Toggle
+        window.toggleLike = (btn) => {
+            const icon = btn.querySelector('i');
+            const countSpan = btn.querySelector('.like-count');
+            let count = parseInt(countSpan.innerText);
+
+            if (icon.classList.contains('fa-regular')) {
+                icon.className = 'fa-solid fa-heart text-pink-500 text-sm animate-bounce';
+                btn.classList.add('text-pink-500');
+                countSpan.innerText = count + 1;
+            } else {
+                icon.className = 'fa-regular fa-heart text-sm';
+                btn.classList.remove('text-pink-500');
+                countSpan.innerText = count - 1;
+            }
+        };
+
+        // Comments Section Toggle
+        window.toggleComments = (id) => {
+            const box = document.getElementById(id);
+            box.classList.toggle('hidden');
+        };
+
+        // Add Comment
+        window.addComment = (e, containerId) => {
+            e.preventDefault();
+            const form = e.target;
+            const input = form.querySelector('input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const name = currentUser ? (currentUser.displayName || currentUser.email.split('@')[0]) : 'مستخدم Sovexa';
+            const letter = name.charAt(0).toUpperCase();
+
+            const commentsList = document.querySelector(`#${containerId} .comments-list`);
+            const newComment = document.createElement('div');
+            newComment.className = 'flex items-start gap-2.5 bg-slate-900/60 p-2.5 rounded-xl border border-slate-800';
+            newComment.innerHTML = `
+                <div class="w-7 h-7 rounded-full bg-gradient-to-tr from-indigo-500 to-pink-500 flex items-center justify-center text-white text-[10px] font-bold">${letter}</div>
+                <div>
+                    <h5 class="text-[11px] font-bold text-white">${name}</h5>
+                    <p class="text-[11px] text-gray-300">${text}</p>
+                </div>
+            `;
+            commentsList.appendChild(newComment);
+            input.value = '';
+
+            // Update Comments Count
+            const countSpan = form.closest('article').querySelector('.comment-count');
+            countSpan.innerText = parseInt(countSpan.innerText) + 1;
+        };
+
+        // Navigation Controller
         window.showSection = (sectionName) => {
             document.getElementById('feedSection').classList.add('hidden');
             document.getElementById('profileSection').classList.add('hidden');
@@ -359,12 +444,6 @@
             if (sectionName === 'feed') document.getElementById('feedSection').classList.remove('hidden');
             else if (sectionName === 'profile') document.getElementById('profileSection').classList.remove('hidden');
             else if (sectionName === 'chat') document.getElementById('chatSection').classList.remove('hidden');
-        };
-
-        // Select Chat Partner
-        window.selectChat = (partnerName) => {
-            document.getElementById('chatPartnerName').innerText = partnerName;
-            document.getElementById('chatPartnerLetter').innerText = partnerName.charAt(0);
         };
 
         // Chat Send Message
@@ -440,7 +519,7 @@
             document.getElementById('profileBio').innerText = bio;
         }
 
-        // Profile Form Update
+        // Edit Profile Form Submit
         document.getElementById('editProfileForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!currentUser) return;
