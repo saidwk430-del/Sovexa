@@ -184,7 +184,9 @@
     <div id="sideMenuModal" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm hidden transition-all duration-300">
         <div id="menuContent" class="absolute top-16 left-4 right-4 sm:left-auto sm:right-10 w-auto sm:w-80 glass-modal p-4 rounded-3xl border border-slate-700 shadow-2xl space-y-3 transform transition-all scale-95 opacity-0">
             <div onclick="showSection('profile'); toggleSideMenu();" class="flex items-center gap-3 p-3 rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-indigo-500/50 cursor-pointer transition-all">
-                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-500 to-pink-500 flex items-center justify-center text-white font-bold userAvatarLetter">S</div>
+                <div class="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-tr from-indigo-500 to-pink-500 flex items-center justify-center text-white font-bold userAvatarContainer">
+                    <span class="userAvatarLetter">S</span>
+                </div>
                 <div class="flex-1 overflow-hidden">
                     <h4 class="text-xs font-bold text-white truncate" id="menuUserName">مستخدم Sovexa</h4>
                     <p class="text-[10px] text-gray-400">عرض الملف الشخصي</p>
@@ -225,7 +227,9 @@
             <!-- Create Post Box with Image Support -->
             <section class="glass-card p-4 rounded-2xl border border-slate-800">
                 <div class="flex items-center gap-3 pb-3 border-b border-slate-800/80">
-                    <button onclick="showSection('profile')" class="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-600 to-pink-500 flex items-center justify-center text-white font-bold userAvatarLetter">S</button>
+                    <button onclick="showSection('profile')" class="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-tr from-indigo-600 to-pink-500 flex items-center justify-center text-white font-bold userAvatarContainer">
+                        <span class="userAvatarLetter">S</span>
+                    </button>
                     <input type="text" id="postInput" placeholder="بماذا تفكر اليوم؟" class="w-full bg-slate-900/80 border border-slate-800 rounded-full px-4 py-2.5 text-xs text-white focus:outline-none">
                 </div>
 
@@ -311,14 +315,14 @@
         <div class="max-w-3xl mx-auto px-4 pt-4">
             <div class="glass-card rounded-3xl overflow-hidden border border-slate-800 relative shadow-2xl mb-4">
                 <div class="h-36 sm:h-48 w-full bg-gradient-to-r from-indigo-900 via-purple-900 to-slate-900 relative">
-                    <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1200&auto=format&fit=crop&q=80" class="w-full h-full object-cover opacity-60" alt="Cover">
+                    <img id="profileCoverImg" src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1200&auto=format&fit=crop&q=80" class="w-full h-full object-cover opacity-70" alt="Cover">
                 </div>
 
                 <div class="px-5 pb-5 relative">
                     <div class="flex flex-col sm:flex-row sm:items-end justify-between -mt-14 sm:-mt-16 mb-4 gap-4">
                         <div class="relative w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 p-[3px] shadow-2xl">
-                            <div class="w-full h-full rounded-[13px] bg-slate-950 flex items-center justify-center text-3xl font-black text-white outfit-font userAvatarLetter">
-                                S
+                            <div class="w-full h-full rounded-[13px] bg-slate-950 flex items-center justify-center text-3xl font-black text-white outfit-font overflow-hidden userAvatarContainer">
+                                <span class="userAvatarLetter">S</span>
                             </div>
                         </div>
 
@@ -361,9 +365,9 @@
     </div>
 
 
-    <!-- EDIT PROFILE MODAL -->
+    <!-- EDIT PROFILE MODAL WITH AVATAR & COVER UPLOAD -->
     <div id="editProfileModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md hidden transition-all duration-300">
-        <div class="w-full max-w-md glass-modal p-6 rounded-3xl shadow-2xl border border-slate-700 relative">
+        <div class="w-full max-w-md glass-modal p-6 rounded-3xl shadow-2xl border border-slate-700 relative max-h-[90vh] overflow-y-auto">
             <div class="flex items-center justify-between pb-4 border-b border-slate-800">
                 <h3 class="text-base font-bold text-white flex items-center gap-2">
                     <i class="fa-solid fa-user-pen text-indigo-400"></i> تعديل الملف الشخصي
@@ -384,7 +388,31 @@
                     <textarea id="editBioInput" rows="3" placeholder="اكتب نبذة قصيرة عنك..." class="w-full bg-slate-900 border border-slate-700 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none resize-none"></textarea>
                 </div>
 
-                <div class="flex items-center justify-end gap-2.5 pt-2">
+                <!-- Avatar Image Selection -->
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 mb-1">الصورة الشخصية (Avatar)</label>
+                    <div class="flex items-center gap-3">
+                        <button type="button" onclick="document.getElementById('avatarFileInput').click()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-indigo-300 text-xs rounded-xl border border-slate-700 transition-all flex items-center gap-1.5">
+                            <i class="fa-solid fa-image"></i> اختر صورة
+                        </button>
+                        <span id="avatarFileName" class="text-[10px] text-gray-400 truncate max-w-[180px]">لم يتم اختيار صورة</span>
+                    </div>
+                    <input type="file" id="avatarFileInput" accept="image/*" class="hidden" onchange="handleAvatarSelection(event)">
+                </div>
+
+                <!-- Cover Image Selection -->
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 mb-1">صورة الغلاف (Cover)</label>
+                    <div class="flex items-center gap-3">
+                        <button type="button" onclick="document.getElementById('coverFileInput').click()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-purple-300 text-xs rounded-xl border border-slate-700 transition-all flex items-center gap-1.5">
+                            <i class="fa-solid fa-panorama"></i> اختر غلاف
+                        </button>
+                        <span id="coverFileName" class="text-[10px] text-gray-400 truncate max-w-[180px]">لم يتم اختيار غلاف</span>
+                    </div>
+                    <input type="file" id="coverFileInput" accept="image/*" class="hidden" onchange="handleCoverSelection(event)">
+                </div>
+
+                <div class="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-800">
                     <button type="button" onclick="toggleEditModal(false)" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-gray-300 text-xs font-semibold rounded-xl transition-all">
                         إلغاء
                     </button>
@@ -398,7 +426,7 @@
 
 
     <!-- ============================================== -->
-    <!-- FIREBASE & CHAT REALTIME INTEGRATION -->
+    <!-- FIREBASE & PROFILE AVATAR/COVER REALTIME SCRIPT -->
     <!-- ============================================== -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -422,6 +450,8 @@
         let currentUser = null;
         let allUsers = [];
         let selectedImageFile = null;
+        let selectedAvatarFile = null;
+        let selectedCoverFile = null;
 
         // Toast Notification Function
         window.showToast = (msg) => {
@@ -441,7 +471,24 @@
             }, 3000);
         };
 
-        // Image Handling & Preview
+        // File Selection Handlers for Profile Edit
+        window.handleAvatarSelection = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                selectedAvatarFile = file;
+                document.getElementById('avatarFileName').innerText = file.name;
+            }
+        };
+
+        window.handleCoverSelection = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                selectedCoverFile = file;
+                document.getElementById('coverFileName').innerText = file.name;
+            }
+        };
+
+        // Image Handling & Preview for Posts
         window.handleImageSelection = (event) => {
             const file = event.target.files[0];
             if (file) {
@@ -485,9 +532,12 @@
                 }
 
                 const userName = currentUser ? (currentUser.displayName || currentUser.email.split('@')[0]) : 'مستخدم Sovexa';
+                const userPhoto = currentUser ? (currentUser.photoURL || null) : null;
+
                 await addDoc(collection(db, "posts"), {
                     userId: currentUser ? currentUser.uid : "anonymous",
                     userName: userName,
+                    userPhoto: userPhoto,
                     userEmail: currentUser ? currentUser.email : "",
                     text: postText,
                     mediaUrl: mediaUrl,
@@ -529,6 +579,10 @@
                     const postId = docSnap.id;
                     const letter = (post.userName || 'S').charAt(0).toUpperCase();
 
+                    const avatarHTML = post.userPhoto ? 
+                        `<img src="${post.userPhoto}" class="w-10 h-10 rounded-full object-cover border border-indigo-500/30" alt="Avatar">` :
+                        `<div class="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-500 to-pink-500 flex items-center justify-center text-white font-bold text-xs">${letter}</div>`;
+
                     const mediaHTML = post.mediaUrl ? `
                         <div class="rounded-xl overflow-hidden border border-slate-800/80 post-media-container mt-2">
                             <img src="${post.mediaUrl}" loading="lazy" class="w-full max-h-96 object-cover hover:scale-[1.02] transition-all duration-300" alt="Post Attachment">
@@ -540,9 +594,7 @@
                     postCard.innerHTML = `
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-500 to-pink-500 flex items-center justify-center text-white font-bold text-xs">
-                                    ${letter}
-                                </div>
+                                ${avatarHTML}
                                 <div>
                                     <h4 class="font-bold text-xs text-white">${post.userName || 'مستخدم Sovexa'}</h4>
                                     <p class="text-[10px] text-gray-400">الآن • <i class="fa-solid fa-globe"></i></p>
@@ -692,7 +744,7 @@
             }
         };
 
-        // ================= CHAT REALTIME LOGIC =================
+        // CHAT REALTIME LOGIC
         function listenToRealtimeChat() {
             const chatQuery = query(collection(db, "global_chat"), orderBy("createdAt", "asc"));
             onSnapshot(chatQuery, (snapshot) => {
@@ -724,7 +776,6 @@
             });
         }
 
-        // Send Chat Message
         document.getElementById('chatForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!currentUser) {
@@ -808,7 +859,6 @@
             showSection('profile');
             document.getElementById('profileName').innerText = name;
             document.getElementById('profileEmail').innerText = '@' + email.split('@')[0];
-            document.querySelectorAll('.userAvatarLetter').forEach(el => el.innerText = name.charAt(0).toUpperCase());
         };
 
         // Side Menu
@@ -818,73 +868,4 @@
             if (modal.classList.contains('hidden')) {
                 modal.classList.remove('hidden');
                 setTimeout(() => {
-                    content.classList.remove('scale-95', 'opacity-0');
-                    content.classList.add('scale-100', 'opacity-100');
-                }, 10);
-            } else {
-                content.classList.remove('scale-100', 'opacity-100');
-                content.classList.add('scale-95', 'opacity-0');
-                setTimeout(() => modal.classList.add('hidden'), 200);
-            }
-        };
-
-        window.switchAccount = async () => {
-            toggleSideMenu();
-            await signOut(auth);
-            showToast("تم تسجيل الخروج، يمكنك تسجيل الدخول بحساب جديد!");
-        };
-
-        // Comments Toggle
-        window.toggleComments = (id) => {
-            const box = document.getElementById(id);
-            box.classList.toggle('hidden');
-        };
-
-        // Navigation
-        window.showSection = (sectionName) => {
-            document.getElementById('feedSection').classList.add('hidden');
-            document.getElementById('profileSection').classList.add('hidden');
-            document.getElementById('chatSection').classList.add('hidden');
-
-            if (sectionName === 'feed') document.getElementById('feedSection').classList.remove('hidden');
-            else if (sectionName === 'profile') document.getElementById('profileSection').classList.remove('hidden');
-            else if (sectionName === 'chat') document.getElementById('chatSection').classList.remove('hidden');
-        };
-
-        // Profile Modal
-        window.toggleEditModal = (show) => {
-            const modal = document.getElementById('editProfileModal');
-            if (show) {
-                modal.classList.remove('hidden');
-                document.getElementById('editNameInput').value = document.getElementById('profileName').innerText;
-                document.getElementById('editBioInput').value = document.getElementById('profileBio').innerText;
-            } else {
-                modal.classList.add('hidden');
-            }
-        };
-
-        async function loadUsersForSearch() {
-            try {
-                const querySnapshot = await getDocs(collection(db, "users"));
-                allUsers = [];
-                querySnapshot.forEach((docSnap) => {
-                    allUsers.push(docSnap.data());
-                });
-            } catch (err) {
-                console.log("Error loading users: ", err);
-            }
-        }
-
-        // Auth Listener
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                currentUser = user;
-                document.getElementById('loginSection').classList.add('hidden');
-                document.getElementById('mainHeader').classList.remove('hidden');
-                document.getElementById('feedSection').classList.remove('hidden');
-
-                const emailPrefix = user.email ? user.email.split('@')[0] : 'user';
-                document.getElementById('profileEmail').innerText = '@' + emailPrefix;
-
-                const userDocRef = doc(db, "users", user.uid);
-                const userDocSn
+                    content.classList.re
