@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sovexa - تسجيل الدخول</title>
+    <title>Sovexa - الرئيسية</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts -->
@@ -21,299 +21,284 @@
             font-family: 'Inter', sans-serif;
             background-color: #0b0f17;
             color: #f3f4f6;
-            overflow: hidden;
-            height: 100vh;
-            width: 100vw;
         }
         .outfit-font {
             font-family: 'Outfit', sans-serif;
         }
-        /* Fullscreen Canvas Background */
-        #bgCanvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-        }
-        /* Glassmorphism Panel */
+        /* Glassmorphism Classes */
         .glass-card {
             background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glass-nav {
+            background: rgba(11, 15, 23, 0.85);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+            border-b: 1px solid rgba(255, 255, 255, 0.08);
         }
-        /* Glowing Text Effect */
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b0f17;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #334155;
+        }
         .glow-text {
-            text-shadow: 0 0 20px rgba(99, 102, 241, 0.6), 0 0 40px rgba(236, 72, 153, 0.4);
-        }
-        .glow-letter {
-            text-shadow: 0 0 30px rgba(99, 102, 241, 0.8), 0 0 60px rgba(236, 72, 153, 0.6);
+            text-shadow: 0 0 15px rgba(99, 102, 241, 0.5);
         }
     </style>
 </head>
-<body class="relative flex flex-col justify-between items-center min-h-screen select-none overflow-hidden">
+<body class="bg-[#0b0f17] text-gray-100 min-h-screen pb-20 md:pb-6">
 
-    <!-- Fullscreen Interactive Animated Background Canvas -->
-    <canvas id="bgCanvas"></canvas>
+    <!-- Top Navigation Bar -->
+    <header class="sticky top-0 z-50 w-full glass-nav px-4 py-2.5">
+        <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+            
+            <!-- Logo & Search -->
+            <div class="flex items-center gap-3">
+                <a href="#" class="flex items-center gap-2">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 p-[1.5px] shadow-lg shadow-indigo-500/30">
+                        <div class="w-full h-full rounded-[10px] bg-slate-950 flex items-center justify-center">
+                            <span class="outfit-font font-black text-xl text-transparent bg-clip-text bg-gradient-to-tr from-indigo-400 to-pink-400">S</span>
+                        </div>
+                    </div>
+                    <span class="outfit-font font-black text-2xl tracking-wider text-white hidden sm:block glow-text">Sovexa</span>
+                </a>
 
-    <!-- Overlay Tint for Depth -->
-    <div class="absolute inset-0 bg-gradient-to-b from-slate-950/40 via-transparent to-slate-950/80 z-0 pointer-events-none"></div>
+                <!-- Search Input -->
+                <div class="relative hidden sm:block w-64">
+                    <input type="text" placeholder="البحث في Sovexa..." class="w-full bg-slate-900/90 border border-slate-800 rounded-full py-2 px-4 pr-10 text-xs text-white focus:outline-none focus:border-indigo-500 transition-all">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-gray-400 text-xs"></i>
+                </div>
+            </div>
 
-    <!-- Top Header / Bar -->
-    <header class="relative z-10 w-full p-4 sm:p-6 flex justify-between items-center max-w-7xl mx-auto">
-        <div class="flex items-center gap-2">
-            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span class="text-xs font-semibold tracking-wider text-gray-300 uppercase outfit-font">Sovexa Network</span>
+            <!-- Middle Navigation Links (Desktop) -->
+            <nav class="hidden md:flex items-center gap-1 bg-slate-900/60 p-1 rounded-full border border-slate-800/80">
+                <a href="#" class="px-5 py-2 rounded-full bg-indigo-600 text-white text-xs font-semibold flex items-center gap-2 transition-all shadow-lg shadow-indigo-500/20">
+                    <i class="fa-solid fa-house"></i>
+                    <span>الرئيسية</span>
+                </a>
+                <a href="#" class="px-5 py-2 rounded-full hover:bg-slate-800 text-gray-400 hover:text-white text-xs font-medium flex items-center gap-2 transition-all">
+                    <i class="fa-solid fa-tv"></i>
+                    <span>فيديو</span>
+                </a>
+                <a href="#" class="px-5 py-2 rounded-full hover:bg-slate-800 text-gray-400 hover:text-white text-xs font-medium flex items-center gap-2 transition-all">
+                    <i class="fa-solid fa-users"></i>
+                    <span>المجموعات</span>
+                </a>
+            </nav>
+
+            <!-- Left Actions (Notifications, Messages, Profile) -->
+            <div class="flex items-center gap-2.5">
+                <button class="w-9 h-9 rounded-full bg-slate-900 hover:bg-slate-800 border border-slate-800 flex items-center justify-center text-gray-300 hover:text-white transition-all relative">
+                    <i class="fa-solid fa-bell text-xs"></i>
+                    <span class="absolute top-1 right-1 w-2 h-2 rounded-full bg-pink-500"></span>
+                </button>
+                
+                <button class="w-9 h-9 rounded-full bg-slate-900 hover:bg-slate-800 border border-slate-800 flex items-center justify-center text-gray-300 hover:text-white transition-all">
+                    <i class="fa-solid fa-paper-plane text-xs"></i>
+                </button>
+
+                <!-- Profile Avatar -->
+                <div class="w-9 h-9 rounded-full p-[1.5px] bg-gradient-to-tr from-indigo-500 to-pink-500 cursor-pointer">
+                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" class="w-full h-full rounded-full object-cover" alt="Profile">
+                </div>
+            </div>
+
         </div>
-        <button onclick="toggleLoginForm()" class="px-3.5 py-1.5 text-xs font-medium bg-white/10 hover:bg-white/20 text-white rounded-full backdrop-blur-md border border-white/10 transition-all flex items-center gap-2">
-            <i class="fa-solid fa-eye" id="toggleIcon"></i>
-            <span id="toggleBtnText">إخفاء النموذج</span>
-        </button>
     </header>
 
-    <!-- Center Content: Logo Box + Login Form -->
-    <main class="relative z-10 flex flex-col items-center justify-center my-auto px-4 w-full max-w-md">
+    <!-- Main Container Layout -->
+    <div class="max-w-7xl mx-auto px-2 sm:px-4 pt-4 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
-        <!-- Center Icon S Container -->
-        <div class="mb-4 sm:mb-6 flex flex-col items-center group cursor-pointer" onclick="toggleLoginForm()">
-            <div class="w-24 h-24 sm:w-32 sm:h-32 rounded-3xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 p-[2px] shadow-2xl shadow-indigo-500/50 transition-all duration-500 transform group-hover:scale-105 group-hover:rotate-1">
-                <div class="w-full h-full rounded-[22px] bg-slate-950/80 backdrop-blur-xl flex items-center justify-center border border-white/20">
-                    <span class="outfit-font font-black text-5xl sm:text-6xl text-transparent bg-clip-text bg-gradient-to-tr from-indigo-400 via-pink-400 to-purple-300 glow-letter">
-                        S
-                    </span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Glass Login Form Box -->
-        <div id="loginCard" class="w-full glass-card p-5 sm:p-7 rounded-3xl transition-all duration-500 transform opacity-100 scale-100 max-h-[80vh] overflow-y-auto">
-            <div class="text-center mb-5">
-                <h2 class="text-xl sm:text-2xl font-bold text-white mb-1">مرحباً بك في Sovexa</h2>
-                <p class="text-xs text-gray-300">اختر طريقة تسجيل الدخول المفضل لديك</p>
-            </div>
-
-            <!-- Quick Social & Phone Login Buttons -->
-            <div class="space-y-2.5 mb-5">
-                <!-- Google Login Button -->
-                <button onclick="alert('جارٍ تفعيل الدخول بحساب Google عبر Firebase...');" class="w-full py-2.5 px-4 bg-slate-900/90 hover:bg-slate-800 border border-gray-700 hover:border-gray-500 text-white font-medium text-xs rounded-xl transition-all flex items-center justify-center gap-3 group shadow-md">
-                    <svg class="w-4 h-4" viewBox="0 0 24 24">
-                        <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.7 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.2 9 5 12 5z"/>
-                        <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.8z"/>
-                        <path fill="#FBBC05" d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.3s.2-1.6.4-2.3L1.9 7.3C.7 9.7 0 10.8 0 12.3s.7 2.6 1.9 5l3.7-2.5z"/>
-                        <path fill="#34A853" d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.2-6.4-5.2L1.9 16C3.7 19.7 7.5 23 12 23z"/>
-                    </svg>
-                    <span>تسجيل الدخول عبر Google</span>
-                </button>
-
-                <!-- Phone Login Button -->
-                <button onclick="switchTab('phone')" class="w-full py-2.5 px-4 bg-slate-900/90 hover:bg-slate-800 border border-gray-700 hover:border-indigo-500 text-white font-medium text-xs rounded-xl transition-all flex items-center justify-center gap-3 text-indigo-300">
-                    <i class="fa-solid fa-mobile-screen-button text-indigo-400 text-sm"></i>
-                    <span>تسجيل الدخول برقم الهاتف</span>
-                </button>
-            </div>
-
-            <!-- Separator Line -->
-            <div class="relative flex py-2 items-center mb-4">
-                <div class="flex-grow border-t border-gray-700/80"></div>
-                <span class="flex-shrink mx-3 text-[11px] text-gray-400">أو بالبريد الإلكتروني</span>
-                <div class="flex-grow border-t border-gray-700/80"></div>
-            </div>
-
-            <!-- Email Form Area -->
-            <form id="emailForm" onsubmit="event.preventDefault(); alert('جارٍ التحقق من الحساب...');" class="space-y-3">
-                <div>
-                    <label class="block text-[11px] font-semibold text-gray-300 mb-1">البريد الإلكتروني</label>
-                    <div class="relative">
-                        <input type="email" required placeholder="name@sovexa.com" class="w-full bg-slate-900/90 border border-gray-700 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none transition-colors pr-9">
-                        <i class="fa-solid fa-envelope absolute left-3 top-3 text-gray-400 text-xs"></i>
+        <!-- Left Sidebar (Desktop Profile & Shortcuts) -->
+        <aside class="hidden lg:block lg:col-span-3 space-y-4 sticky top-20">
+            <div class="glass-card p-4 rounded-2xl border border-slate-800">
+                <div class="flex items-center gap-3 mb-4">
+                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" class="w-12 h-12 rounded-xl object-cover" alt="User">
+                    <div>
+                        <h3 class="font-bold text-sm text-white">سارة أحمد</h3>
+                        <p class="text-xs text-gray-400">@sara_ahmed</p>
                     </div>
                 </div>
-
-                <div>
-                    <label class="block text-[11px] font-semibold text-gray-300 mb-1">كلمة المرور</label>
-                    <div class="relative">
-                        <input type="password" required placeholder="••••••••" class="w-full bg-slate-900/90 border border-gray-700 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none transition-colors pr-9">
-                        <i class="fa-solid fa-lock absolute left-3 top-3 text-gray-400 text-xs"></i>
-                    </div>
+                <div class="pt-3 border-t border-slate-800/80 space-y-2 text-xs">
+                    <a href="#" class="flex items-center justify-between p-2 rounded-xl hover:bg-slate-800/60 text-gray-300 transition-colors">
+                        <span class="flex items-center gap-2.5"><i class="fa-solid fa-bookmark text-indigo-400"></i> العناصر المحفوظة</span>
+                        <span class="bg-indigo-950 text-indigo-300 px-2 py-0.5 rounded-full text-[10px]">12</span>
+                    </a>
+                    <a href="#" class="flex items-center justify-between p-2 rounded-xl hover:bg-slate-800/60 text-gray-300 transition-colors">
+                        <span class="flex items-center gap-2.5"><i class="fa-solid fa-user-group text-purple-400"></i> الأصدقاء</span>
+                        <span class="bg-slate-800 text-gray-400 px-2 py-0.5 rounded-full text-[10px]">284</span>
+                    </a>
                 </div>
-
-                <div class="flex items-center justify-between text-[11px] text-gray-400">
-                    <label class="flex items-center gap-1.5 cursor-pointer">
-                        <input type="checkbox" class="rounded bg-slate-800 border-gray-700 text-indigo-600 focus:ring-0">
-                        <span>تذكرني</span>
-                    </label>
-                    <a href="#" class="text-indigo-400 hover:underline">نسيت كلمة المرور؟</a>
-                </div>
-
-                <button type="submit" class="w-full py-3 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-500 hover:to-pink-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-indigo-500/30 transition-all transform active:scale-95">
-                    متابعة بالبريد الإلكتروني
-                </button>
-            </form>
-
-            <!-- Phone Form Area (Hidden by default) -->
-            <form id="phoneForm" onsubmit="event.preventDefault(); alert('جارٍ إرسال رمز التحقق SMS...');" class="space-y-3 hidden">
-                <div>
-                    <label class="block text-[11px] font-semibold text-gray-300 mb-1">رقم الهاتف المحمول</label>
-                    <div class="relative flex gap-2">
-                        <input type="tel" required placeholder="+213 600 000 000" class="w-full bg-slate-900/90 border border-gray-700 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none transition-colors text-left dir-ltr">
-                    </div>
-                </div>
-
-                <button type="submit" class="w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-emerald-500/20 transition-all transform active:scale-95 flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-paper-plane"></i>
-                    <span>إرسال رمز التحقق (SMS)</span>
-                </button>
-
-                <button type="button" onclick="switchTab('email')" class="w-full text-center text-[11px] text-gray-400 hover:text-white pt-1">
-                    الرجوع للبريد الإلكتروني
-                </button>
-            </form>
-
-            <div class="mt-5 pt-3 border-t border-gray-800/80 text-center">
-                <p class="text-[11px] text-gray-400">
-                    ليس لديك حساب؟ 
-                    <a href="#" onclick="alert('سنتيح إنشاء الحساب فور ربط قاعدة البيانات!');" class="text-pink-400 font-semibold hover:underline">إنشاء حساب جديد</a>
-                </p>
             </div>
-        </div>
+        </aside>
 
-    </main>
-
-    <!-- Bottom Brand Title Sovexa -->
-    <footer class="relative z-10 w-full pb-6 pt-2 text-center">
-        <h1 class="outfit-font font-black text-3xl sm:text-4xl tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-white via-indigo-200 to-pink-300 glow-text uppercase">
-            Sovexa
-        </h1>
-        <div class="w-2 h-2 rounded-full bg-indigo-500 mx-auto mt-2 shadow-lg shadow-indigo-500/80 animate-ping"></div>
-    </footer>
-
-    <!-- Background Animation Script -->
-    <script>
-        const canvas = document.getElementById('bgCanvas');
-        const ctx = canvas.getContext('2d');
-
-        let width, height;
-        let particles = [];
-
-        function resize() {
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
-        }
-
-        window.addEventListener('resize', resize);
-        resize();
-
-        class Particle {
-            constructor() {
-                this.reset();
-            }
-            reset() {
-                this.x = Math.random() * width;
-                this.y = Math.random() * height;
-                this.size = Math.random() * 3 + 1;
-                this.speedX = (Math.random() - 0.5) * 0.8;
-                this.speedY = (Math.random() - 0.5) * 0.8;
-                this.alpha = Math.random() * 0.6 + 0.2;
-                this.color = Math.random() > 0.5 ? '#6366f1' : '#ec4899';
-            }
-            update() {
-                this.x += this.speedX;
-                this.y += this.speedY;
-
-                if (this.x < 0 || this.x > width || this.y < 0 || this.y > height) {
-                    this.reset();
-                }
-            }
-            draw() {
-                ctx.save();
-                ctx.globalAlpha = this.alpha;
-                ctx.shadowBlur = 12;
-                ctx.shadowColor = this.color;
-                ctx.fillStyle = this.color;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.restore();
-            }
-        }
-
-        for (let i = 0; i < 60; i++) {
-            particles.push(new Particle());
-        }
-
-        function animate() {
-            const bgGradient = ctx.createLinearGradient(0, 0, width, height);
-            bgGradient.addColorStop(0, '#0b0f17');
-            bgGradient.addColorStop(0.5, '#1e1b4b');
-            bgGradient.addColorStop(1, '#0f172a');
-
-            ctx.fillStyle = bgGradient;
-            ctx.fillRect(0, 0, width, height);
-
-            ctx.save();
-            ctx.shadowBlur = 100;
-            ctx.shadowColor = '#4f46e5';
-            ctx.fillStyle = 'rgba(79, 70, 229, 0.15)';
-            ctx.beginPath();
-            ctx.arc(width * 0.2, height * 0.3, 180, 0, Math.PI * 2);
-            ctx.fill();
-
-            ctx.shadowColor = '#ec4899';
-            ctx.fillStyle = 'rgba(236, 72, 153, 0.12)';
-            ctx.beginPath();
-            ctx.arc(width * 0.8, height * 0.7, 220, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.restore();
-
-            particles.forEach(p => {
-                p.update();
-                p.draw();
-            });
-
-            requestAnimationFrame(animate);
-        }
-
-        animate();
-
-        // Toggle Login Form
-        let isFormVisible = true;
-        function toggleLoginForm() {
-            const card = document.getElementById('loginCard');
-            const icon = document.getElementById('toggleIcon');
-            const btnText = document.getElementById('toggleBtnText');
+        <!-- Center Feed (Main Content) -->
+        <main class="lg:col-span-6 space-y-4">
             
-            isFormVisible = !isFormVisible;
-            if (isFormVisible) {
-                card.style.opacity = '1';
-                card.style.transform = 'scale(1)';
-                card.style.pointerEvents = 'auto';
-                icon.className = 'fa-solid fa-eye';
-                btnText.innerText = 'إخفاء النموذج';
-            } else {
-                card.style.opacity = '0';
-                card.style.transform = 'scale(0.9)';
-                card.style.pointerEvents = 'none';
-                icon.className = 'fa-solid fa-eye-slash';
-                btnText.innerText = 'إظهار النموذج';
-            }
-        }
+            <!-- Stories Section -->
+            <section class="glass-card p-3 rounded-2xl overflow-x-auto flex gap-3 no-scrollbar">
+                
+                <!-- Add Story Button -->
+                <div class="relative min-w-[100px] h-36 sm:min-w-[110px] sm:h-40 rounded-xl overflow-hidden bg-slate-900 border border-slate-800 flex flex-col justify-between p-2 group cursor-pointer">
+                    <div class="w-full h-24 overflow-hidden rounded-lg">
+                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80" class="w-full h-full object-cover group-hover:scale-110 transition-all duration-300" alt="My Story">
+                    </div>
+                    <div class="absolute top-20 right-1/2 translate-x-1/2 w-8 h-8 rounded-full bg-indigo-600 border-2 border-slate-950 flex items-center justify-center text-white text-xs shadow-lg">
+                        <i class="fa-solid fa-plus"></i>
+                    </div>
+                    <span class="text-[11px] font-semibold text-center text-gray-300 mt-2">إنشاء قصة</span>
+                </div>
 
-        // Switch Tab between Email and Phone
-        function switchTab(type) {
-            const emailForm = document.getElementById('emailForm');
-            const phoneForm = document.getElementById('phoneForm');
+                <!-- User Story 1 -->
+                <div class="relative min-w-[100px] h-36 sm:min-w-[110px] sm:h-40 rounded-xl overflow-hidden group cursor-pointer">
+                    <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=300&auto=format&fit=crop&q=80" class="w-full h-full object-cover group-hover:scale-110 transition-all duration-300" alt="Story">
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-transparent to-transparent"></div>
+                    <div class="absolute top-2 right-2 w-7 h-7 rounded-full p-[1.5px] bg-indigo-500">
+                        <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=100&auto=format&fit=crop&q=80" class="w-full h-full rounded-full object-cover" alt="User">
+                    </div>
+                    <span class="absolute bottom-2 right-2 left-2 text-[11px] font-medium text-white truncate">أحمد علي</span>
+                </div>
 
-            if(type === 'phone') {
-                emailForm.classList.add('hidden');
-                phoneForm.classList.remove('hidden');
-            } else {
-                phoneForm.classList.add('hidden');
-                emailForm.classList.remove('hidden');
-            }
-        }
-    </script>
+                <!-- User Story 2 -->
+                <div class="relative min-w-[100px] h-36 sm:min-w-[110px] sm:h-40 rounded-xl overflow-hidden group cursor-pointer">
+                    <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=300&auto=format&fit=crop&q=80" class="w-full h-full object-cover group-hover:scale-110 transition-all duration-300" alt="Story">
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-transparent to-transparent"></div>
+                    <div class="absolute top-2 right-2 w-7 h-7 rounded-full p-[1.5px] bg-pink-500">
+                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80" class="w-full h-full rounded-full object-cover" alt="User">
+                    </div>
+                    <span class="absolute bottom-2 right-2 left-2 text-[11px] font-medium text-white truncate">مريم محمد</span>
+                </div>
+
+            </section>
+
+            <!-- Create Post Box -->
+            <section class="glass-card p-4 rounded-2xl border border-slate-800">
+                <div class="flex items-center gap-3 pb-3 border-b border-slate-800/80">
+                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" class="w-10 h-10 rounded-full object-cover" alt="User">
+                    <input type="text" placeholder="بماذا تفكر اليوم يا سارة؟" class="w-full bg-slate-900/80 border border-slate-800 rounded-full px-4 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500 transition-all">
+                </div>
+                <div class="flex items-center justify-between pt-3 text-xs">
+                    <button class="flex items-center gap-2 text-emerald-400 hover:bg-slate-800/50 px-3 py-1.5 rounded-xl transition-colors">
+                        <i class="fa-solid fa-image"></i>
+                        <span class="text-gray-300">صورة / فيديو</span>
+                    </button>
+                    <button class="flex items-center gap-2 text-amber-400 hover:bg-slate-800/50 px-3 py-1.5 rounded-xl transition-colors">
+                        <i class="fa-solid fa-face-smile"></i>
+                        <span class="text-gray-300">شعور / نشاط</span>
+                    </button>
+                    <button class="px-4 py-1.5 bg-gradient-to-r from-indigo-600 to-pink-600 hover:from-indigo-500 hover:to-pink-500 text-white font-semibold text-xs rounded-xl transition-all shadow-md">
+                        نشر
+                    </button>
+                </div>
+            </section>
+
+            <!-- Post Item 1 -->
+            <article class="glass-card p-4 rounded-2xl border border-slate-800 space-y-3">
+                <!-- Post Header -->
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=100&auto=format&fit=crop&q=80" class="w-10 h-10 rounded-full object-cover" alt="User">
+                        <div>
+                            <h4 class="font-bold text-xs text-white">أحمد علي</h4>
+                            <p class="text-[10px] text-gray-400">منذ ساعتين • <i class="fa-solid fa-globe"></i></p>
+                        </div>
+                    </div>
+                    <button class="text-gray-400 hover:text-white"><i class="fa-solid fa-ellipsis"></i></button>
+                </div>
+
+                <!-- Post Text -->
+                <p class="text-xs text-gray-200 leading-relaxed">
+                    يسعدني جداً الإعلان عن انطلاق التجربة الجديدة على منصة <span class="text-indigo-400 font-bold">#Sovexa</span>! تصميم رائع وتجربة مستخدم سلسة للغاية. 🚀✨
+                </p>
+
+                <!-- Post Image -->
+                <div class="rounded-xl overflow-hidden border border-slate-800">
+                    <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80" class="w-full max-h-80 object-cover" alt="Post Image">
+                </div>
+
+                <!-- Post Stats -->
+                <div class="flex items-center justify-between text-[11px] text-gray-400 py-1 border-b border-slate-800/80">
+                    <div class="flex items-center gap-1">
+                        <span class="w-4 h-4 rounded-full bg-indigo-600 flex items-center justify-center text-[8px] text-white"><i class="fa-solid fa-thumbs-up"></i></span>
+                        <span>42 إعجاب</span>
+                    </div>
+                    <div>12 تعليق • 3 مشاركات</div>
+                </div>
+
+                <!-- Post Action Buttons -->
+                <div class="grid grid-cols-3 gap-1 pt-1 text-xs">
+                    <button class="flex items-center justify-center gap-2 py-2 hover:bg-slate-800/60 rounded-xl text-gray-400 hover:text-indigo-400 transition-colors">
+                        <i class="fa-regular fa-thumbs-up"></i>
+                        <span>إعجاب</span>
+                    </button>
+                    <button class="flex items-center justify-center gap-2 py-2 hover:bg-slate-800/60 rounded-xl text-gray-400 hover:text-white transition-colors">
+                        <i class="fa-regular fa-comment"></i>
+                        <span>تعليق</span>
+                    </button>
+                    <button class="flex items-center justify-center gap-2 py-2 hover:bg-slate-800/60 rounded-xl text-gray-400 hover:text-white transition-colors">
+                        <i class="fa-solid fa-share"></i>
+                        <span>مشاركة</span>
+                    </button>
+                </div>
+            </article>
+
+        </main>
+
+        <!-- Right Sidebar (Desktop Trends & Suggestions) -->
+        <aside class="hidden lg:block lg:col-span-3 space-y-4 sticky top-20">
+            <div class="glass-card p-4 rounded-2xl border border-slate-800">
+                <h3 class="font-bold text-xs text-white mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-fire text-amber-400"></i>
+                    <span>المواضيع الشائعة</span>
+                </h3>
+                <div class="space-y-3 text-xs">
+                    <div>
+                        <p class="text-[10px] text-gray-400">التكنولوجيا • شائع</p>
+                        <h4 class="font-semibold text-gray-200 hover:text-indigo-400 cursor-pointer">#Sovexa_App</h4>
+                        <p class="text-[10px] text-gray-400">1.4 ألف منشور</p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] text-gray-400">البرمجة • شائع</p>
+                        <h4 class="font-semibold text-gray-200 hover:text-indigo-400 cursor-pointer">#Web_Development</h4>
+                        <p class="text-[10px] text-gray-400">850 منشور</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+    </div>
+
+    <!-- Mobile Bottom Navigation Bar -->
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 glass-nav border-t border-slate-800 px-6 py-2 flex justify-between items-center z-50">
+        <a href="#" class="text-indigo-400 flex flex-col items-center gap-1">
+            <i class="fa-solid fa-house text-lg"></i>
+            <span class="text-[9px]">الرئيسية</span>
+        </a>
+        <a href="#" class="text-gray-400 hover:text-white flex flex-col items-center gap-1">
+            <i class="fa-solid fa-tv text-lg"></i>
+            <span class="text-[9px]">فيديو</span>
+        </a>
+        <a href="#" class="text-gray-400 hover:text-white flex flex-col items-center gap-1">
+            <i class="fa-solid fa-users text-lg"></i>
+            <span class="text-[9px]">المجموعات</span>
+        </a>
+        <a href="#" class="text-gray-400 hover:text-white flex flex-col items-center gap-1">
+            <i class="fa-solid fa-user text-lg"></i>
+            <span class="text-[9px]">حسابي</span>
+        </a>
+    </nav>
+
 </body>
 </html>
