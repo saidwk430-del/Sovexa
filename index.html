@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sovexa - تسجيل الدخول</title>
+    <title>Sovexa - منصة التواصل الاجتماعي</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts -->
@@ -12,161 +12,173 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #0b0f17;
-            color: #f3f4f6;
-            overflow: hidden;
-            height: 100vh;
-            width: 100vw;
-        }
-        .outfit-font {
-            font-family: 'Outfit', sans-serif;
-        }
-        #bgCanvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background-color: #0b0f17; color: #f3f4f6; }
+        .outfit-font { font-family: 'Outfit', sans-serif; }
         .glass-card {
             background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glass-nav {
+            background: rgba(11, 15, 23, 0.85);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         }
-        .glow-text {
-            text-shadow: 0 0 20px rgba(99, 102, 241, 0.6), 0 0 40px rgba(236, 72, 153, 0.4);
+        #bgCanvas {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0;
+            pointer-events: none;
         }
-        .glow-letter {
-            text-shadow: 0 0 30px rgba(99, 102, 241, 0.8), 0 0 60px rgba(236, 72, 153, 0.6);
-        }
+        .glow-text { text-shadow: 0 0 15px rgba(99, 102, 241, 0.5); }
     </style>
 </head>
-<body class="relative flex flex-col justify-between items-center min-h-screen select-none overflow-hidden">
+<body class="min-h-screen relative select-none">
 
     <!-- Interactive Background Canvas -->
     <canvas id="bgCanvas"></canvas>
-    <div class="absolute inset-0 bg-gradient-to-b from-slate-950/40 via-transparent to-slate-950/80 z-0 pointer-events-none"></div>
 
-    <!-- Header -->
-    <header class="relative z-10 w-full p-4 sm:p-6 flex justify-between items-center max-w-7xl mx-auto">
-        <div class="flex items-center gap-2">
-            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span class="text-xs font-semibold tracking-wider text-gray-300 uppercase outfit-font">Sovexa Network</span>
-        </div>
-        <button onclick="toggleLoginForm()" class="px-3.5 py-1.5 text-xs font-medium bg-white/10 hover:bg-white/20 text-white rounded-full backdrop-blur-md border border-white/10 transition-all flex items-center gap-2">
-            <i class="fa-solid fa-eye" id="toggleIcon"></i>
-            <span id="toggleBtnText">إخفاء النموذج</span>
-        </button>
-    </header>
-
-    <!-- Main Login Card -->
-    <main class="relative z-10 flex flex-col items-center justify-center my-auto px-4 w-full max-w-md">
+    <!-- ==================== PART 1: LOGIN VIEW ==================== -->
+    <div id="loginSection" class="relative z-10 flex flex-col justify-between items-center min-h-screen p-4">
         
-        <!-- Logo -->
-        <div class="mb-4 sm:mb-6 flex flex-col items-center group cursor-pointer" onclick="toggleLoginForm()">
-            <div class="w-24 h-24 sm:w-32 sm:h-32 rounded-3xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 p-[2px] shadow-2xl shadow-indigo-500/50 transition-all duration-500 transform group-hover:scale-105">
-                <div class="w-full h-full rounded-[22px] bg-slate-950/80 backdrop-blur-xl flex items-center justify-center border border-white/20">
-                    <span class="outfit-font font-black text-5xl sm:text-6xl text-transparent bg-clip-text bg-gradient-to-tr from-indigo-400 via-pink-400 to-purple-300 glow-letter">S</span>
+        <!-- Top Bar -->
+        <header class="w-full p-4 flex justify-between items-center max-w-7xl mx-auto">
+            <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span class="text-xs font-semibold tracking-wider text-gray-300 uppercase outfit-font">Sovexa Network</span>
+            </div>
+        </header>
+
+        <!-- Center Login Box -->
+        <main class="flex flex-col items-center justify-center my-auto w-full max-w-md">
+            <!-- Logo -->
+            <div class="mb-5 flex flex-col items-center">
+                <div class="w-24 h-24 rounded-3xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 p-[2px] shadow-2xl shadow-indigo-500/50">
+                    <div class="w-full h-full rounded-[22px] bg-slate-950/80 backdrop-blur-xl flex items-center justify-center border border-white/20">
+                        <span class="outfit-font font-black text-5xl text-transparent bg-clip-text bg-gradient-to-tr from-indigo-400 via-pink-400 to-purple-300">S</span>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Form Card -->
-        <div id="loginCard" class="w-full glass-card p-5 sm:p-7 rounded-3xl transition-all duration-500 transform opacity-100 scale-100 max-h-[80vh] overflow-y-auto">
-            <div class="text-center mb-5">
-                <h2 class="text-xl sm:text-2xl font-bold text-white mb-1">مرحباً بك في Sovexa</h2>
-                <p class="text-xs text-gray-300">قم بتسجيل الدخول للوصول لحسابك</p>
-            </div>
+            <!-- Form Card -->
+            <div class="w-full glass-card p-6 rounded-3xl shadow-2xl">
+                <div class="text-center mb-5">
+                    <h2 class="text-xl font-bold text-white mb-1">مرحباً بك في Sovexa</h2>
+                    <p class="text-xs text-gray-300">سجل الدخول للمتابعة إلى المنصة</p>
+                </div>
 
-            <!-- Social Login -->
-            <div class="space-y-2.5 mb-5">
-                <button id="googleLoginBtn" class="w-full py-2.5 px-4 bg-slate-900/90 hover:bg-slate-800 border border-gray-700 hover:border-gray-500 text-white font-medium text-xs rounded-xl transition-all flex items-center justify-center gap-3 shadow-md">
+                <!-- Google Login -->
+                <button id="googleLoginBtn" class="w-full py-2.5 px-4 bg-slate-900/90 hover:bg-slate-800 border border-gray-700 text-white font-medium text-xs rounded-xl transition-all flex items-center justify-center gap-3 shadow-md mb-4">
                     <svg class="w-4 h-4" viewBox="0 0 24 24">
                         <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.7 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.2 9 5 12 5z"/>
                         <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.8z"/>
                         <path fill="#FBBC05" d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.3s.2-1.6.4-2.3L1.9 7.3C.7 9.7 0 10.8 0 12.3s.7 2.6 1.9 5l3.7-2.5z"/>
                         <path fill="#34A853" d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.2-6.4-5.2L1.9 16C3.7 19.7 7.5 23 12 23z"/>
                     </svg>
-                    <span>تسجيل الدخول عبر Google</span>
+                    <span>متابعة باستخدام Google</span>
                 </button>
 
-                <button onclick="switchTab('phone')" class="w-full py-2.5 px-4 bg-slate-900/90 hover:bg-slate-800 border border-gray-700 hover:border-indigo-500 text-white font-medium text-xs rounded-xl transition-all flex items-center justify-center gap-3 text-indigo-300">
-                    <i class="fa-solid fa-mobile-screen-button text-indigo-400 text-sm"></i>
-                    <span>تسجيل الدخول برقم الهاتف</span>
-                </button>
-            </div>
+                <div class="relative flex py-2 items-center mb-4">
+                    <div class="flex-grow border-t border-gray-700/80"></div>
+                    <span class="flex-shrink mx-3 text-[11px] text-gray-400">أو بالبريد الإلكتروني</span>
+                    <div class="flex-grow border-t border-gray-700/80"></div>
+                </div>
 
-            <div class="relative flex py-2 items-center mb-4">
-                <div class="flex-grow border-t border-gray-700/80"></div>
-                <span class="flex-shrink mx-3 text-[11px] text-gray-400">أو بالبريد الإلكتروني</span>
-                <div class="flex-grow border-t border-gray-700/80"></div>
+                <!-- Email Form -->
+                <form id="emailForm" class="space-y-3">
+                    <div>
+                        <label class="block text-[11px] font-semibold text-gray-300 mb-1">البريد الإلكتروني</label>
+                        <input type="email" id="emailInput" required placeholder="name@sovexa.com" class="w-full bg-slate-900/90 border border-gray-700 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-semibold text-gray-300 mb-1">كلمة المرور</label>
+                        <input type="password" id="passwordInput" required placeholder="••••••••" class="w-full bg-slate-900/90 border border-gray-700 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none">
+                    </div>
+                    <button type="submit" class="w-full py-3 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:opacity-90 text-white font-bold text-xs rounded-xl shadow-lg shadow-indigo-500/30 transition-all">
+                        تسجيل الدخول / إنشاء حساب
+                    </button>
+                </form>
             </div>
+        </main>
 
-            <!-- Email Form -->
-            <form id="emailForm" class="space-y-3">
-                <div>
-                    <label class="block text-[11px] font-semibold text-gray-300 mb-1">البريد الإلكتروني</label>
-                    <div class="relative">
-                        <input type="email" id="emailInput" required placeholder="name@sovexa.com" class="w-full bg-slate-900/90 border border-gray-700 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none transition-colors pr-9">
-                        <i class="fa-solid fa-envelope absolute left-3 top-3 text-gray-400 text-xs"></i>
+        <footer class="w-py pb-6 text-center">
+            <h1 class="outfit-font font-black text-2xl tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-white via-indigo-200 to-pink-300 uppercase">Sovexa</h1>
+        </footer>
+    </div>
+
+
+    <!-- ==================== PART 2: MAIN FEED VIEW (Hidden Initially) ==================== -->
+    <div id="feedSection" class="relative z-10 hidden min-h-screen pb-20">
+        
+        <!-- Top Navigation Bar -->
+        <header class="sticky top-0 z-50 w-full glass-nav px-4 py-2.5">
+            <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <a href="#" class="flex items-center gap-2">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 p-[1.5px] shadow-lg">
+                            <div class="w-full h-full rounded-[10px] bg-slate-950 flex items-center justify-center">
+                                <span class="outfit-font font-black text-xl text-transparent bg-clip-text bg-gradient-to-tr from-indigo-400 to-pink-400">S</span>
+                            </div>
+                        </div>
+                        <span class="outfit-font font-black text-2xl tracking-wider text-white hidden sm:block glow-text">Sovexa</span>
+                    </a>
+                </div>
+
+                <div class="flex items-center gap-2.5">
+                    <button class="w-9 h-9 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-gray-300">
+                        <i class="fa-solid fa-bell text-xs"></i>
+                    </button>
+                    <button onclick="logout()" class="px-3 py-1.5 rounded-xl bg-red-500/20 text-red-400 text-xs font-semibold hover:bg-red-500/30 transition-colors">
+                        <i class="fa-solid fa-right-from-bracket ml-1"></i> خروج
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content Feed Layout -->
+        <div class="max-w-3xl mx-auto px-4 pt-4 space-y-4">
+            
+            <!-- Create Post Box -->
+            <section class="glass-card p-4 rounded-2xl border border-slate-800">
+                <div class="flex items-center gap-3 pb-3 border-b border-slate-800/80">
+                    <div class="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white font-bold" id="userAvatarLetter">S</div>
+                    <input type="text" placeholder="بماذا تفكر اليوم؟" class="w-full bg-slate-900/80 border border-slate-800 rounded-full px-4 py-2.5 text-xs text-white focus:outline-none">
+                </div>
+                <div class="flex items-center justify-between pt-3 text-xs">
+                    <button class="flex items-center gap-2 text-emerald-400"><i class="fa-solid fa-image"></i> صورة / فيديو</button>
+                    <button class="px-4 py-1.5 bg-gradient-to-r from-indigo-600 to-pink-600 text-white font-semibold rounded-xl">نشر</button>
+                </div>
+            </section>
+
+            <!-- Sample Post -->
+            <article class="glass-card p-4 rounded-2xl border border-slate-800 space-y-3">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center text-white font-bold">أ</div>
+                        <div>
+                            <h4 class="font-bold text-xs text-white">أحمد علي</h4>
+                            <p class="text-[10px] text-gray-400">منذ ساعتين • <i class="fa-solid fa-globe"></i></p>
+                        </div>
                     </div>
                 </div>
-
-                <div>
-                    <label class="block text-[11px] font-semibold text-gray-300 mb-1">كلمة المرور</label>
-                    <div class="relative">
-                        <input type="password" id="passwordInput" required placeholder="••••••••" class="w-full bg-slate-900/90 border border-gray-700 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none transition-colors pr-9">
-                        <i class="fa-solid fa-lock absolute left-3 top-3 text-gray-400 text-xs"></i>
-                    </div>
+                <p class="text-xs text-gray-200">أهلاً بكم في أول منشور حقيقي على منصة Sovexa المتطورة! 🚀✨</p>
+                <div class="rounded-xl overflow-hidden border border-slate-800">
+                    <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80" class="w-full max-h-72 object-cover" alt="Post">
                 </div>
-
-                <button type="submit" class="w-full py-3 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-500 hover:to-pink-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-indigo-500/30 transition-all">
-                    تسجيل الدخول / إنشاء حساب
-                </button>
-            </form>
-
-            <!-- Phone Form -->
-            <form id="phoneForm" class="space-y-3 hidden">
-                <div>
-                    <label class="block text-[11px] font-semibold text-gray-300 mb-1">رقم الهاتف المحمول</label>
-                    <input type="tel" id="phoneNumber" required placeholder="+213 600 000 000" class="w-full bg-slate-900/90 border border-gray-700 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none transition-colors text-left dir-ltr">
-                </div>
-                <div id="recaptcha-container"></div>
-                <button type="submit" class="w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs rounded-xl shadow-lg transition-all flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-paper-plane"></i>
-                    <span>إرسال رمز التحقق</span>
-                </button>
-                <button type="button" onclick="switchTab('email')" class="w-full text-center text-[11px] text-gray-400 hover:text-white pt-1">
-                    الرجوع للبريد الإلكتروني
-                </button>
-            </form>
+            </article>
 
         </div>
-    </main>
+    </div>
 
-    <!-- Footer Brand -->
-    <footer class="relative z-10 w-full pb-6 pt-2 text-center">
-        <h1 class="outfit-font font-black text-3xl sm:text-4xl tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-white via-indigo-200 to-pink-300 glow-text uppercase">
-            Sovexa
-        </h1>
-    </footer>
 
-    <!-- Firebase SDK Modular Import -->
+    <!-- ==================== FIREBASE & AUTH LOGIC ==================== -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-        // Your Firebase Configuration
         const firebaseConfig = {
           apiKey: "AIzaSyCJm_0O6NzS0UYnoYAv5MUIp-QR9xGN18Q",
           authDomain: "sovexa-fbc93.firebaseapp.com",
@@ -177,29 +189,40 @@
           measurementId: "G-5PBTY2WXJ6"
         };
 
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
-        // Email Sign In / Sign Up Handler
-        const emailForm = document.getElementById('emailForm');
-        emailForm.addEventListener('submit', async (e) => {
+        const loginSection = document.getElementById('loginSection');
+        const feedSection = document.getElementById('feedSection');
+
+        // Check Auth State (Auto Login Transition)
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                loginSection.classList.add('hidden');
+                feedSection.classList.remove('hidden');
+                if(user.email) {
+                    document.getElementById('userAvatarLetter').innerText = user.email.charAt(0).toUpperCase();
+                }
+            } else {
+                feedSection.classList.add('hidden');
+                loginSection.classList.remove('hidden');
+            }
+        });
+
+        // Email Sign In / Sign Up
+        document.getElementById('emailForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('emailInput').value;
             const password = document.getElementById('passwordInput').value;
 
             try {
-                // Try logging in
                 await signInWithEmailAndPassword(auth, email, password);
-                alert('تم تسجيل الدخول بنجاح! مرحباً بك في Sovexa');
             } catch (error) {
-                // If account does not exist, create it automatically
                 if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
                     try {
                         await createUserWithEmailAndPassword(auth, email, password);
-                        alert('تم إنشاء حسابك الجديد بنجاح في Sovexa!');
                     } catch (signUpError) {
-                        alert('خطأ أثناء التسجيل: ' + signUpError.message);
+                        alert('خطأ: ' + signUpError.message);
                     }
                 } else {
                     alert('خطأ: ' + error.message);
@@ -207,20 +230,24 @@
             }
         });
 
-        // Google Sign In Handler
-        const googleBtn = document.getElementById('googleLoginBtn');
+        // Google Sign In
         const provider = new GoogleAuthProvider();
-        googleBtn.addEventListener('click', async () => {
+        document.getElementById('googleLoginBtn').addEventListener('click', async () => {
             try {
-                const result = await signInWithPopup(auth, provider);
-                alert('مرحباً بك ' + result.user.displayName + ' تم تسجيل الدخول بواسطة Google!');
+                await signInWithPopup(auth, provider);
             } catch (error) {
                 alert('فشل الدخول بحساب Google: ' + error.message);
             }
         });
+
+        // Logout Global Function
+        window.logout = async () => {
+            await signOut(auth);
+        };
     </script>
 
-    <!-- Canvas Animation Script -->
+
+    <!-- Background Animation -->
     <script>
         const canvas = document.getElementById('bgCanvas');
         const ctx = canvas.getContext('2d');
@@ -256,4 +283,16 @@
                 ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
                 ctx.restore();
             }
-        
+        }
+        for (let i = 0; i < 50; i++) particles.push(new Particle());
+
+        function animate() {
+            ctx.fillStyle = '#0b0f17';
+            ctx.fillRect(0, 0, width, height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animate);
+        }
+        animate();
+    </script>
+</body>
+</html>
