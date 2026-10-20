@@ -1,483 +1,262 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" class="h-full dark">
+<html lang="ar" dir="rtl" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sovexa - مصمم الشعار والأيقونة</title>
+    <title>Sovexa - تسجيل الدخول</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            50: '#f0f3ff',
-                            100: '#e0e7ff',
-                            500: '#6366f1',
-                            600: '#4f46e5',
-                            700: '#4338ca',
-                            900: '#312e81',
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'system-ui', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&family=Outfit:wght@400;600;800;900&display=swap" rel="stylesheet">
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         body {
             font-family: 'Inter', sans-serif;
             background-color: #0b0f17;
             color: #f3f4f6;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
         }
         .outfit-font {
             font-family: 'Outfit', sans-serif;
         }
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
+        /* Fullscreen Canvas Background */
+        #bgCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
         }
-        ::-webkit-scrollbar-track {
-            background: #111827;
+        /* Glassmorphism Panel */
+        .glass-card {
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
         }
-        ::-webkit-scrollbar-thumb {
-            background: #374151;
-            border-radius: 9999px;
+        /* Glowing Text Effect */
+        .glow-text {
+            text-shadow: 0 0 20px rgba(99, 102, 241, 0.6), 0 0 40px rgba(236, 72, 153, 0.4);
         }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #4b5563;
-        }
-        .glass-panel {
-            background: rgba(17, 24, 39, 0.7);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+        .glow-letter {
+            text-shadow: 0 0 30px rgba(99, 102, 241, 0.8), 0 0 60px rgba(236, 72, 153, 0.6);
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col bg-[#0b0f17] text-gray-100 overflow-x-hidden">
+<body class="relative flex flex-col justify-between items-center min-h-screen select-none overflow-hidden">
 
-    <!-- Header Navigation -->
-    <header class="w-full border-b border-gray-800 bg-[#0f172a]/80 backdrop-blur-md sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <div class="flex items-center space-x-3 space-x-reverse">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center text-white font-black text-xl shadow-lg shadow-indigo-500/30 outfit-font">
-                    S
-                </div>
-                <div>
-                    <h1 class="text-xl font-bold tracking-tight outfit-font bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-200 to-indigo-300">
-                        Sovexa Studio
-                    </h1>
-                    <p class="text-xs text-gray-400">مولد أيقونات وشعارات التطبيق</p>
-                </div>
-            </div>
-            
-            <div class="flex items-center gap-2">
-                <a href="./" class="px-3 py-1.5 text-xs font-medium bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg transition-colors flex items-center gap-1.5">
-                    <i class="fa-solid fa-house"></i>
-                    <span>الرئيسية</span>
-                </a>
-            </div>
+    <!-- Fullscreen Interactive Animated Background Canvas -->
+    <canvas id="bgCanvas"></canvas>
+
+    <!-- Overlay Tint for Depth -->
+    <div class="absolute inset-0 bg-gradient-to-b from-slate-950/40 via-transparent to-slate-950/80 z-0 pointer-events-none"></div>
+
+    <!-- Top Header / Bar -->
+    <header class="relative z-10 w-full p-6 flex justify-between items-center max-w-7xl mx-auto">
+        <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span class="text-xs font-semibold tracking-wider text-gray-300 uppercase outfit-font">Sovexa Network</span>
         </div>
+        <button onclick="toggleLoginForm()" class="px-4 py-2 text-xs font-medium bg-white/10 hover:bg-white/20 text-white rounded-full backdrop-blur-md border border-white/10 transition-all flex items-center gap-2">
+            <i class="fa-solid fa-eye" id="toggleIcon"></i>
+            <span id="toggleBtnText">إخفاء نموذج الدخول</span>
+        </button>
     </header>
 
-    <!-- Main Workspace -->
-    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+    <!-- Center Content: Logo Box + Login Form -->
+    <main class="relative z-10 flex flex-col items-center justify-center my-auto px-4 w-full max-w-md">
         
-        <!-- Left / Top: Interactive Live Preview Box -->
-        <div class="lg:col-span-7 flex flex-col items-center justify-center space-y-6">
-            
-            <div class="w-full glass-panel p-6 sm:p-10 rounded-3xl flex flex-col items-center justify-center min-h-[420px] relative overflow-hidden group shadow-2xl border border-gray-800">
-                <!-- Background ambient decorative glow -->
-                <div class="absolute -top-24 -left-24 w-72 h-72 bg-indigo-600/20 rounded-full blur-3xl pointer-events-none"></div>
-                <div class="absolute -bottom-24 -right-24 w-72 h-72 bg-pink-600/20 rounded-full blur-3xl pointer-events-none"></div>
-
-                <div class="text-xs font-medium text-gray-400 mb-6 uppercase tracking-widest flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    معاينة حية فائقة الدقة (Live Preview)
-                </div>
-
-                <!-- Canvas Wrapper for Preview & Export -->
-                <div class="relative flex flex-col items-center justify-center transition-all duration-300 transform group-hover:scale-105">
-                    <canvas id="logoCanvas" width="512" height="512" class="w-64 h-64 sm:w-80 sm:h-80 rounded-3xl shadow-2xl transition-all duration-300"></canvas>
-                </div>
-
-                <!-- Canvas Info Badges -->
-                <div class="mt-8 flex flex-wrap justify-center gap-2">
-                    <span class="px-3 py-1 text-xs rounded-full bg-gray-800/80 text-gray-300 border border-gray-700/50">3D Glassmorphism</span>
-                    <span class="px-3 py-1 text-xs rounded-full bg-gray-800/80 text-gray-300 border border-gray-700/50">Ultra HD Canvas</span>
-                    <span class="px-3 py-1 text-xs rounded-full bg-indigo-950/60 text-indigo-300 border border-indigo-800/40">Vector Gradient S</span>
+        <!-- Center Icon S Container -->
+        <div class="mb-6 flex flex-col items-center group cursor-pointer" onclick="toggleLoginForm()">
+            <div class="w-28 h-28 sm:w-36 sm:h-36 rounded-3xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 p-[2px] shadow-2xl shadow-indigo-500/50 transition-all duration-500 transform group-hover:scale-105 group-hover:rotate-1">
+                <div class="w-full h-full rounded-[22px] bg-slate-950/80 backdrop-blur-xl flex items-center justify-center border border-white/20">
+                    <span class="outfit-font font-black text-6xl sm:text-7xl text-transparent bg-clip-text bg-gradient-to-tr from-indigo-400 via-pink-400 to-purple-300 glow-letter">
+                        S
+                    </span>
                 </div>
             </div>
-
-            <!-- Fast Quick Export Buttons -->
-            <div class="w-full glass-panel p-5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div class="text-right">
-                    <h3 class="text-sm font-semibold text-white">تصدير جاهز للأجهزة</h3>
-                    <p class="text-xs text-gray-400">قم بتحميل الأيقونة بالدقة التي تناسب تطبيقك</p>
-                </div>
-                <div class="flex flex-wrap gap-2 w-full sm:w-auto">
-                    <button onclick="downloadIcon(512)" class="flex-1 sm:flex-initial px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold text-xs rounded-xl shadow-lg shadow-indigo-500/25 transition-all flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-download"></i>
-                        <span>تحميل PNG (512x512)</span>
-                    </button>
-                    <button onclick="downloadIcon(192)" class="px-3 py-2.5 bg-gray-800 hover:bg-gray-700 text-gray-200 font-medium text-xs rounded-xl transition-all flex items-center justify-center gap-1.5">
-                        <i class="fa-solid fa-mobile-screen"></i>
-                        <span>192px</span>
-                    </button>
-                    <button onclick="downloadIcon(64)" class="px-3 py-2.5 bg-gray-800 hover:bg-gray-700 text-gray-200 font-medium text-xs rounded-xl transition-all flex items-center justify-center gap-1.5">
-                        <i class="fa-solid fa-globe"></i>
-                        <span>Favicon</span>
-                    </button>
-                </div>
-            </div>
-
         </div>
 
-        <!-- Right / Bottom: Customization Control Panel -->
-        <div class="lg:col-span-5 w-full glass-panel p-6 rounded-3xl space-y-6 border border-gray-800">
-            <div>
-                <h2 class="text-lg font-bold text-white flex items-center gap-2">
-                    <i class="fa-solid fa-sliders text-indigo-400"></i>
-                    <span>أدوات التخصيص والتصميم</span>
-                </h2>
-                <p class="text-xs text-gray-400 mt-1">تعديل الألوان، الإضاءة، والخطوط لحظياً</p>
+        <!-- Glass Login Form Box -->
+        <div id="loginCard" class="w-full glass-card p-6 sm:p-8 rounded-3xl transition-all duration-500 transform opacity-100 scale-100">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-bold text-white mb-1">مرحباً بك في Sovexa</h2>
+                <p class="text-xs text-gray-300">سجل دخولك للتواصل مع أصدقائك والعالم</p>
             </div>
 
-            <!-- Customization Controls Accordion/Sections -->
-            <div class="space-y-5 text-sm">
-
-                <!-- 1. Text & Branding Input -->
-                <div class="space-y-2">
-                    <label class="block text-xs font-semibold text-gray-300">اسم العلامة التجارية (Text Label)</label>
+            <form onsubmit="event.preventDefault(); alert('جارٍ ربط قاعدة البيانات لحفظ الحسابات...');" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 mb-1">البريد الإلكتروني / اسم المستخدم</label>
                     <div class="relative">
-                        <input type="text" id="brandText" value="Sovexa" class="w-full bg-gray-900/90 border border-gray-700 rounded-xl px-3.5 py-2.5 text-white text-sm focus:outline-none focus:border-indigo-500 transition-colors outfit-font">
-                        <span class="absolute left-3 top-2.5 text-xs text-gray-500 outfit-font">Brand Name</span>
+                        <input type="text" required placeholder="name@sovexa.com" class="w-full bg-slate-900/80 border border-gray-700 focus:border-indigo-500 rounded-xl px-4 py-3 text-sm text-white focus:outline-none transition-colors pr-10">
+                        <i class="fa-solid fa-envelope absolute left-3.5 top-3.5 text-gray-400 text-sm"></i>
                     </div>
                 </div>
 
-                <!-- 2. Color Scheme Presets -->
-                <div class="space-y-2">
-                    <label class="block text-xs font-semibold text-gray-300">أنماط الألوان الجاهزة (Presets)</label>
-                    <div class="grid grid-cols-4 gap-2">
-                        <button onclick="applyPreset('cyber')" class="p-2 bg-gray-900 rounded-xl border border-gray-800 hover:border-indigo-500 flex flex-col items-center gap-1 group">
-                            <div class="w-full h-4 rounded-md bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
-                            <span class="text-[10px] text-gray-400 group-hover:text-white">Cyber</span>
-                        </button>
-                        <button onclick="applyPreset('sunset')" class="p-2 bg-gray-900 rounded-xl border border-gray-800 hover:border-amber-500 flex flex-col items-center gap-1 group">
-                            <div class="w-full h-4 rounded-md bg-gradient-to-r from-amber-500 via-rose-500 to-purple-600"></div>
-                            <span class="text-[10px] text-gray-400 group-hover:text-white">Sunset</span>
-                        </button>
-                        <button onclick="applyPreset('emerald')" class="p-2 bg-gray-900 rounded-xl border border-gray-800 hover:border-emerald-500 flex flex-col items-center gap-1 group">
-                            <div class="w-full h-4 rounded-md bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-600"></div>
-                            <span class="text-[10px] text-gray-400 group-hover:text-white">Emerald</span>
-                        </button>
-                        <button onclick="applyPreset('royal')" class="p-2 bg-gray-900 rounded-xl border border-gray-800 hover:border-blue-500 flex flex-col items-center gap-1 group">
-                            <div class="w-full h-4 rounded-md bg-gradient-to-r from-blue-600 via-indigo-600 to-slate-900"></div>
-                            <span class="text-[10px] text-gray-400 group-hover:text-white">Royal</span>
-                        </button>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 mb-1">كلمة المرور</label>
+                    <div class="relative">
+                        <input type="password" required placeholder="••••••••" class="w-full bg-slate-900/80 border border-gray-700 focus:border-indigo-500 rounded-xl px-4 py-3 text-sm text-white focus:outline-none transition-colors pr-10">
+                        <i class="fa-solid fa-lock absolute left-3.5 top-3.5 text-gray-400 text-sm"></i>
                     </div>
                 </div>
 
-                <!-- 3. Gradient Color Pickers -->
-                <div class="grid grid-cols-2 gap-3">
-                    <div class="space-y-1.5">
-                        <label class="block text-xs font-medium text-gray-400">لون حرف S (بداية)</label>
-                        <div class="flex items-center gap-2 bg-gray-900 p-2 rounded-xl border border-gray-800">
-                            <input type="color" id="letterColor1" value="#6366f1" class="w-8 h-8 rounded-lg border-0 cursor-pointer bg-transparent">
-                            <span id="letterColor1Hex" class="text-xs font-mono text-gray-300">#6366f1</span>
-                        </div>
-                    </div>
-                    <div class="space-y-1.5">
-                        <label class="block text-xs font-medium text-gray-400">لون حرف S (نهاية)</label>
-                        <div class="flex items-center gap-2 bg-gray-900 p-2 rounded-xl border border-gray-800">
-                            <input type="color" id="letterColor2" value="#ec4899" class="w-8 h-8 rounded-lg border-0 cursor-pointer bg-transparent">
-                            <span id="letterColor2Hex" class="text-xs font-mono text-gray-300">#ec4899</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 4. Background Container Gradient Pickers -->
-                <div class="grid grid-cols-2 gap-3">
-                    <div class="space-y-1.5">
-                        <label class="block text-xs font-medium text-gray-400">خلفية الأيقونة (علوي)</label>
-                        <div class="flex items-center gap-2 bg-gray-900 p-2 rounded-xl border border-gray-800">
-                            <input type="color" id="bgColor1" value="#1e1b4b" class="w-8 h-8 rounded-lg border-0 cursor-pointer bg-transparent">
-                            <span id="bgColor1Hex" class="text-xs font-mono text-gray-300">#1e1b4b</span>
-                        </div>
-                    </div>
-                    <div class="space-y-1.5">
-                        <label class="block text-xs font-medium text-gray-400">خلفية الأيقونة (سفلي)</label>
-                        <div class="flex items-center gap-2 bg-gray-900 p-2 rounded-xl border border-gray-800">
-                            <input type="color" id="bgColor2" value="#0f172a" class="w-8 h-8 rounded-lg border-0 cursor-pointer bg-transparent">
-                            <span id="bgColor2Hex" class="text-xs font-mono text-gray-300">#0f172a</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 5. Glow & Size Sliders -->
-                <div class="space-y-4 pt-2 border-t border-gray-800">
-                    <div class="space-y-1.5">
-                        <div class="flex justify-between text-xs">
-                            <span class="font-medium text-gray-300">شدة التوهج والبريق (Glow Power)</span>
-                            <span id="glowVal" class="text-indigo-400 font-mono">25px</span>
-                        </div>
-                        <input type="range" id="glowSlider" min="0" max="60" value="25" class="w-full accent-indigo-500 bg-gray-800 rounded-lg h-2 cursor-pointer">
-                    </div>
-
-                    <div class="space-y-1.5">
-                        <div class="flex justify-between text-xs">
-                            <span class="font-medium text-gray-300">حجم حرف S داخل الأيقونة</span>
-                            <span id="letterSizeVal" class="text-indigo-400 font-mono">210px</span>
-                        </div>
-                        <input type="range" id="letterSizeSlider" min="120" max="280" value="210" class="w-full accent-indigo-500 bg-gray-800 rounded-lg h-2 cursor-pointer">
-                    </div>
-
-                    <div class="space-y-1.5">
-                        <div class="flex justify-between text-xs">
-                            <span class="font-medium text-gray-300">انحناء زوايا الإطار (Border Radius)</span>
-                            <span id="radiusVal" class="text-indigo-400 font-mono">60px</span>
-                        </div>
-                        <input type="range" id="radiusSlider" min="20" max="120" value="60" class="w-full accent-indigo-500 bg-gray-800 rounded-lg h-2 cursor-pointer">
-                    </div>
-                </div>
-
-                <!-- 6. Toggle Subtitle / Layout Options -->
-                <div class="flex items-center justify-between pt-3 border-t border-gray-800">
-                    <span class="text-xs font-medium text-gray-300">إظهار اسم Sovexa أسفل الأيقونة</span>
-                    <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" id="showTextToggle" checked class="sr-only peer">
-                        <div class="w-11 h-6 bg-gray-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                <div class="flex items-center justify-between text-xs text-gray-400">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" class="rounded bg-slate-800 border-gray-700 text-indigo-600 focus:ring-0">
+                        <span>تذكرني</span>
                     </label>
+                    <a href="#" class="text-indigo-400 hover:underline">نسيت كلمة المرور؟</a>
                 </div>
 
+                <button type="submit" class="w-full py-3.5 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-500 hover:to-pink-500 text-white font-bold text-sm rounded-xl shadow-lg shadow-indigo-500/30 transition-all transform active:scale-95">
+                    تسجيل الدخول
+                </button>
+            </form>
+
+            <div class="mt-6 pt-4 border-t border-gray-800/80 text-center">
+                <p class="text-xs text-gray-400">
+                    ليس لديك حساب؟ 
+                    <a href="#" onclick="alert('سنتيح إنشاء الحساب فور ربط قاعدة البيانات!');" class="text-pink-400 font-semibold hover:underline">إنشاء حساب جديد</a>
+                </p>
             </div>
         </div>
 
     </main>
 
-    <!-- Footer -->
-    <footer class="mt-auto border-t border-gray-800 py-4 text-center text-xs text-gray-500">
-        <p>تطبيق Sovexa - جميع الحقوق محفوظة &copy; 2026</p>
+    <!-- Bottom Brand Title Sovexa -->
+    <footer class="relative z-10 w-full pb-8 pt-4 text-center">
+        <h1 class="outfit-font font-black text-4xl sm:text-5xl tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-white via-indigo-200 to-pink-300 glow-text uppercase">
+            Sovexa
+        </h1>
+        <div class="w-2 h-2 rounded-full bg-indigo-500 mx-auto mt-2 shadow-lg shadow-indigo-500/80 animate-ping"></div>
     </footer>
 
-    <!-- JavaScript Canvas Logic -->
+    <!-- Background Animation Script -->
     <script>
-        const canvas = document.getElementById('logoCanvas');
+        const canvas = document.getElementById('bgCanvas');
         const ctx = canvas.getContext('2d');
 
-        // Inputs
-        const brandTextInput = document.getElementById('brandText');
-        const letterColor1Input = document.getElementById('letterColor1');
-        const letterColor2Input = document.getElementById('letterColor2');
-        const bgColor1Input = document.getElementById('bgColor1');
-        const bgColor2Input = document.getElementById('bgColor2');
-        const glowSlider = document.getElementById('glowSlider');
-        const letterSizeSlider = document.getElementById('letterSizeSlider');
-        const radiusSlider = document.getElementById('radiusSlider');
-        const showTextToggle = document.getElementById('showTextToggle');
+        let width, height;
+        let particles = [];
 
-        // Color Hex Labels
-        const letterColor1Hex = document.getElementById('letterColor1Hex');
-        const letterColor2Hex = document.getElementById('letterColor2Hex');
-        const bgColor1Hex = document.getElementById('bgColor1Hex');
-        const bgColor2Hex = document.getElementById('bgColor2Hex');
-        const glowVal = document.getElementById('glowVal');
-        const letterSizeVal = document.getElementById('letterSizeVal');
-        const radiusVal = document.getElementById('radiusVal');
-
-        // Preset Configurations
-        const presets = {
-            cyber: { l1: '#6366f1', l2: '#ec4899', bg1: '#1e1b4b', bg2: '#0f172a', glow: 30 },
-            sunset: { l1: '#f59e0b', l2: '#f43f5e', bg1: '#451a03', bg2: '#18181b', glow: 25 },
-            emerald: { l1: '#34d399', l2: '#06b6d4', bg1: '#064e3b', bg2: '#022c22', glow: 25 },
-            royal: { l1: '#3b82f6', l2: '#8b5cf6', bg1: '#172554', bg2: '#030712', glow: 20 }
-        };
-
-        function applyPreset(name) {
-            const p = presets[name];
-            if(!p) return;
-            letterColor1Input.value = p.l1;
-            letterColor2Input.value = p.l2;
-            bgColor1Input.value = p.bg1;
-            bgColor2Input.value = p.bg2;
-            glowSlider.value = p.glow;
-            drawLogo();
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
         }
 
-        // Draw Canvas Main Function
-        function drawLogo() {
-            // Update UI Hex Labels
-            letterColor1Hex.innerText = letterColor1Input.value;
-            letterColor2Hex.innerText = letterColor2Input.value;
-            bgColor1Hex.innerText = bgColor1Input.value;
-            bgColor2Hex.innerText = bgColor2Input.value;
-            glowVal.innerText = glowSlider.value + 'px';
-            letterSizeVal.innerText = letterSizeSlider.value + 'px';
-            radiusVal.innerText = radiusSlider.value + 'px';
+        window.addEventListener('resize', resize);
+        resize();
 
-            const width = canvas.width;
-            const height = canvas.height;
-
-            // Clear Canvas
-            ctx.clearRect(0, 0, width, height);
-
-            const showText = showTextToggle.checked;
-            const iconSize = showText ? 340 : 420;
-            const iconX = (width - iconSize) / 2;
-            const iconY = showText ? 35 : (height - iconSize) / 2;
-            const borderRadius = parseInt(radiusSlider.value);
-            const glowPower = parseInt(glowSlider.value);
-
-            // 1. Outer Ambient Glow Shadow
-            if (glowPower > 0) {
-                ctx.save();
-                ctx.shadowColor = letterColor1Input.value;
-                ctx.shadowBlur = glowPower * 1.5;
-                ctx.shadowOffsetX = 0;
-                ctx.shadowOffsetY = 10;
-                ctx.fillStyle = bgColor1Input.value;
-                drawRoundedRect(ctx, iconX, iconY, iconSize, iconSize, borderRadius);
-                ctx.fill();
-                ctx.restore();
+        // Create Glowing Particles
+        class Particle {
+            constructor() {
+                this.reset();
             }
+            reset() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.size = Math.random() * 3 + 1;
+                this.speedX = (Math.random() - 0.5) * 0.8;
+                this.speedY = (Math.random() - 0.5) * 0.8;
+                this.alpha = Math.random() * 0.6 + 0.2;
+                this.color = Math.random() > 0.5 ? '#6366f1' : '#ec4899';
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
 
-            // 2. Icon Container Rounded Rectangle Background Gradient
-            ctx.save();
-            const bgGrad = ctx.createLinearGradient(iconX, iconY, iconX + iconSize, iconY + iconSize);
-            bgGrad.addColorStop(0, bgColor1Input.value);
-            bgGrad.addColorStop(1, bgColor2Input.value);
-            ctx.fillStyle = bgGrad;
-            drawRoundedRect(ctx, iconX, iconY, iconSize, iconSize, borderRadius);
-            ctx.fill();
-
-            // 3. Glassmorphism Light Reflection Overlay
-            const glassGrad = ctx.createLinearGradient(iconX, iconY, iconX + iconSize, iconY + iconSize);
-            glassGrad.addColorStop(0, 'rgba(255, 255, 255, 0.18)');
-            glassGrad.addColorStop(0.4, 'rgba(255, 255, 255, 0.03)');
-            glassGrad.addColorStop(1, 'rgba(0, 0, 0, 0.35)');
-            ctx.fillStyle = glassGrad;
-            drawRoundedRect(ctx, iconX, iconY, iconSize, iconSize, borderRadius);
-            ctx.fill();
-
-            // Border Highlight Outline
-            ctx.lineWidth = 3;
-            const borderGrad = ctx.createLinearGradient(iconX, iconY, iconX + iconSize, iconY + iconSize);
-            borderGrad.addColorStop(0, 'rgba(255, 255, 255, 0.3)');
-            borderGrad.addColorStop(1, 'rgba(255, 255, 255, 0.05)');
-            ctx.strokeStyle = borderGrad;
-            drawRoundedRect(ctx, iconX, iconY, iconSize, iconSize, borderRadius);
-            ctx.stroke();
-            ctx.restore();
-
-            // 4. Stylized Letter 'S' Design Centered Inside Icon Container
-            ctx.save();
-            const letterFontSize = parseInt(letterSizeSlider.value) * (showText ? 0.85 : 1);
-            const centerX = iconX + (iconSize / 2);
-            const centerY = iconY + (iconSize / 2) + (letterFontSize * 0.32);
-
-            // Glow effect for Letter 'S'
-            ctx.shadowColor = letterColor1Input.value;
-            ctx.shadowBlur = glowPower;
-            ctx.shadowOffsetX = 0;
-            ctx.shadowOffsetY = 0;
-
-            // Letter 'S' Gradient Fill
-            const letterGrad = ctx.createLinearGradient(iconX, iconY, iconX + iconSize, iconY + iconSize);
-            letterGrad.addColorStop(0, letterColor1Input.value);
-            letterGrad.addColorStop(1, letterColor2Input.value);
-
-            ctx.font = `900 ${letterFontSize}px 'Outfit', 'Inter', sans-serif`;
-            ctx.textAlign = 'center';
-            ctx.fillStyle = letterGrad;
-            ctx.fillText('S', centerX, centerY);
-            ctx.restore();
-
-            // 5. Brand Subtitle Text "Sovexa" Below Logo
-            if (showText) {
+                if (this.x < 0 || this.x > width || this.y < 0 || this.y > height) {
+                    this.reset();
+                }
+            }
+            draw() {
                 ctx.save();
-                const brandText = brandTextInput.value || 'Sovexa';
-                const textY = iconY + iconSize + 65;
-                
-                // Text Gradient
-                const textGrad = ctx.createLinearGradient(0, textY - 30, 0, textY);
-                textGrad.addColorStop(0, '#ffffff');
-                textGrad.addColorStop(1, '#cbd5e1');
-
-                ctx.font = `800 46px 'Outfit', 'Inter', sans-serif`;
-                ctx.textAlign = 'center';
-                ctx.fillStyle = textGrad;
-                ctx.letterSpacing = '2px';
-                ctx.fillText(brandText, width / 2, textY);
-
-                // Small Glowing Dot accent under name
+                ctx.globalAlpha = this.alpha;
+                ctx.shadowBlur = 12;
+                ctx.shadowColor = this.color;
+                ctx.fillStyle = this.color;
                 ctx.beginPath();
-                ctx.arc(width / 2, textY + 18, 4, 0, Math.PI * 2);
-                ctx.fillStyle = letterColor1Input.value;
-                ctx.shadowColor = letterColor1Input.value;
-                ctx.shadowBlur = 10;
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
                 ctx.fill();
-
                 ctx.restore();
             }
         }
 
-        // Helper function for rounded rectangles on HTML5 Canvas
-        function drawRoundedRect(ctx, x, y, width, height, radius) {
+        for (let i = 0; i < 65; i++) {
+            particles.push(new Particle());
+        }
+
+        function animate() {
+            // Draw gradient background on canvas
+            const bgGradient = ctx.createLinearGradient(0, 0, width, height);
+            bgGradient.addColorStop(0, '#0b0f17');
+            bgGradient.addColorStop(0.5, '#1e1b4b');
+            bgGradient.addColorStop(1, '#0f172a');
+
+            ctx.fillStyle = bgGradient;
+            ctx.fillRect(0, 0, width, height);
+
+            // Draw glowing circles in corners
+            ctx.save();
+            ctx.shadowBlur = 100;
+            ctx.shadowColor = '#4f46e5';
+            ctx.fillStyle = 'rgba(79, 70, 229, 0.15)';
             ctx.beginPath();
-            ctx.moveTo(x + radius, y);
-            ctx.lineTo(x + width - radius, y);
-            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
-            ctx.lineTo(x + width, y + height - radius);
-            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
-            ctx.lineTo(x + radius, y + height);
-            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
-            ctx.lineTo(x, y + radius);
-            ctx.quadraticCurveTo(x, y, x + radius, y);
-            ctx.closePath();
-        }
+            ctx.arc(width * 0.2, height * 0.3, 180, 0, Math.PI * 2);
+            ctx.fill();
 
-        // Download Icon in requested resolution
-        function downloadIcon(size) {
-            // Create offscreen canvas for crisp resolution export
-            const exportCanvas = document.createElement('canvas');
-            exportCanvas.width = size;
-            exportCanvas.height = size;
-            const expCtx = exportCanvas.getContext('2d');
+            ctx.shadowColor = '#ec4899';
+            ctx.fillStyle = 'rgba(236, 72, 153, 0.12)';
+            ctx.beginPath();
+            ctx.arc(width * 0.8, height * 0.7, 220, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
 
-            // Draw current canvas scaled to download size
-            expCtx.drawImage(canvas, 0, 0, size, size);
-
-            // Download Trigger
-            const link = document.createElement('a');
-            link.download = `Sovexa-AppIcon-${size}x${size}.png`;
-            link.href = exportCanvas.toDataURL('image/png');
-            link.click();
-        }
-
-        // Event Listeners for real-time adjustments
-        [brandTextInput, letterColor1Input, letterColor2Input, bgColor1Input, bgColor2Input, glowSlider, letterSizeSlider, radiusSlider, showTextToggle].forEach(el => {
-            el.addEventListener('input', drawLogo);
-            el.addEventListener('change', drawLogo);
-        });
-
-        // Initial Draw on Window Load
-        window.onload = function() {
-            // Ensure Font is loaded before rendering canvas text
-            document.fonts.ready.then(function() {
-                drawLogo();
+            // Render Particles
+            particles.forEach(p => {
+                p.update();
+                p.draw();
             });
-        };
+
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+
+        // Toggle Login Form visibility for clean view
+        let isFormVisible = true;
+        function toggleLoginForm() {
+            const card = document.getElementById('loginCard');
+            const icon = document.getElementById('toggleIcon');
+            const btnText = document.getElementById('toggleBtnText');
+            
+            isFormVisible = !isFormVisible;
+            if (isFormVisible) {
+                card.style.opacity = '1';
+                card.style.transform = 'scale(1)';
+                card.style.pointerEvents = 'auto';
+                icon.className = 'fa-solid fa-eye';
+                btnText.innerText = 'إخفاء نموذج الدخول';
+            } else {
+                card.style.opacity = '0';
+                card.style.transform = 'scale(0.9)';
+                card.style.pointerEvents = 'none';
+                icon.className = 'fa-solid fa-eye-slash';
+                btnText.innerText = 'إظهار نموذج الدخول';
+            }
+        }
     </script>
 </body>
-            </html>
+</html>
