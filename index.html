@@ -327,8 +327,11 @@
                         </div>
 
                         <div class="flex items-center gap-2.5">
-                            <button onclick="toggleEditModal(true)" class="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:opacity-90 text-white text-xs font-semibold rounded-xl shadow-lg transition-all flex items-center gap-1.5">
+                            <button id="editProfileBtn" onclick="toggleEditModal(true)" class="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:opacity-90 text-white text-xs font-semibold rounded-xl shadow-lg transition-all flex items-center gap-1.5">
                                 <i class="fa-solid fa-pen-to-square"></i> تعديل الملف
+                            </button>
+                            <button id="followUserBtn" onclick="toggleFollowTargetUser()" class="hidden px-5 py-2 bg-gradient-to-r from-pink-600 to-purple-600 hover:opacity-90 text-white text-xs font-bold rounded-xl shadow-lg transition-all items-center gap-1.5">
+                                <i class="fa-solid fa-user-plus"></i> <span>متابعة</span>
                             </button>
                         </div>
                     </div>
@@ -346,15 +349,15 @@
 
                     <div class="grid grid-cols-3 gap-2 mt-5 py-3 px-4 bg-slate-900/60 rounded-2xl border border-slate-800 text-center">
                         <div>
-                            <span class="block font-bold text-base text-white">0</span>
+                            <span class="block font-bold text-base text-white" id="profilePostsCount">0</span>
                             <span class="text-[10px] text-gray-400">المنشورات</span>
                         </div>
                         <div class="border-x border-slate-800">
-                            <span class="block font-bold text-base text-white">0</span>
+                            <span class="block font-bold text-base text-white" id="profileFollowersCount">0</span>
                             <span class="text-[10px] text-gray-400">المتابعون</span>
                         </div>
                         <div>
-                            <span class="block font-bold text-base text-white">0</span>
+                            <span class="block font-bold text-base text-white" id="profileFollowingCount">0</span>
                             <span class="text-[10px] text-gray-400">يتابع</span>
                         </div>
                     </div>
@@ -365,7 +368,7 @@
     </div>
 
 
-    <!-- EDIT PROFILE MODAL WITH AVATAR & COVER UPLOAD -->
+    <!-- EDIT PROFILE MODAL -->
     <div id="editProfileModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md hidden transition-all duration-300">
         <div class="w-full max-w-md glass-modal p-6 rounded-3xl shadow-2xl border border-slate-700 relative max-h-[90vh] overflow-y-auto">
             <div class="flex items-center justify-between pb-4 border-b border-slate-800">
@@ -426,12 +429,12 @@
 
 
     <!-- ============================================== -->
-    <!-- FIREBASE & PROFILE AVATAR/COVER REALTIME SCRIPT -->
+    <!-- FIREBASE & FOLLOW/UNFOLLOW REALTIME LOGIC -->
     <!-- ============================================== -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, deleteDoc, updateDoc, increment, collection, getDocs, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, deleteDoc, updateDoc, increment, collection, getDocs, addDoc, onSnapshot, query, orderBy, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyCJm_0O6NzS0UYnoYAv5MUIp-QR9xGN18Q",
@@ -448,6 +451,7 @@
         const db = getFirestore(app);
 
         let currentUser = null;
+        let activeProfileUid = null;
         let allUsers = [];
         let selectedImageFile = null;
         let selectedAvatarFile = null;
@@ -471,7 +475,7 @@
             }, 3000);
         };
 
-        // File Selection Handlers for Profile Edit
+        // File Selection Handlers
         window.handleAvatarSelection = (e) => {
             const file = e.target.files[0];
             if (file) {
@@ -488,7 +492,6 @@
             }
         };
 
-        // Image Handling & Preview for Posts
         window.handleImageSelection = (event) => {
             const file = event.target.files[0];
             if (file) {
@@ -509,7 +512,7 @@
             document.getElementById('imagePreview').src = '';
         };
 
-        // Create & Publish Post
+        // Create Post
         window.createNewPost = async () => {
             const textInput = document.getElementById('postInput');
             const postText = textInput.value.trim();
@@ -593,10 +596,10 @@
                     postCard.className = 'glass-card p-4 rounded-2xl border border-slate-800 space-y-3';
                     postCard.innerHTML = `
                         <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-3">
+                            <div class="flex items-center gap-3 cursor-pointer" onclick="viewUserProfileByUid('${post.userId}')">
                                 ${avatarHTML}
                                 <div>
-                                    <h4 class="font-bold text-xs text-white">${post.userName || 'مستخدم Sovexa'}</h4>
+                                    <h4 class="font-bold text-xs text-white hover:text-indigo-400 transition-all">${post.userName || 'مستخدم Sovexa'}</h4>
                                     <p class="text-[10px] text-gray-400">الآن • <i class="fa-solid fa-globe"></i></p>
                                 </div>
                             </div>
@@ -802,7 +805,7 @@
             }
         });
 
-        // Toggle Notifications Box
+        // Notifications Box
         window.toggleNotifications = () => {
             const dropdown = document.getElementById('notifDropdown');
             dropdown.classList.toggle('hidden');
@@ -836,15 +839,15 @@
                 resultsBox.innerHTML = filtered.map(u => `
                     <div class="flex items-center justify-between p-2 rounded-xl bg-slate-900/80 hover:bg-slate-800 transition-all">
                         <div class="flex items-center gap-2.5">
-                            <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 to-pink-500 flex items-center justify-center text-white text-xs font-bold">
-                                ${(u.displayName || u.email).charAt(0).toUpperCase()}
+                            <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 to-pink-500 flex items-center justify-center text-white text-xs font-bold overflow-hidden">
+                                ${u.photoURL ? `<img src="${u.photoURL}" class="w-full h-full object-cover">` : (u.displayName || u.email).charAt(0).toUpperCase()}
                             </div>
                             <div>
                                 <h5 class="text-xs font-bold text-white">${u.displayName || 'مستخدم Sovexa'}</h5>
                                 <p class="text-[10px] text-gray-400">@${u.email.split('@')[0]}</p>
                             </div>
                         </div>
-                        <button onclick="viewUserProfile('${u.displayName || 'مستخدم Sovexa'}', '${u.email}')" class="px-3 py-1 bg-indigo-600/30 border border-indigo-500/40 hover:bg-indigo-600 text-indigo-300 hover:text-white text-[10px] font-semibold rounded-lg transition-all">
+                        <button onclick="viewUserProfileByUid('${u.uid}')" class="px-3 py-1 bg-indigo-600/30 border border-indigo-500/40 hover:bg-indigo-600 text-indigo-300 hover:text-white text-[10px] font-semibold rounded-lg transition-all">
                             عرض الملف
                         </button>
                     </div>
@@ -853,19 +856,7 @@
             resultsBox.classList.remove('hidden');
         };
 
-        window.viewUserProfile = (name, email) => {
+        // Profile View & Follow System
+        window.viewUserProfileByUid = async (uid) => {
             document.getElementById('searchResults').classList.add('hidden');
-            document.getElementById('searchInput').value = '';
-            showSection('profile');
-            document.getElementById('profileName').innerText = name;
-            document.getElementById('profileEmail').innerText = '@' + email.split('@')[0];
-        };
-
-        // Side Menu
-        window.toggleSideMenu = () => {
-            const modal = document.getElementById('sideMenuModal');
-            const content = document.getElementById('menuContent');
-            if (modal.classList.contains('hidden')) {
-                modal.classList.remove('hidden');
-                setTimeout(() => {
-                    content.classList.re
+            document.getE
