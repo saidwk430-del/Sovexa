@@ -47,6 +47,9 @@
     <!-- Interactive Background Canvas -->
     <canvas id="bgCanvas"></canvas>
 
+    <!-- Toast Notification Popup Container -->
+    <div id="toastContainer" class="fixed top-16 left-1/2 transform -translate-x-1/2 z-50 flex flex-col items-center gap-2 pointer-events-none"></div>
+
     <!-- ==================== PART 1: LOGIN VIEW ==================== -->
     <div id="loginSection" class="relative z-10 flex flex-col justify-between items-center min-h-screen p-4">
         <header class="w-full p-4 flex justify-between items-center max-w-7xl mx-auto">
@@ -128,9 +131,45 @@
                 <button onclick="showSection('feed')" class="px-3 py-1.5 rounded-xl bg-slate-900/80 border border-slate-800 text-gray-300 hover:text-white text-xs font-semibold transition-all">
                     <i class="fa-solid fa-house ml-1"></i> الرئيسية
                 </button>
-                <button onclick="showSection('chat')" class="px-3 py-1.5 rounded-xl bg-purple-600/30 border border-purple-500/40 text-purple-300 hover:text-white text-xs font-semibold transition-all relative">
+
+                <!-- Notifications Bell Button -->
+                <div class="relative">
+                    <button onclick="toggleNotifications()" class="w-9 h-9 rounded-xl bg-slate-800/80 border border-slate-700 text-gray-200 hover:text-white hover:bg-slate-700 flex items-center justify-center transition-all relative">
+                        <i class="fa-solid fa-bell text-sm"></i>
+                        <span id="notifBadge" class="absolute -top-1 -right-1 w-4 h-4 bg-pink-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center animate-pulse">2</span>
+                    </button>
+
+                    <!-- Notifications Dropdown -->
+                    <div id="notifDropdown" class="hidden absolute left-0 sm:left-auto sm:right-0 top-12 w-72 sm:w-80 glass-modal p-3 rounded-2xl border border-slate-700 shadow-2xl z-50 space-y-2">
+                        <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+                            <h4 class="text-xs font-bold text-white flex items-center gap-1.5">
+                                <i class="fa-solid fa-bell text-pink-400"></i> الإشعارات
+                            </h4>
+                            <button onclick="clearNotifBadge()" class="text-[10px] text-indigo-400 hover:underline">تحديد الكل كمقروء</button>
+                        </div>
+                        <div class="space-y-1.5 max-h-60 overflow-y-auto" id="notifList">
+                            <div class="flex items-center gap-2.5 p-2 rounded-xl bg-slate-900/90 border border-slate-800">
+                                <div class="w-8 h-8 rounded-full bg-pink-500/20 text-pink-400 flex items-center justify-center text-xs"><i class="fa-solid fa-heart"></i></div>
+                                <div class="flex-1">
+                                    <p class="text-[11px] text-gray-200">قام <span class="font-bold text-white">أحمد علي</span> بالإعجاب بمنشورك.</p>
+                                    <span class="text-[9px] text-gray-400">منذ 5 دقائق</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2.5 p-2 rounded-xl bg-slate-900/90 border border-slate-800">
+                                <div class="w-8 h-8 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-xs"><i class="fa-solid fa-comment"></i></div>
+                                <div class="flex-1">
+                                    <p class="text-[11px] text-gray-200">علقت <span class="font-bold text-white">سارة محمد</span> على المنشور.</p>
+                                    <span class="text-[9px] text-gray-400">منذ 15 دقيقة</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="showSection('chat')" class="px-3 py-1.5 rounded-xl bg-purple-600/30 border border-purple-500/40 text-purple-300 hover:text-white text-xs font-semibold transition-all">
                     <i class="fa-solid fa-comments ml-1"></i> الدردشة
                 </button>
+
                 <button onclick="showSection('profile')" class="px-3 py-1.5 rounded-xl bg-indigo-600/30 border border-indigo-500/40 text-indigo-300 hover:text-white text-xs font-semibold transition-all">
                     <i class="fa-solid fa-user ml-1"></i> ملفي
                 </button>
@@ -147,7 +186,6 @@
     <!-- ==================== SIDE MENU ==================== -->
     <div id="sideMenuModal" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm hidden transition-all duration-300">
         <div id="menuContent" class="absolute top-16 left-4 right-4 sm:left-auto sm:right-10 w-auto sm:w-80 glass-modal p-4 rounded-3xl border border-slate-700 shadow-2xl space-y-3 transform transition-all scale-95 opacity-0">
-            
             <div onclick="showSection('profile'); toggleSideMenu();" class="flex items-center gap-3 p-3 rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-indigo-500/50 cursor-pointer transition-all">
                 <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-500 to-pink-500 flex items-center justify-center text-white font-bold userAvatarLetter">S</div>
                 <div class="flex-1 overflow-hidden">
@@ -190,7 +228,6 @@
                     <span>تسجيل الخروج</span>
                 </button>
             </div>
-
         </div>
     </div>
 
@@ -206,10 +243,7 @@
                     <input type="text" id="searchInput" oninput="handleSearch(this.value)" placeholder="ابحث عن أصدقاء أو مستخدمين..." class="w-full bg-slate-900/90 border border-slate-800 focus:border-indigo-500 rounded-xl pr-9 pl-4 py-2 text-xs text-white focus:outline-none transition-all">
                 </div>
 
-                <!-- Live Search Results Dropdown -->
-                <div id="searchResults" class="hidden absolute left-0 right-0 top-12 mt-1 glass-modal rounded-2xl border border-slate-700 shadow-2xl p-2 z-50 max-h-60 overflow-y-auto space-y-1">
-                    <!-- Results rendered dynamically via JS -->
-                </div>
+                <div id="searchResults" class="hidden absolute left-0 right-0 top-12 mt-1 glass-modal rounded-2xl border border-slate-700 shadow-2xl p-2 z-50 max-h-60 overflow-y-auto space-y-1"></div>
             </section>
 
             <!-- Create Post Box -->
@@ -235,7 +269,7 @@
                         </div>
                     </div>
                 </div>
-                <p class="text-xs text-gray-200">أهلاً بكم في المنشور الأول لـ Sovexa! جربوا ميزة البحث الجديدة بالأعلى لباقي مستخدمي المنصة! 🚀✨</p>
+                <p class="text-xs text-gray-200">أهلاً بكم في Sovexa! جربوا التفاعل الآن وتلقي الإشعارات الفورية! 🚀✨</p>
                 <div class="rounded-xl overflow-hidden border border-slate-800">
                     <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80" class="w-full max-h-72 object-cover" alt="Post">
                 </div>
@@ -253,7 +287,7 @@
                         <span class="bg-slate-800 text-[10px] px-1.5 py-0.5 rounded-full text-white comment-count">1</span>
                     </button>
 
-                    <button class="flex items-center gap-2 text-gray-400 hover:text-emerald-400 transition-all font-semibold py-1 px-3 rounded-lg hover:bg-slate-900">
+                    <button onclick="showToast('تم نسخ رابط المنشور للمشاركة! 🚀')" class="flex items-center gap-2 text-gray-400 hover:text-emerald-400 transition-all font-semibold py-1 px-3 rounded-lg hover:bg-slate-900">
                         <i class="fa-solid fa-share text-sm"></i>
                         <span>مشاركة</span>
                     </button>
@@ -265,7 +299,7 @@
                             <div class="w-7 h-7 rounded-full bg-pink-600 flex items-center justify-center text-white text-[10px] font-bold">س</div>
                             <div>
                                 <h5 class="text-[11px] font-bold text-white">سارة محمد</h5>
-                                <p class="text-[11px] text-gray-300">ميزة البحث عن المستعملين ممتازة جداً! بالتوفيق 🔥</p>
+                                <p class="text-[11px] text-gray-300">ميزة الإشعارات مذهلة ورائعة جداً! 🔥</p>
                             </div>
                         </div>
                     </div>
@@ -426,7 +460,7 @@
     </div>
 
 
-    <!-- FIREBASE & SEARCH LOGIC -->
+    <!-- FIREBASE & NOTIFICATIONS LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -449,7 +483,38 @@
         let currentUser = null;
         let allUsers = [];
 
-        // Live Search Handler
+        // Toast Notification Function
+        window.showToast = (msg) => {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'glass-modal px-4 py-2.5 rounded-2xl border border-indigo-500/50 shadow-2xl text-xs font-bold text-white flex items-center gap-2 transform transition-all duration-300 translate-y-[-10px] opacity-0';
+            toast.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400"></i> ${msg}`;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-[-10px]', 'opacity-0');
+            }, 10);
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        };
+
+        // Toggle Notifications Box
+        window.toggleNotifications = () => {
+            const dropdown = document.getElementById('notifDropdown');
+            dropdown.classList.toggle('hidden');
+        };
+
+        // Clear Notification Red Badge
+        window.clearNotifBadge = () => {
+            const badge = document.getElementById('notifBadge');
+            if (badge) badge.classList.add('hidden');
+            showToast('تم تحديث جميع الإشعارات كمقروءة.');
+        };
+
+        // Live Search
         window.handleSearch = (query) => {
             const resultsBox = document.getElementById('searchResults');
             const cleanQuery = query.trim().toLowerCase();
@@ -497,7 +562,7 @@
             document.querySelectorAll('.userAvatarLetter').forEach(el => el.innerText = name.charAt(0).toUpperCase());
         };
 
-        // Toggle Side Menu
+        // Side Menu Toggle
         window.toggleSideMenu = () => {
             const modal = document.getElementById('sideMenuModal');
             const content = document.getElementById('menuContent');
@@ -518,7 +583,7 @@
         window.switchAccount = async () => {
             toggleSideMenu();
             await signOut(auth);
-            alert("تم تسجيل الخروج، يمكنك الآن تسجيل الدخول بحساب آخر!");
+            showToast("تم تسجيل الخروج، يمكنك تسجيل الدخول بحساب جديد!");
         };
 
         // Interactive Like Toggle
@@ -531,6 +596,7 @@
                 icon.className = 'fa-solid fa-heart text-pink-500 text-sm animate-bounce';
                 btn.classList.add('text-pink-500');
                 countSpan.innerText = count + 1;
+                showToast("أبديت إعجابك بالمنشور! ❤️");
             } else {
                 icon.className = 'fa-regular fa-heart text-sm';
                 btn.classList.remove('text-pink-500');
@@ -570,6 +636,7 @@
 
             const countSpan = form.closest('article').querySelector('.comment-count');
             countSpan.innerText = parseInt(countSpan.innerText) + 1;
+            showToast("تم إضافة تعليقك بنجاح! 💬");
         };
 
         // Navigation Controller
@@ -693,7 +760,7 @@
 
                 updateProfileUI(newName, newBio);
                 toggleEditModal(false);
-                alert("تم تحديث معلومات الملف الشخصي بنجاح! 🎉");
+                showToast("تم تحديث معلومات الملف الشخصي بنجاح! 🎉");
             } catch (error) {
                 alert("حدث خطأ أثناء الحفظ: " + error.message);
             } finally {
