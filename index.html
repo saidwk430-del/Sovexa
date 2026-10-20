@@ -144,11 +144,10 @@
     </header>
 
 
-    <!-- ==================== SIDE MENU (Facebook Style Dropdown) ==================== -->
+    <!-- ==================== SIDE MENU ==================== -->
     <div id="sideMenuModal" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm hidden transition-all duration-300">
         <div id="menuContent" class="absolute top-16 left-4 right-4 sm:left-auto sm:right-10 w-auto sm:w-80 glass-modal p-4 rounded-3xl border border-slate-700 shadow-2xl space-y-3 transform transition-all scale-95 opacity-0">
             
-            <!-- User Summary Header -->
             <div onclick="showSection('profile'); toggleSideMenu();" class="flex items-center gap-3 p-3 rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-indigo-500/50 cursor-pointer transition-all">
                 <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-500 to-pink-500 flex items-center justify-center text-white font-bold userAvatarLetter">S</div>
                 <div class="flex-1 overflow-hidden">
@@ -160,21 +159,17 @@
 
             <div class="border-t border-slate-800 my-2"></div>
 
-            <!-- Menu Options List -->
             <div class="space-y-1.5 text-xs font-semibold">
-                <!-- Switch Account Option -->
                 <button onclick="switchAccount()" class="w-full flex items-center gap-3 p-2.5 rounded-xl text-gray-300 hover:text-white hover:bg-slate-900/90 transition-all">
                     <div class="w-7 h-7 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center"><i class="fa-solid fa-users-between-lines"></i></div>
                     <span>تبديل الحساب</span>
                 </button>
 
-                <!-- Settings -->
                 <button onclick="alert('قسم الإعدادات والخصوصية قيد التطوير')" class="w-full flex items-center gap-3 p-2.5 rounded-xl text-gray-300 hover:text-white hover:bg-slate-900/90 transition-all">
                     <div class="w-7 h-7 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center"><i class="fa-solid fa-gear"></i></div>
                     <span>الإعدادات والخصوصية</span>
                 </button>
 
-                <!-- Dark Theme / Appearance -->
                 <button class="w-full flex items-center justify-between p-2.5 rounded-xl text-gray-300 hover:text-white hover:bg-slate-900/90 transition-all">
                     <div class="flex items-center gap-3">
                         <div class="w-7 h-7 rounded-lg bg-pink-500/20 text-pink-400 flex items-center justify-center"><i class="fa-solid fa-moon"></i></div>
@@ -183,7 +178,6 @@
                     <span class="text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full">مفعل</span>
                 </button>
 
-                <!-- Support & Help -->
                 <button onclick="alert('تواصل مع الدعم عبر قسم الدردشة')" class="w-full flex items-center gap-3 p-2.5 rounded-xl text-gray-300 hover:text-white hover:bg-slate-900/90 transition-all">
                     <div class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center"><i class="fa-solid fa-circle-question"></i></div>
                     <span>المساعدة والدعم</span>
@@ -191,7 +185,6 @@
 
                 <div class="border-t border-slate-800 my-2"></div>
 
-                <!-- Logout -->
                 <button onclick="logout(); toggleSideMenu();" class="w-full flex items-center gap-3 p-2.5 rounded-xl text-red-400 hover:bg-red-500/10 transition-all">
                     <div class="w-7 h-7 rounded-lg bg-red-500/20 text-red-400 flex items-center justify-center"><i class="fa-solid fa-right-from-bracket"></i></div>
                     <span>تسجيل الخروج</span>
@@ -206,6 +199,20 @@
     <div id="feedSection" class="relative z-10 hidden min-h-screen pb-20">
         <div class="max-w-3xl mx-auto px-4 pt-4 space-y-4">
             
+            <!-- Search Bar Box -->
+            <section class="glass-card p-3 rounded-2xl border border-slate-800 relative">
+                <div class="relative flex items-center">
+                    <i class="fa-solid fa-magnifying-glass absolute right-3.5 text-gray-400 text-xs"></i>
+                    <input type="text" id="searchInput" oninput="handleSearch(this.value)" placeholder="ابحث عن أصدقاء أو مستخدمين..." class="w-full bg-slate-900/90 border border-slate-800 focus:border-indigo-500 rounded-xl pr-9 pl-4 py-2 text-xs text-white focus:outline-none transition-all">
+                </div>
+
+                <!-- Live Search Results Dropdown -->
+                <div id="searchResults" class="hidden absolute left-0 right-0 top-12 mt-1 glass-modal rounded-2xl border border-slate-700 shadow-2xl p-2 z-50 max-h-60 overflow-y-auto space-y-1">
+                    <!-- Results rendered dynamically via JS -->
+                </div>
+            </section>
+
+            <!-- Create Post Box -->
             <section class="glass-card p-4 rounded-2xl border border-slate-800">
                 <div class="flex items-center gap-3 pb-3 border-b border-slate-800/80">
                     <button onclick="showSection('profile')" class="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-600 to-pink-500 flex items-center justify-center text-white font-bold userAvatarLetter">S</button>
@@ -228,7 +235,7 @@
                         </div>
                     </div>
                 </div>
-                <p class="text-xs text-gray-200">أهلاً بكم في المنشور الأول لـ Sovexa! جربوا التفاعل والضغط على الأيقونات العلوية! 🚀✨</p>
+                <p class="text-xs text-gray-200">أهلاً بكم في المنشور الأول لـ Sovexa! جربوا ميزة البحث الجديدة بالأعلى لباقي مستخدمي المنصة! 🚀✨</p>
                 <div class="rounded-xl overflow-hidden border border-slate-800">
                     <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80" class="w-full max-h-72 object-cover" alt="Post">
                 </div>
@@ -258,7 +265,7 @@
                             <div class="w-7 h-7 rounded-full bg-pink-600 flex items-center justify-center text-white text-[10px] font-bold">س</div>
                             <div>
                                 <h5 class="text-[11px] font-bold text-white">سارة محمد</h5>
-                                <p class="text-[11px] text-gray-300">تطوير القائمة الجانبية مذهل جداً! بالتوفيق 🔥</p>
+                                <p class="text-[11px] text-gray-300">ميزة البحث عن المستعملين ممتازة جداً! بالتوفيق 🔥</p>
                             </div>
                         </div>
                     </div>
@@ -419,13 +426,364 @@
     </div>
 
 
-    <!-- FIREBASE & LOGIC -->
+    <!-- FIREBASE & SEARCH LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyCJm_0O6NzS0UYnoYAv5MUIp-QR9xGN18Q",
           authDomain: "sovexa-fbc93.firebaseapp.com",
-          projectId: "sovexa-
+          projectId: "sovexa-fbc93",
+          storageBucket: "sovexa-fbc93.firebasestorage.app",
+          messagingSenderId: "147264654219",
+          appId: "1:147264654219:web:7487b91cc6c5fa041efd8e",
+          measurementId: "G-5PBTY2WXJ6"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUser = null;
+        let allUsers = [];
+
+        // Live Search Handler
+        window.handleSearch = (query) => {
+            const resultsBox = document.getElementById('searchResults');
+            const cleanQuery = query.trim().toLowerCase();
+
+            if (!cleanQuery) {
+                resultsBox.classList.add('hidden');
+                resultsBox.innerHTML = '';
+                return;
+            }
+
+            const filtered = allUsers.filter(u => 
+                (u.displayName && u.displayName.toLowerCase().includes(cleanQuery)) ||
+                (u.email && u.email.toLowerCase().includes(cleanQuery))
+            );
+
+            if (filtered.length === 0) {
+                resultsBox.innerHTML = '<p class="text-[11px] text-gray-400 p-2 text-center">لا توجد نتائج مطابقة</p>';
+            } else {
+                resultsBox.innerHTML = filtered.map(u => `
+                    <div class="flex items-center justify-between p-2 rounded-xl bg-slate-900/80 hover:bg-slate-800 transition-all">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 to-pink-500 flex items-center justify-center text-white text-xs font-bold">
+                                ${(u.displayName || u.email).charAt(0).toUpperCase()}
+                            </div>
+                            <div>
+                                <h5 class="text-xs font-bold text-white">${u.displayName || 'مستخدم Sovexa'}</h5>
+                                <p class="text-[10px] text-gray-400">@${u.email.split('@')[0]}</p>
+                            </div>
+                        </div>
+                        <button onclick="viewUserProfile('${u.displayName || 'مستخدم Sovexa'}', '${u.email}')" class="px-3 py-1 bg-indigo-600/30 border border-indigo-500/40 hover:bg-indigo-600 text-indigo-300 hover:text-white text-[10px] font-semibold rounded-lg transition-all">
+                            عرض الملف
+                        </button>
+                    </div>
+                `).join('');
+            }
+            resultsBox.classList.remove('hidden');
+        };
+
+        window.viewUserProfile = (name, email) => {
+            document.getElementById('searchResults').classList.add('hidden');
+            document.getElementById('searchInput').value = '';
+            showSection('profile');
+            document.getElementById('profileName').innerText = name;
+            document.getElementById('profileEmail').innerText = '@' + email.split('@')[0];
+            document.querySelectorAll('.userAvatarLetter').forEach(el => el.innerText = name.charAt(0).toUpperCase());
+        };
+
+        // Toggle Side Menu
+        window.toggleSideMenu = () => {
+            const modal = document.getElementById('sideMenuModal');
+            const content = document.getElementById('menuContent');
+            if (modal.classList.contains('hidden')) {
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    content.classList.remove('scale-95', 'opacity-0');
+                    content.classList.add('scale-100', 'opacity-100');
+                }, 10);
+            } else {
+                content.classList.remove('scale-100', 'opacity-100');
+                content.classList.add('scale-95', 'opacity-0');
+                setTimeout(() => modal.classList.add('hidden'), 200);
+            }
+        };
+
+        // Switch Account Handler
+        window.switchAccount = async () => {
+            toggleSideMenu();
+            await signOut(auth);
+            alert("تم تسجيل الخروج، يمكنك الآن تسجيل الدخول بحساب آخر!");
+        };
+
+        // Interactive Like Toggle
+        window.toggleLike = (btn) => {
+            const icon = btn.querySelector('i');
+            const countSpan = btn.querySelector('.like-count');
+            let count = parseInt(countSpan.innerText);
+
+            if (icon.classList.contains('fa-regular')) {
+                icon.className = 'fa-solid fa-heart text-pink-500 text-sm animate-bounce';
+                btn.classList.add('text-pink-500');
+                countSpan.innerText = count + 1;
+            } else {
+                icon.className = 'fa-regular fa-heart text-sm';
+                btn.classList.remove('text-pink-500');
+                countSpan.innerText = count - 1;
+            }
+        };
+
+        // Comments Toggle
+        window.toggleComments = (id) => {
+            const box = document.getElementById(id);
+            box.classList.toggle('hidden');
+        };
+
+        // Add Comment
+        window.addComment = (e, containerId) => {
+            e.preventDefault();
+            const form = e.target;
+            const input = form.querySelector('input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const name = currentUser ? (currentUser.displayName || currentUser.email.split('@')[0]) : 'مستخدم Sovexa';
+            const letter = name.charAt(0).toUpperCase();
+
+            const commentsList = document.querySelector(`#${containerId} .comments-list`);
+            const newComment = document.createElement('div');
+            newComment.className = 'flex items-start gap-2.5 bg-slate-900/60 p-2.5 rounded-xl border border-slate-800';
+            newComment.innerHTML = `
+                <div class="w-7 h-7 rounded-full bg-gradient-to-tr from-indigo-500 to-pink-500 flex items-center justify-center text-white text-[10px] font-bold">${letter}</div>
+                <div>
+                    <h5 class="text-[11px] font-bold text-white">${name}</h5>
+                    <p class="text-[11px] text-gray-300">${text}</p>
+                </div>
+            `;
+            commentsList.appendChild(newComment);
+            input.value = '';
+
+            const countSpan = form.closest('article').querySelector('.comment-count');
+            countSpan.innerText = parseInt(countSpan.innerText) + 1;
+        };
+
+        // Navigation Controller
+        window.showSection = (sectionName) => {
+            document.getElementById('feedSection').classList.add('hidden');
+            document.getElementById('profileSection').classList.add('hidden');
+            document.getElementById('chatSection').classList.add('hidden');
+
+            if (sectionName === 'feed') document.getElementById('feedSection').classList.remove('hidden');
+            else if (sectionName === 'profile') document.getElementById('profileSection').classList.remove('hidden');
+            else if (sectionName === 'chat') document.getElementById('chatSection').classList.remove('hidden');
+        };
+
+        // Chat Send Message
+        document.getElementById('chatForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const chatMessages = document.getElementById('chatMessages');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'flex justify-end';
+            msgDiv.innerHTML = `
+                <div class="max-w-[75%] p-3 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-xs leading-relaxed rounded-tl-none">
+                    ${text}
+                </div>
+            `;
+            chatMessages.appendChild(msgDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            input.value = '';
+        });
+
+        // Modal Controller
+        window.toggleEditModal = (show) => {
+            const modal = document.getElementById('editProfileModal');
+            if (show) {
+                modal.classList.remove('hidden');
+                document.getElementById('editNameInput').value = document.getElementById('profileName').innerText;
+                document.getElementById('editBioInput').value = document.getElementById('profileBio').innerText;
+            } else {
+                modal.classList.add('hidden');
+            }
+        };
+
+        // Fetch All Users for Search
+        async function loadUsersForSearch() {
+            try {
+                const querySnapshot = await getDocs(collection(db, "users"));
+                allUsers = [];
+                querySnapshot.forEach((docSnap) => {
+                    allUsers.push(docSnap.data());
+                });
+            } catch (err) {
+                console.log("Error loading users: ", err);
+            }
+        }
+
+        // Auth Listener
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                document.getElementById('loginSection').classList.add('hidden');
+                document.getElementById('mainHeader').classList.remove('hidden');
+                document.getElementById('feedSection').classList.remove('hidden');
+
+                const emailPrefix = user.email ? user.email.split('@')[0] : 'user';
+                document.getElementById('profileEmail').innerText = '@' + emailPrefix;
+
+                const userDocRef = doc(db, "users", user.uid);
+                const userDocSnap = await getDoc(userDocRef);
+
+                let displayName = user.displayName || emailPrefix;
+                let bio = "مرحباً بكم في ملفي الشخصي على Sovexa! 🚀";
+
+                if (userDocSnap.exists()) {
+                    const data = userDocSnap.data();
+                    if (data.displayName) displayName = data.displayName;
+                    if (data.bio) bio = data.bio;
+                }
+
+                updateProfileUI(displayName, bio);
+                loadUsersForSearch();
+            } else {
+                currentUser = null;
+                document.getElementById('loginSection').classList.remove('hidden');
+                document.getElementById('mainHeader').classList.add('hidden');
+                document.getElementById('feedSection').classList.add('hidden');
+                document.getElementById('profileSection').classList.add('hidden');
+                document.getElementById('chatSection').classList.add('hidden');
+            }
+        });
+
+        function updateProfileUI(name, bio) {
+            const letter = name.charAt(0).toUpperCase();
+            document.querySelectorAll('.userAvatarLetter').forEach(el => el.innerText = letter);
+            document.getElementById('profileName').innerText = name;
+            document.getElementById('menuUserName').innerText = name;
+            document.getElementById('profileBio').innerText = bio;
+        }
+
+        // Edit Profile Form Submit
+        document.getElementById('editProfileForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!currentUser) return;
+
+            const newName = document.getElementById('editNameInput').value;
+            const newBio = document.getElementById('editBioInput').value;
+            const saveBtn = document.getElementById('saveProfileBtn');
+
+            saveBtn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> جاري الحفظ...';
+
+            try {
+                await updateProfile(currentUser, { displayName: newName });
+                await setDoc(doc(db, "users", currentUser.uid), {
+                    displayName: newName,
+                    bio: newBio,
+                    email: currentUser.email,
+                    updatedAt: new Date()
+                }, { merge: true });
+
+                updateProfileUI(newName, newBio);
+                toggleEditModal(false);
+                alert("تم تحديث معلومات الملف الشخصي بنجاح! 🎉");
+            } catch (error) {
+                alert("حدث خطأ أثناء الحفظ: " + error.message);
+            } finally {
+                saveBtn.innerHTML = '<span>حفظ التغييرات</span>';
+            }
+        });
+
+        // Email Auth
+        document.getElementById('emailForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('emailInput').value;
+            const password = document.getElementById('passwordInput').value;
+
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+            } catch (error) {
+                if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
+                    try {
+                        await createUserWithEmailAndPassword(auth, email, password);
+                    } catch (signUpError) {
+                        alert('خطأ: ' + signUpError.message);
+                    }
+                } else {
+                    alert('خطأ: ' + error.message);
+                }
+            }
+        });
+
+        // Google Auth
+        const provider = new GoogleAuthProvider();
+        document.getElementById('googleLoginBtn').addEventListener('click', async () => {
+            try {
+                await signInWithPopup(auth, provider);
+            } catch (error) {
+                alert('فشل الدخول: ' + error.message);
+            }
+        });
+
+        // Logout
+        window.logout = async () => {
+            await signOut(auth);
+        };
+    </script>
+
+    <!-- Canvas Animation -->
+    <script>
+        const canvas = document.getElementById('bgCanvas');
+        const ctx = canvas.getContext('2d');
+        let width, height, particles = [];
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Particle {
+            constructor() { this.reset(); }
+            reset() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.size = Math.random() * 3 + 1;
+                this.speedX = (Math.random() - 0.5) * 0.8;
+                this.speedY = (Math.random() - 0.5) * 0.8;
+                this.alpha = Math.random() * 0.6 + 0.2;
+                this.color = Math.random() > 0.5 ? '#6366f1' : '#ec4899';
+            }
+            update() {
+                this.x += this.speedX; this.y += this.speedY;
+                if (this.x < 0 || this.x > width || this.y < 0 || this.y > height) this.reset();
+            }
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.shadowBlur = 12; ctx.shadowColor = this.color;
+                ctx.fillStyle = this.color;
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
+                ctx.restore();
+            }
+        }
+        for (let i = 0; i < 50; i++) particles.push(new Particle());
+
+        function animate() {
+            ctx.fillStyle = '#0b0f17';
+            ctx.fillRect(0, 0, width, height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animate);
+        }
+        animate();
+    </script>
+</body>
+</html>
