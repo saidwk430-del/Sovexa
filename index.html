@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus - Modern Social Network</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            900: '#312e81',
+                        },
+                        accent: {
+                            pink: '#ec4899',
+                            purple: '#a855f7',
+                            cyan: '#06b6d4'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 9999px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #334155;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        .glass-header {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+    </style>
+</head>
+<body class="bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans antialiased h-full flex flex-col transition-colors duration-200">
+
+    <!-- TOP NAVIGATION BAR -->
+    <header class="sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 border-b border-slate-200 dark:border-slate-800 glass-header px-4 py-2.5 flex items-center justify-between gap-4">
+        <!-- Left: Logo & Search -->
+        <div class="flex items-center gap-4 lg:w-1/4">
+            <a href="#" class="flex items-center gap-2 group">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 via-accent-purple to-accent-pink flex items-center justify-center text-white shadow-md shadow-brand-500/20 group-hover:scale-105 transition-transform duration-200">
+                    <i class="fa-solid fa-square-n text-2xl font-black"></i>
+                </div>
+                <span class="text-xl font-bold bg-gradient-to-r from-brand-600 via-accent-purple to-accent-pink bg-clip-text text-transparent hidden sm:inline">NEXUS</span>
+            </a>
+            
+            <div class="relative flex-1 max-w-xs">
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                <input type="text" placeholder="Search Nexus..." class="w-full bg-slate-100 dark:bg-slate-800/80 text-sm text-slate-800 dark:text-slate-100 pl-9 pr-4 py-2 rounded-full border border-transparent focus:border-brand-500 focus:outline-none focus:bg-white dark:focus:bg-slate-800 transition-all">
+            </div>
+        </div>
+
+        <!-- Center: Navigation Tabs -->
+        <nav class="hidden md:flex items-center justify-center gap-1 flex-1 max-w-md">
+            <button onclick="switchTab('feed')" id="nav-feed" class="nav-tab active flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 text-brand-600 dark:text-brand-500 bg-brand-50 dark:bg-brand-900/30">
+                <i class="fa-solid fa-house text-lg"></i>
+                <span class="hidden lg:inline">Home</span>
+            </button>
+            <button onclick="switchTab('friends')" id="nav-friends" class="nav-tab flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl font-medium text-sm text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-200">
+                <i class="fa-solid fa-user-group text-lg"></i>
+                <span class="hidden lg:inline">Friends</span>
+            </button>
+            <button onclick="switchTab('messages')" id="nav-messages" class="nav-tab flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl font-medium text-sm text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-200 relative">
+                <i class="fa-solid fa-message text-lg"></i>
+                <span class="hidden lg:inline">Messages</span>
+                <span class="absolute top-2 right-4 w-2 h-2 rounded-full bg-accent-pink"></span>
+            </button>
+            <button onclick="switchTab('profile')" id="nav-profile" class="nav-tab flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl font-medium text-sm text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-200">
+                <i class="fa-solid fa-user text-lg"></i>
+                <span class="hidden lg:inline">Profile</span>
+            </button>
+        </nav>
+
+        <!-- Right: Actions & User Avatar -->
+        <div class="flex items-center justify-end gap-2 lg:w-1/4">
+            <!-- Theme Toggle -->
+            <button onclick="toggleDarkMode()" class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center justify-center transition-colors">
+                <i class="fa-solid fa-moon dark:hidden"></i>
+                <i class="fa-solid fa-sun hidden dark:block text-amber-400"></i>
+            </button>
+
+            <!-- Notifications Dropdown Trigger -->
+            <div class="relative">
+                <button onclick="toggleNotifications()" class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center justify-center transition-colors relative">
+                    <i class="fa-solid fa-bell"></i>
+                    <span class="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-brand-500 ring-2 ring-white dark:ring-slate-900"></span>
+                </button>
+                <!-- Popup Panel -->
+                <div id="notif-popup" class="hidden absolute right-0 mt-3 w-80 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl z-50 p-4">
+                    <div class="flex justify-between items-center mb-3">
+                        <h4 class="font-bold text-slate-900 dark:text-white">Notifications</h4>
+                        <span class="text-xs text-brand-600 dark:text-brand-400 cursor-pointer hover:underline">Mark all read</span>
+                    </div>
+                    <div class="space-y-3 max-h-64 overflow-y-auto pr-1">
+                        <div class="flex items-center gap-3 p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer">
+                            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=faces" class="w-9 h-9 rounded-full object-cover">
+                            <div class="text-xs">
+                                <p class="text-slate-800 dark:text-slate-200"><span class="font-semibold">Sarah Jenkins</span> liked your post.</p>
+                                <span class="text-slate-400">2m ago</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3 p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer">
+                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=faces" class="w-9 h-9 rounded-full object-cover">
+                            <div class="text-xs">
+                                <p class="text-slate-800 dark:text-slate-200"><span class="font-semibold">Alex Rivera</span> commented on your photo.</p>
+                                <span class="text-slate-400">1h ago</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Avatar -->
+            <div onclick="switchTab('profile')" class="flex items-center gap-2 cursor-pointer p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&crop=faces" alt="CurrentUser" class="w-9 h-9 rounded-full object-cover ring-2 ring-brand-500/50">
+                <span class="font-semibold text-sm hidden xl:inline">Elena Rostova</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN APP CONTAINER -->
+    <div class="flex-1 max-w-7xl w-full mx-auto px-2 sm:px-4 py-4 flex gap-6 overflow-hidden">
+
+        <!-- LEFT SIDEBAR -->
+        <aside class="hidden lg:flex flex-col gap-2 w-64 shrink-0 overflow-y-auto pr-2">
+            <!-- User Summary Card -->
+            <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm mb-2">
+                <div class="flex items-center gap-3 mb-3">
+                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&crop=faces" class="w-12 h-12 rounded-full object-cover">
+                    <div>
+                        <h3 class="font-bold text-slate-900 dark:text-white text-sm">Elena Rostova</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">@elena_design</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-3 gap-2 pt-3 border-t border-slate-100 dark:border-slate-800 text-center">
+                    <div>
+                        <div class="font-bold text-slate-900 dark:text-white text-sm">1.2k</div>
+                        <div class="text-[10px] text-slate-500 uppercase tracking-wider">Posts</div>
+                    </div>
+                    <div>
+                        <div class="font-bold text-slate-900 dark:text-white text-sm">4.8k</div>
+                        <div class="text-[10px] text-slate-500 uppercase tracking-wider">Friends</div>
+                    </div>
+                    <div>
+                        <div class="font-bold text-slate-900 dark:text-white text-sm">12k</div>
+                        <div class="text-[10px] text-slate-500 uppercase tracking-wider">Likes</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Links -->
+            <div class="flex flex-col gap-1 text-sm font-medium">
+                <a href="#" onclick="switchTab('feed')" class="sidebar-item active flex items-center gap-3 px-4 py-3 rounded-xl bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 font-semibold transition-all">
+                    <i class="fa-solid fa-newspaper text-lg w-6 text-center"></i>
+                    <span>News Feed</span>
+                </a>
+                <a href="#" onclick="switchTab('friends')" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200/60 dark:hover:bg-slate-800 transition-all">
+                    <i class="fa-solid fa-user-group text-lg w-6 text-center"></i>
+                    <span>Friends & Community</span>
+                </a>
+                <a href="#" onclick="switchTab('messages')" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200/60 dark:hover:bg-slate-800 transition-all">
+                    <i class="fa-solid fa-comments text-lg w-6 text-center"></i>
+                    <span>Direct Messages</span>
+                </a>
+                <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200/60 dark:hover:bg-slate-800 transition-all">
+                    <i class="fa-solid fa-bookmark text-lg w-6 text-center"></i>
+                    <span>Saved Collections</span>
+                </a>
+                <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200/60 dark:hover:bg-slate-800 transition-all">
+                    <i class="fa-solid fa-fire text-lg w-6 text-center"></i>
+                    <span>Popular Stories</span>
+                </a>
+                <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200/60 dark:hover:bg-slate-800 transition-all">
+                    <i class="fa-solid fa-gear text-lg w-6 text-center"></i>
+                    <span>Account Settings</span>
+                </a>
+            </div>
+
+            <!-- Custom Promo Widget -->
+            <div class="mt-auto p-4 rounded-2xl bg-gradient-to-br from-brand-600 via-accent-purple to-accent-pink text-white shadow-lg shadow-brand-500/20">
+                <div class="flex items-center gap-2 mb-2 font-bold text-sm">
+                    <i class="fa-solid fa-sparkles"></i>
+                    <span>Nexus Premium</span>
+                </div>
+                <p class="text-xs text-white/80 mb-3">Upgrade for high-res streaming, custom badges & zero ads.</p>
+                <button class="w-full py-1.5 bg-white text-brand-700 rounded-lg text-xs font-bold hover:bg-brand-50 transition-colors">Explore Perks</button>
+            </div>
+        </aside>
+
+        <!-- CENTER CONTENT AREA -->
+        <main class="flex-1 overflow-y-auto pr-1 space-y-4">
+
+            <!-- TAB 1: NEWS FEED VIEW -->
+            <div id="tab-feed" class="tab-content space-y-4">
+
+                <!-- STORIES CAROUSEL -->
+                <div class="flex gap-3 overflow-x-auto pb-2 scrollbar-none">
+                    <!-- Add Story -->
+                    <div class="relative w-28 h-40 shrink-0 rounded-2xl overflow-hidden group cursor-pointer border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
+                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&crop=faces" class="h-28 w-full object-cover group-hover:scale-105 transition-transform duration-300">
+                        <div class="absolute inset-x-0 bottom-0 h-12 bg-white dark:bg-slate-900 flex flex-col items-center justify-center p-1">
+                            <div class="w-7 h-7 rounded-full bg-brand-600 text-white flex items-center justify-center -mt-6 border-2 border-white dark:border-slate-900 shadow">
+                                <i class="fa-solid fa-plus text-xs"></i>
+                            </div>
+                            <span class="text-[11px] font-medium text-slate-700 dark:text-slate-300 mt-1">Add Story</span>
+                        </div>
+                    </div>
+                    <!-- Friend Story 1 -->
+                    <div class="relative w-28 h-40 shrink-0 rounded-2xl overflow-hidden group cursor-pointer shadow-sm">
+                        <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=300&h=400&fit=crop" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
+                        <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=100&h=100&fit=crop&crop=faces" class="absolute top-2 left-2 w-8 h-8 rounded-full border-2 border-brand-500 object-cover">
+                        <span class="absolute bottom-2 left-2 right-2 text-xs font-semibold text-white truncate">Marcus V.</span>
+                    </div>
+                    <!-- Friend Story 2 -->
+                    <div class="relative w-28 h-40 shrink-0 rounded-2xl overflow-hidden group cursor-pointer shadow-sm">
+                        <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=300&h=400&fit=crop" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
+                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=faces" class="absolute top-2 left-2 w-8 h-8 rounded-full border-2 border-brand-500 object-cover">
+                        <span class="absolute bottom-2 left-2 right-2 text-xs font-semibold text-white truncate">Sarah J.</span>
+                    </div>
+                    <!-- Friend Story 3 -->
+                    <div class="relative w-28 h-40 shrink-0 rounded-2xl overflow-hidden group cursor-pointer shadow-sm">
+                        <img src="https://images.unsplash.com/photo-1526772662000-3f88f10405ff?w=300&h=400&fit=crop" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
+                        <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=faces" class="absolute top-2 left-2 w-8 h-8 rounded-full border-2 border-brand-500 object-cover">
+                        <span class="absolute bottom-2 left-2 right-2 text-xs font-semibold text-white truncate">David K.</span>
+                    </div>
+                </div>
+
+                <!-- CREATE POST CARD -->
+                <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-3">
+                    <div class="flex items-center gap-3">
+                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&crop=faces" class="w-10 h-10 rounded-full object-cover">
+                        <input id="post-input" type="text" placeholder="What's on your mind, Elena?" class="flex-1 bg-slate-100 dark:bg-slate-800/80 text-sm text-slate-800 dark:text-slate-100 px-4 py-2.5 rounded-full border border-transparent focus:border-brand-500 focus:outline-none focus:bg-white dark:focus:bg-slate-800 transition-all">
+                    </div>
+                    
+                    <!-- Image URL Input Container (Hidden by default) -->
+                    <div id="image-url-container" class="hidden pt-2">
+                        <input id="post-image-input" type="text" placeholder="Paste image URL (e.g. https://images.unsplash.com/...)" class="w-full bg-slate-50 dark:bg-slate-800 text-xs px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none">
+                    </div>
+
+                    <div class="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800 text-slate-500 dark:text-slate-400 text-xs">
+                        <div class="flex items-center gap-1 sm:gap-2">
+                            <button onclick="toggleImageInput()" class="flex items-center gap-1.5 px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-emerald-500 font-medium">
+                                <i class="fa-solid fa-image text-base"></i>
+                                <span class="hidden sm:inline">Photo/Video</span>
+                            </button>
+                            <button class="flex items-center gap-1.5 px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-amber-500 font-medium">
+                                <i class="fa-solid fa-face-smile text-base"></i>
+                                <span class="hidden sm:inline">Feeling/Activity</span>
+                            </button>
+                            <button class="flex items-center gap-1.5 px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-rose-500 font-medium">
+                                <i class="fa-solid fa-location-dot text-base"></i>
+                                <span class="hidden sm:inline">Check In</span>
+                            </button>
+                        </div>
+                        <button onclick="createNewPost()" class="px-5 py-2 bg-gradient-to-r from-brand-600 to-accent-purple hover:opacity-95 text-white font-semibold rounded-xl text-xs shadow-md shadow-brand-500/20 transition-all active:scale-95">
+                            Post
+                        </button>
+                    </div>
+                </div>
+
+                <!-- DYNAMIC FEED POSTS CONTAINER -->
+                <div id="feed-container" class="space-y-4">
+                    
+                    <!-- PRE-LOADED POST 1 -->
+                    <article class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-3">
+                        <!-- Author Header -->
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=faces" class="w-10 h-10 rounded-full object-cover">
+                                <div>
+                                    <h4 class="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-1">
+                                        Alex Rivera
+                                        <i class="fa-solid fa-circle-check text-brand-500 text-xs"></i>
+                                    </h4>
+                                    <p class="text-[11px] text-slate-400">2 hours ago · <i class="fa-solid fa-globe"></i></p>
+                                </div>
+                            </div>
+                            <button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-2 rounded-full">
+                                <i class="fa-solid fa-ellipsis"></i>
+                            </button>
+                        </div>
+
+                        <!-- Content Text -->
+                        <p class="text-sm text-slate-700 dark:text-slate-200 leading-relaxed">
+                            Just completed the initial redesign for our new design system! Clean lines, vibrant gradients, and ultra-responsive components. What do you all think? 🚀✨
+                        </p>
+
+                        <!-- Attached Image -->
+                        <div class="rounded-xl overflow-hidden border border-slate-100 dark:border-slate-800">
+                            <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&h=450&fit=crop" class="w-full object-cover max-h-96">
+                        </div>
+
+                        <!-- Reactions Summary -->
+                        <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 pt-1 pb-2 border-b border-slate-100 dark:border-slate-800">
+                            <div class="flex items-center gap-1">
+                                <span class="flex -space-x-1">
+                                    <span class="w-5 h-5 rounded-full bg-brand-500 flex items-center justify-center text-white text-[9px]"><i class="fa-solid fa-thumbs-up"></i></span>
+                                    <span class="w-5 h-5 rounded-full bg-rose-500 flex items-center justify-center text-white text-[9px]"><i class="fa-solid fa-heart"></i></span>
+                                </span>
+                                <span>428</span>
+                            </div>
+                            <div class="flex gap-3">
+                                <span>34 Comments</span>
+                                <span>12 Shares</span>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="grid grid-cols-3 gap-1 pt-1 text-slate-600 dark:text-slate-400 text-xs font-semibold">
+                            <button onclick="toggleLike(this)" class="like-btn flex items-center justify-center gap-2 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                                <i class="fa-regular fa-thumbs-up text-base"></i>
+                                <span>Like</span>
+                            </button>
+                            <button onclick="toggleComments('comments-1')" class="flex items-center justify-center gap-2 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                                <i class="fa-regular fa-comment text-base"></i>
+                                <span>Comment</span>
+                            </button>
+                            <button class="flex items-center justify-center gap-2 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                                <i class="fa-regular fa-share-from-square text-base"></i>
+                                <span>Share</span>
+                            </button>
+                        </div>
+
+                        <!-- Expandable Comment Section -->
+                        <div id="comments-1" class="hidden pt-3 border-t border-slate-100 dark:border-slate-800 space-y-3">
+                            <!-- Existing Comment -->
+                            <div class="flex items-start gap-2.5">
+                                <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=faces" class="w-7 h-7 rounded-full object-cover">
+                                <div class="bg-slate-100 dark:bg-slate-800/80 p-2.5 rounded-2xl text-xs flex-1">
+                                    <span class="font-bold text-slate-900 dark:text-white block mb-0.5">Sarah Jenkins</span>
+                                    <span class="text-slate-700 dark:text-slate-300">The gradient choices are absolutely stunning! Great work Alex!</span>
+                                </div>
+                            </div>
+                            <!-- Comment Input -->
+                            <div class="flex items-center gap-2 pt-1">
+                                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&crop=faces" class="w-7 h-7 rounded-full object-cover">
+                                <input type="text" onkeydown="handleCommentSubmit(event, 'comment-list-1')" placeholder="Write a comment..." class="flex-1 bg-slate-100 dark:bg-slate-800 text-xs text-slate-800 dark:text-slate-100 px-3 py-2 rounded-full focus:outline-none focus:ring-1 focus:ring-brand-500">
+                            </div>
+                            <div id="comment-list-1" class="space-y-2"></div>
+                        </div>
+                    </article>
+
+                    <!-- PRE-LOADED POST 2 -->
+                    <article class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-3">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=100&h=100&fit=crop&crop=faces" class="w-10 h-10 rounded-full object-cover">
+                                <div>
+                                    <h4 class="font-bold text-sm text-slate-900 dark:text-white">Marcus Vance</h4>
+                                    <p class="text-[11px] text-slate-400">5 hours ago · <i class="fa-solid fa-globe"></i></p>
+                                </div>
+                            </div>
+                            <button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-2 rounded-full">
+                                <i class="fa-solid fa-ellipsis"></i>
+                            </button>
+                        </div>
+                        <p class="text-sm text-slate-700 dark:text-slate-200 leading-relaxed">
+                            Weekend trip to the mountains. Disconnecting from screen time and reconnecting with nature. 🌲⛰️
+                        </p>
+                        <div class="rounded-xl overflow-hidden border border-slate-100 dark:border-slate-800">
+                            <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&h=450&fit=crop" class="w-full object-cover max-h-96">
+                        </div>
+                        <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 pt-1 pb-2 border-b border-slate-100 dark:border-slate-800">
+                            <div class="flex items-center gap-1">
+                                <span class="w-5 h-5 rounded-full bg-rose-500 flex items-center justify-center text-white text-[9px]"><i class="fa-solid fa-heart"></i></span>
+                                <span>892</span>
+                            </div>
+                            <div class="flex gap-3">
+                                <span>88 Comments</span>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-1 pt-1 text-slate-600 dark:text-slate-400 text-xs font-semibold">
+                            <button onclick="toggleLike(this)" class="like-btn flex items-center justify-center gap-2 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                                <i class="fa-regular fa-thumbs-up text-base"></i>
+                                <span>Like</span>
+                            </button>
+                            <button onclick="toggleComments('comments-2')" class="flex items-center justify-center gap-2 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                                <i class="fa-regular fa-comment text-base"></i>
+                                <span>Comment</span>
+                            </button>
+                            <button class="flex items-center justify-center gap-2 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                                <i class="fa-regular fa-share-from-square text-base"></i>
+                                <span>Share</span>
+                            </button>
+                        </div>
+                        <div id="comments-2" class="hidden pt-3 border-t border-slate-100 dark:border-slate-800 space-y-3">
+                            <div class="flex items-center gap-2 pt-1">
+                                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&crop=faces" class="w-7 h-7 rounded-full object-cover">
+                                <input type="text" onkeydown="handleCommentSubmit(event, 'comment-list-2')" placeholder="Write a comment..." class="flex-1 bg-slate-100 dark:bg-slate-800 text-xs text-slate-800 dark:text-slate-100 px-3 py-2 rounded-full focus:outline-none focus:ring-1 focus:ring-brand-500">
+                            </div>
+                            <div id="comment-list-2" class="space-y-2"></div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+
+            <!-- TAB 2: FRIENDS VIEW -->
+            <div id="tab-friends" class="tab-content hidden space-y-4">
+                <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm">
+                    <h3 class="font-bold text-lg text-slate-900 dark:text-white mb-4">Friend Requests (2)</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="p-3 border border-slate-100 dark:border-slate-800 rounded-xl flex items-center gap-3">
+                            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=faces" class="w-14 h-14 rounded-full object-cover">
+                            <div class="flex-1">
+                                <h4 class="font-bold text-sm text-slate-900 dark:text-white">David Kim</h4>
+                                <p class="text-xs text-slate-400 mb-2">12 Mutual Friends</p>
+                                <div class="flex gap-2">
+                                    <button class="px-3 py-1 bg-brand-600 text-white rounded-lg text-xs font-semibold">Confirm</button>
+                                    <button class="px-3 py-1 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-semibold">Remove</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-3 border border-slate-100 dark:border-slate-800 rounded-xl flex items-center gap-3">
+                            <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop&crop=faces" class="w-14 h-14 rounded-full object-cover">
+                            <div class="flex-1">
+                                <h4 class="font-bold text-sm text-slate-900 dark:text-white">Jessica Chen</h4>
+                                <p class="text-xs text-slate-400 mb-2">5 Mutual Friends</p>
+                                <div class="flex gap-2">
+                                    <button class="px-3 py-1 bg-brand-600 text-white rounded-lg text-xs font-semibold">Confirm</button>
+                                    <button class="px-3 py-1 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-semibold">Remove</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: MESSAGES VIEW -->
+            <div id="tab-messages" class="tab-content hidden h-[600px] rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm flex overflow-hidden">
+                <!-- Chat List Sidebar -->
+                <div class="w-1/3 border-r border-slate-100 dark:border-slate-800 p-3 space-y-2">
+                    <h3 class="font-bold text-slate-900 dark:text-white text-base mb-2">Chats</h3>
+                    <div class="space-y-1">
+                        <div class="flex items-center gap-3 p-2.5 rounded-xl bg-brand-50 dark:bg-brand-900/20 cursor-pointer">
+                            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=faces" class="w-10 h-10 rounded-full object-cover">
+                            <div class="flex-1 min-w-0">
+                                <h4 class="font-bold text-xs text-slate-900 dark:text-white truncate">Sarah Jenkins</h4>
+                                <p class="text-[11px] text-brand-600 dark:text-brand-400 truncate">Hey! Are we still on for lunch?</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Chat Conversation Area -->
+                <div class="flex-1 flex flex-col bg-slate-50/50 dark:bg-slate-950/50">
+                    <div class="p-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-white dark:bg-slate-900">
+                        <div class="flex items-center gap-2">
+                            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=faces" class="w-8 h-8 rounded-full object-cover">
+                            <span class="font-bold text-xs text-slate-900 dark:text-white">Sarah Jenkins</span>
+                        </div>
+                    </div>
+                    <div class="flex-1 p-4 space-y-3 overflow-y-auto text-xs">
+                        <div class="flex justify-start">
+                            <div class="bg-white dark:bg-slate-800 p-3 rounded-2xl max-w-xs shadow-sm">Hey Elena! Are we still on for lunch today?</div>
+                        </div>
+                        <div class="flex justify-end">
+                            <div class="bg-brand-600 text-white p-3 rounded-2xl max-w-xs shadow-sm">Absolutely! Let's meet at 1 PM.</div>
+                        </div>
+                    </div>
+                    <div class="p-3 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 flex gap-2">
+                        <input type="text" placeholder="Type a message..." class="flex-1 bg-slate-100 dark:bg-slate-800 text-xs px-3 py-2 rounded-full focus:outline-none">
+                        <button class="w-8 h-8 rounded-full bg-brand-600 text-white flex items-center justify-center text-xs"><i class="fa-solid fa-paper-plane"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4: PROFILE VIEW -->
+            <div id="tab-profile" class="tab-content hidden space-y-4">
+                <div class="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 overflow-hidden shadow-sm">
+                    <div class="h-44 bg-gradient-to-r from-brand-600 via-accent-purple to-accent-pink"></div>
+                    <div class="px-6 pb-6 relative">
+                        <div class="flex justify-between items-end -mt-12 mb-4">
+                            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&crop=faces" class="w-24 h-24 rounded-full border-4 border-white dark:border-slate-900 object-cover shadow-md">
+                            <button class="px-4 py-2 bg-brand-600 text-white font-semibold rounded-xl text-xs shadow-md">Edit Profile</button>
+                        </div>
+                        <h2 class="text-xl font-bold text-slate-900 dark:text-white">Elena Rostova</h2>
+                        <p class="text-xs text-slate-500 mb-2">Lead UI/UX Designer & Creative Strategist</p>
+                        <p class="text-xs text-slate-700 dark:text-slate-300">Crafting modern digital experiences with passion. Always learning, always building. ✨</p>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- RIGHT SIDEBAR -->
+        <aside class="hidden xl:flex flex-col gap-4 w-72 shrink-0 overflow-y-auto">
+            
+            <!-- Trending Section -->
+            <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-3">
+                <div class="flex items-center justify-between">
+                    <h3 class="font-bold text-slate-900 dark:text-white text-sm">Trending for You</h3>
+                    <i class="fa-solid fa-arrow-trend-up text-brand-500 text-xs"></i>
+                </div>
+                <div class="space-y-2.5 text-xs">
+                    <div class="cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 rounded-lg transition-colors">
+                        <span class="text-[10px] text-slate-400 block">Technology · Trending</span>
+                        <p class="font-bold text-slate-800 dark:text-slate-200">#NexusDesignSystem</p>
+                        <span class="text-[10px] text-slate-400">24.5k Posts</span>
+                    </div>
+                    <div class="cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 rounded-lg transition-colors">
+                        <span class="text-[10px] text-slate-400 block">Design · Trending</span>
+                        <p class="font-bold text-slate-800 dark:text-slate-200">#UIUX2026</p>
+                        <span class="text-[10px] text-slate-400">12.1k Posts</span>
+                    </div>
+                    <div class="cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 rounded-lg transition-colors">
+                        <span class="text-[10px] text-slate-400 block">AI & Future · Trending</span>
+                        <p class="font-bold text-slate-800 dark:text-slate-200">#GenerativeArt</p>
+                        <span class="text-[10px] text-slate-400">89.4k Posts</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Online Contacts -->
+            <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-3">
+                <div class="flex items-center justify-between">
+                    <h3 class="font-bold text-slate-900 dark:text-white text-sm">Online Friends</h3>
+                    <span class="text-xs bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded-full font-medium">8 Active</span>
+                </div>
+                <div class="space-y-2">
+                    <div class="flex items-center gap-3 p-1.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer transition-colors">
+                        <div class="relative">
+                            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=faces" class="w-8 h-8 rounded-full object-cover">
+                            <span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-slate-900"></span>
+                        </div>
+                        <span class="text-xs font-semibold text-slate-800 dark:text-slate-200">Sarah Jenkins</span>
+                    </div>
+                    <div class="flex items-center gap-3 p-1.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer transition-colors">
+                        <div class="relative">
+                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=faces" class="w-8 h-8 rounded-full object-cover">
+                            <span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-slate-900"></span>
+                        </div>
+                        <span class="text-xs font-semibold text-slate-800 dark:text-slate-200">Alex Rivera</span>
+                    </div>
+                    <div class="flex items-center gap-3 p-1.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer transition-colors">
+                        <div class="relative">
+                            <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=100&h=100&fit=crop&crop=faces" class="w-8 h-8 rounded-full object-cover">
+                            <span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-slate-900"></span>
+                        </div>
+                        <span class="text-xs font-semibold text-slate-800 dark:text-slate-200">Marcus Vance</span>
+                    </div>
+                </div>
+            </div>
+
+        </aside>
+
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Toggle Dark Mode
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark');
+        }
+
+        // Toggle Notifications Panel
+        function toggleNotifications() {
+            const notif = document.getElementById('notif-popup');
+            notif.classList.toggle('hidden');
+        }
+
+        // Switch Main Content Tabs
+        function switchTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
+            
+            // Show target tab
+            const target = document.getElementById(`tab-${tabName}`);
+            if (target) target.classList.remove('hidden');
+
+            // Reset navigation styles
+            document.querySelectorAll('.nav-tab').forEach(btn => {
+                btn.className = "nav-tab flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl font-medium text-sm text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-200";
+            });
+
+            // Set active button style
+            const activeNav = document.getElementById(`nav-${tabName}`);
+            if (activeNav) {
+                activeNav.className = "nav-tab active flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 text-brand-600 dark:text-brand-500 bg-brand-50 dark:bg-brand-900/30";
+            }
+        }
+
+        // Toggle Image Input Field in Post Creator
+        function toggleImageInput() {
+            const imgBox = document.getElementById('image-url-container');
+            imgBox.classList.toggle('hidden');
+        }
+
+        // Create New Feed Post Dynamically
+        function createNewPost() {
+            const input = document.getElementById('post-input');
+            const imgInput = document.getElementById('post-image-input');
+            const text = input.value.trim();
+            const imageUrl = imgInput.value.trim();
+
+            if (!text && !imageUrl) return;
+
+            const feed = document.getElementById('feed-container');
+            const postId = 'post-' + Date.now();
+            const commentsId = 'comments-' + Date.now();
+            const commentListId = 'comment-list-' + Date.now();
+
+            const postHTML = `
+                <article class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-3 animate-fade-in">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&crop=faces" class="w-10 h-10 rounded-full object-cover">
+                            <div>
+                                <h4 class="font-bold text-sm text-slate-900 dark:text-white">Elena Rostova</h4>
+                                <p class="text-[11px] text-slate-400">Just now · <i class="fa-solid fa-globe"></i></p>
+                            </div>
+                        </div>
+                        <button class="text-slate-400 hover:text-slate-600 p-2 rounded-full"><i class="fa-solid fa-ellipsis"></i></button>
+                    </div>
+                    ${text ? `<p class="text-sm text-slate-700 dark:text-slate-200 leading-relaxed">${text}</p>` : ''}
+                    ${imageUrl ? `<div class="rounded-xl overflow-hidden border border-slate-100 dark:border-slate-800"><img src="${imageUrl}" class="w-full object-cover max-h-96" onerror="this.style.display='none'"></div>` : ''}
+                    
+                    <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 pt-1 pb-2 border-b border-slate-100 dark:border-slate-800">
+                        <div class="flex items-center gap-1">
+                            <span class="w-5 h-5 rounded-full bg-brand-500 flex items-center justify-center text-white text-[9px]"><i class="fa-solid fa-thumbs-up"></i></span>
+                            <span class="like-count">1</span>
+                        </div>
+                        <span class="comment-count">0 Comments</span>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-1 pt-1 text-slate-600 dark:text-slate-400 text-xs font-semibold">
+                        <button onclick="toggleLike(this)" class="like-btn flex items-center justify-center gap-2 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                            <i class="fa-regular fa-thumbs-up text-base"></i>
+                            <span>Like</span>
+                        </button>
+                        <button onclick="toggleComments('${commentsId}')" class="flex items-center justify-center gap-2 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                            <i class="fa-regular fa-comment text-base"></i>
+                            <span>Comment</span>
+                        </button>
+                        <button class="flex items-center justify-center gap-2 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                            <i class="fa-regular fa-share-from-square text-base"></i>
+                            <span>Share</span>
+                        </button>
+                    </div>
+
+                    <div id="${commentsId}" class="hidden pt-3 border-t border-slate-100 dark:border-slate-800 space-y-3">
+                        <div class="flex items-center gap-2 pt-1">
+                            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&crop=faces" class="w-7 h-7 rounded-full object-cover">
+                            <input type="text" onkeydown="handleCommentSubmit(event, '${commentListId}')" placeholder="Write a comment..." class="flex-1 bg-slate-100 dark:bg-slate-800 text-xs text-slate-800 dark:text-slate-100 px-3 py-2 rounded-full focus:outline-none focus:ring-1 focus:ring-brand-500">
+                        </div>
+                        <div id="${commentListId}" class="space-y-2"></div>
+                    </div>
+                
