@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <link rel="manifest" href="manifest.json">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sovexa - منصة التواصل الاجتماعي</title>
     <!-- Tailwind CSS -->
@@ -139,33 +138,6 @@
                     <i class="fa-solid fa-house ml-1"></i> الرئيسية
                 </button>
 
-                <!-- Notifications Bell Button -->
-                <div class="relative">
-                    <button onclick="toggleNotifications()" class="w-9 h-9 rounded-xl bg-slate-800/80 border border-slate-700 text-gray-200 hover:text-white hover:bg-slate-700 flex items-center justify-center transition-all relative">
-                        <i class="fa-solid fa-bell text-sm"></i>
-                        <span id="notifBadge" class="absolute -top-1 -right-1 w-4 h-4 bg-pink-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center animate-pulse">2</span>
-                    </button>
-
-                    <!-- Notifications Dropdown -->
-                    <div id="notifDropdown" class="hidden absolute left-0 sm:left-auto sm:right-0 top-12 w-72 sm:w-80 glass-modal p-3 rounded-2xl border border-slate-700 shadow-2xl z-50 space-y-2">
-                        <div class="flex items-center justify-between pb-2 border-b border-slate-800">
-                            <h4 class="text-xs font-bold text-white flex items-center gap-1.5">
-                                <i class="fa-solid fa-bell text-pink-400"></i> الإشعارات
-                            </h4>
-                            <button onclick="clearNotifBadge()" class="text-[10px] text-indigo-400 hover:underline">تحديد الكل كمقروء</button>
-                        </div>
-                        <div class="space-y-1.5 max-h-60 overflow-y-auto" id="notifList">
-                            <div class="flex items-center gap-2.5 p-2 rounded-xl bg-slate-900/90 border border-slate-800">
-                                <div class="w-8 h-8 rounded-full bg-pink-500/20 text-pink-400 flex items-center justify-center text-xs"><i class="fa-solid fa-heart"></i></div>
-                                <div class="flex-1">
-                                    <p class="text-[11px] text-gray-200">قام <span class="font-bold text-white">أحمد علي</span> بالإعجاب بمنشورك.</p>
-                                    <span class="text-[9px] text-gray-400">منذ 5 دقائق</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 <button onclick="showSection('chat')" class="px-3 py-1.5 rounded-xl bg-purple-600/30 border border-purple-500/40 text-purple-300 hover:text-white text-xs font-semibold transition-all">
                     <i class="fa-solid fa-comments ml-1"></i> الدردشة
                 </button>
@@ -173,74 +145,22 @@
                 <button onclick="showSection('profile')" class="px-3 py-1.5 rounded-xl bg-indigo-600/30 border border-indigo-500/40 text-indigo-300 hover:text-white text-xs font-semibold transition-all">
                     <i class="fa-solid fa-user ml-1"></i> ملفي
                 </button>
-                
-                <button onclick="toggleSideMenu()" class="w-9 h-9 rounded-xl bg-slate-800/80 border border-slate-700 text-gray-200 hover:text-white hover:bg-slate-700 flex items-center justify-center transition-all">
-                    <i class="fa-solid fa-bars text-sm"></i>
-                </button>
             </div>
         </div>
     </header>
-
-
-    <!-- ==================== SIDE MENU ==================== -->
-    <div id="sideMenuModal" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm hidden transition-all duration-300">
-        <div id="menuContent" class="absolute top-16 left-4 right-4 sm:left-auto sm:right-10 w-auto sm:w-80 glass-modal p-4 rounded-3xl border border-slate-700 shadow-2xl space-y-3 transform transition-all scale-95 opacity-0">
-            <div onclick="showSection('profile'); toggleSideMenu();" class="flex items-center gap-3 p-3 rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-indigo-500/50 cursor-pointer transition-all">
-                <div class="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-tr from-indigo-500 to-pink-500 flex items-center justify-center text-white font-bold userAvatarContainer">
-                    <span class="userAvatarLetter">S</span>
-                </div>
-                <div class="flex-1 overflow-hidden">
-                    <h4 class="text-xs font-bold text-white truncate" id="menuUserName">مستخدم Sovexa</h4>
-                    <p class="text-[10px] text-gray-400">عرض الملف الشخصي</p>
-                </div>
-                <i class="fa-solid fa-chevron-left text-xs text-gray-400"></i>
-            </div>
-
-            <div class="border-t border-slate-800 my-2"></div>
-
-            <div class="space-y-1.5 text-xs font-semibold">
-                <button onclick="switchAccount()" class="w-full flex items-center gap-3 p-2.5 rounded-xl text-gray-300 hover:text-white hover:bg-slate-900/90 transition-all">
-                    <div class="w-7 h-7 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center"><i class="fa-solid fa-users-between-lines"></i></div>
-                    <span>تبديل الحساب</span>
-                </button>
-
-                <button onclick="logout(); toggleSideMenu();" class="w-full flex items-center gap-3 p-2.5 rounded-xl text-red-400 hover:bg-red-500/10 transition-all">
-                    <div class="w-7 h-7 rounded-lg bg-red-500/20 text-red-400 flex items-center justify-center"><i class="fa-solid fa-right-from-bracket"></i></div>
-                    <span>تسجيل الخروج</span>
-                </button>
-            </div>
-        </div>
-    </div>
 
 
     <!-- ==================== PART 2: MAIN FEED VIEW ==================== -->
     <div id="feedSection" class="relative z-10 hidden min-h-screen pb-20">
         <div class="max-w-3xl mx-auto px-4 pt-4 space-y-4">
             
-            <!-- Search Bar Box -->
-            <section class="glass-card p-3 rounded-2xl border border-slate-800 relative">
-                <div class="relative flex items-center">
-                    <i class="fa-solid fa-magnifying-glass absolute right-3.5 text-gray-400 text-xs"></i>
-                    <input type="text" id="searchInput" oninput="handleSearch(this.value)" placeholder="ابحث عن أصدقاء أو مستخدمين..." class="w-full bg-slate-900/90 border border-slate-800 focus:border-indigo-500 rounded-xl pr-9 pl-4 py-2 text-xs text-white focus:outline-none transition-all">
-                </div>
-                <div id="searchResults" class="hidden absolute left-0 right-0 top-12 mt-1 glass-modal rounded-2xl border border-slate-700 shadow-2xl p-2 z-50 max-h-60 overflow-y-auto space-y-1"></div>
-            </section>
-
             <!-- Create Post Box with Image Support -->
             <section class="glass-card p-4 rounded-2xl border border-slate-800">
                 <div class="flex items-center gap-3 pb-3 border-b border-slate-800/80">
-                    <button onclick="showSection('profile')" class="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-tr from-indigo-600 to-pink-500 flex items-center justify-center text-white font-bold userAvatarContainer">
+                    <div class="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-tr from-indigo-600 to-pink-500 flex items-center justify-center text-white font-bold userAvatarContainer">
                         <span class="userAvatarLetter">S</span>
-                    </button>
+                    </div>
                     <input type="text" id="postInput" placeholder="بماذا تفكر اليوم؟" class="w-full bg-slate-900/80 border border-slate-800 rounded-full px-4 py-2.5 text-xs text-white focus:outline-none">
-                </div>
-
-                <!-- Glassmorphism Image Preview Area -->
-                <div id="imagePreviewContainer" class="hidden mt-3 relative rounded-xl overflow-hidden border border-slate-700/60 post-media-container p-2">
-                    <img id="imagePreview" src="" class="w-full max-h-60 object-cover rounded-lg" alt="معاينة الصورة">
-                    <button onclick="removeSelectedImage()" class="absolute top-4 left-4 w-7 h-7 bg-slate-950/80 hover:bg-red-600 text-white rounded-full flex items-center justify-center text-xs transition-all border border-white/20">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
                 </div>
 
                 <!-- Hidden Native File Input -->
@@ -248,7 +168,7 @@
 
                 <div class="flex items-center justify-between pt-3 text-xs">
                     <button onclick="document.getElementById('mediaFileInput').click()" class="flex items-center gap-2 text-emerald-400 hover:text-emerald-300 font-semibold transition-all">
-                        <i class="fa-solid fa-image text-sm"></i> صورة / فيديو
+                        <i class="fa-solid fa-image text-sm"></i> صورة
                     </button>
                     <button id="submitPostBtn" onclick="createNewPost()" class="px-5 py-1.5 bg-gradient-to-r from-indigo-600 to-pink-600 hover:opacity-90 text-white font-bold rounded-xl transition-all shadow-md flex items-center gap-1.5">
                         <span>نشر</span>
@@ -263,65 +183,22 @@
     </div>
 
 
-    <!-- ==================== PART 3: CHAT VIEW WITH IMAGE UPLOAD ==================== -->
+    <!-- ==================== PART 3: CHAT VIEW ==================== -->
     <div id="chatSection" class="relative z-10 hidden min-h-[calc(100vh-80px)] pb-10">
         <div class="max-w-4xl mx-auto px-4 pt-4">
-            <div class="glass-card rounded-3xl border border-slate-800 overflow-hidden grid grid-cols-1 md:grid-cols-3 h-[75vh]">
-                <div class="border-b md:border-b-0 md:border-l border-slate-800 p-4 bg-slate-950/50 flex flex-col">
-                    <h3 class="text-sm font-bold text-white mb-3 flex items-center gap-2">
-                        <i class="fa-solid fa-comments text-purple-400"></i> المحادثات
-                    </h3>
-                    <div class="space-y-2 overflow-y-auto flex-1 pr-1" id="chatUsersList">
-                        <div class="flex items-center gap-3 p-2.5 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 cursor-pointer hover:bg-indigo-600/30 transition-all">
-                            <div class="relative w-10 h-10 rounded-full bg-gradient-to-tr from-purple-500 to-indigo-500 flex items-center justify-center text-white font-bold text-xs">
-                                S
-                                <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-400 rounded-full border-2 border-slate-950"></span>
-                            </div>
-                            <div>
-                                <h4 class="text-xs font-bold text-white">الدردشة العامة (Sovexa Public)</h4>
-                                <p class="text-[10px] text-gray-400 truncate">تحدث مع الجميع مجاناً</p>
-                            </div>
-                        </div>
-                    </div>
+            <div class="glass-card rounded-3xl border border-slate-800 overflow-hidden flex flex-col h-[75vh]">
+                <div class="p-3.5 border-b border-slate-800 bg-slate-950/60">
+                    <h4 class="text-xs font-bold text-white">الدردشة العامة Sovexa</h4>
                 </div>
 
-                <div class="md:col-span-2 flex flex-col h-full bg-slate-900/40">
-                    <div class="p-3.5 border-b border-slate-800 flex items-center justify-between bg-slate-950/60">
-                        <div class="flex items-center gap-2.5">
-                            <div class="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-white font-bold text-xs" id="chatPartnerLetter">S</div>
-                            <div>
-                                <h4 class="text-xs font-bold text-white" id="chatPartnerName">الدردشة العامة Sovexa</h4>
-                                <span class="text-[9px] text-emerald-400">مباشر الآن</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="flex-1 p-4 overflow-y-auto space-y-3" id="chatMessages">
-                        <div class="text-center text-gray-400 text-xs py-4">جاري تحميل الرسائل...</div>
-                    </div>
-
-                    <!-- Chat Image Preview Bar inside form if selected -->
-                    <div id="chatImagePreviewContainer" class="hidden px-4 py-2 bg-slate-950/80 border-t border-slate-800 flex items-center justify-between">
-                        <div class="flex items-center gap-2">
-                            <img id="chatImagePreview" src="" class="w-10 h-10 object-cover rounded-lg border border-slate-700" alt="معاينة الشات">
-                            <span class="text-[11px] text-purple-300">تم اختيار صورة للإرسال</span>
-                        </div>
-                        <button type="button" onclick="removeChatSelectedImage()" class="w-6 h-6 rounded-full bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white flex items-center justify-center text-xs transition-all">
-                            <i class="fa-solid fa-xmark"></i>
-                        </button>
-                    </div>
-
-                    <form id="chatForm" class="p-3 border-t border-slate-800 flex items-center gap-2 bg-slate-950/60">
-                        <input type="file" id="chatFileInput" accept="image/*" class="hidden" onchange="handleChatImageSelection(event)">
-                        <button type="button" onclick="document.getElementById('chatFileInput').click()" class="w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 text-purple-400 flex items-center justify-center text-xs transition-all border border-slate-700">
-                            <i class="fa-solid fa-image"></i>
-                        </button>
-                        <input type="text" id="chatInput" placeholder="اكتب رسالتك العامة..." class="flex-1 bg-slate-900 border border-slate-700 focus:border-purple-500 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none">
-                        <button type="submit" id="chatSubmitBtn" class="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:opacity-90 text-white text-xs font-bold rounded-xl transition-all flex items-center gap-1">
-                            <i class="fa-solid fa-paper-plane"></i>
-                        </button>
-                    </form>
+                <div class="flex-1 p-4 overflow-y-auto space-y-3" id="chatMessages">
+                    <div class="text-center text-gray-400 text-xs py-4">جاري تحميل الرسائل...</div>
                 </div>
+
+                <form id="chatForm" onsubmit="sendChatMessage(event)" class="p-3 border-t border-slate-800 flex items-center gap-2 bg-slate-950/60">
+                    <input type="text" id="chatInput" placeholder="اكتب رسالتك..." required class="flex-1 bg-slate-900 border border-slate-700 focus:border-purple-500 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none">
+                    <button type="submit" class="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-xs font-bold rounded-xl">إرسال</button>
+                </form>
             </div>
         </div>
     </div>
@@ -330,128 +207,25 @@
     <!-- ==================== PART 4: PROFILE VIEW ==================== -->
     <div id="profileSection" class="relative z-10 hidden min-h-screen pb-20">
         <div class="max-w-3xl mx-auto px-4 pt-4">
-            <div class="glass-card rounded-3xl overflow-hidden border border-slate-800 relative shadow-2xl mb-4">
-                <div class="h-36 sm:h-48 w-full bg-gradient-to-r from-indigo-900 via-purple-900 to-slate-900 relative">
-                    <img id="profileCoverImg" src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1200&auto=format&fit=crop&q=80" class="w-full h-full object-cover opacity-70" alt="Cover">
+            <div class="glass-card rounded-3xl overflow-hidden border border-slate-800 p-6 text-center space-y-3 shadow-2xl">
+                <div class="w-24 h-24 mx-auto rounded-full bg-gradient-to-tr from-indigo-500 to-pink-500 flex items-center justify-center text-3xl font-black text-white userAvatarContainer">
+                    <span class="userAvatarLetter">S</span>
                 </div>
-
-                <div class="px-5 pb-5 relative">
-                    <div class="flex flex-col sm:flex-row sm:items-end justify-between -mt-14 sm:-mt-16 mb-4 gap-4">
-                        <div class="relative w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 p-[3px] shadow-2xl">
-                            <div class="w-full h-full rounded-[13px] bg-slate-950 flex items-center justify-center text-3xl font-black text-white outfit-font overflow-hidden userAvatarContainer">
-                                <span class="userAvatarLetter">S</span>
-                            </div>
-                        </div>
-
-                        <div class="flex items-center gap-2.5">
-                            <button id="editProfileBtn" onclick="toggleEditModal(true)" class="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:opacity-90 text-white text-xs font-semibold rounded-xl shadow-lg transition-all flex items-center gap-1.5">
-                                <i class="fa-solid fa-pen-to-square"></i> تعديل الملف
-                            </button>
-                            <button id="followUserBtn" onclick="toggleFollowTargetUser()" class="hidden px-5 py-2 bg-gradient-to-r from-pink-600 to-purple-600 hover:opacity-90 text-white text-xs font-bold rounded-xl shadow-lg transition-all items-center gap-1.5">
-                                <i class="fa-solid fa-user-plus"></i> <span>متابعة</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div>
-                        <h2 class="text-xl font-bold text-white flex items-center gap-2">
-                            <span id="profileName">مستخدم Sovexa</span>
-                            <i class="fa-solid fa-circle-check text-indigo-400 text-sm"></i>
-                        </h2>
-                        <p class="text-xs text-indigo-300 font-mono mt-0.5" id="profileEmail">user@sovexa.com</p>
-                        <p class="text-xs text-gray-300 mt-2.5 leading-relaxed max-w-xl" id="profileBio">
-                            مرحباً بكم في ملفي الشخصي على Sovexa! 🚀
-                        </p>
-                    </div>
-
-                    <div class="grid grid-cols-3 gap-2 mt-5 py-3 px-4 bg-slate-900/60 rounded-2xl border border-slate-800 text-center">
-                        <div>
-                            <span class="block font-bold text-base text-white" id="profilePostsCount">0</span>
-                            <span class="text-[10px] text-gray-400">المنشورات</span>
-                        </div>
-                        <div class="border-x border-slate-800">
-                            <span class="block font-bold text-base text-white" id="profileFollowersCount">0</span>
-                            <span class="text-[10px] text-gray-400">المتابعون</span>
-                        </div>
-                        <div>
-                            <span class="block font-bold text-base text-white" id="profileFollowingCount">0</span>
-                            <span class="text-[10px] text-gray-400">يتابع</span>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    <!-- EDIT PROFILE MODAL -->
-    <div id="editProfileModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md hidden transition-all duration-300">
-        <div class="w-full max-w-md glass-modal p-6 rounded-3xl shadow-2xl border border-slate-700 relative max-h-[90vh] overflow-y-auto">
-            <div class="flex items-center justify-between pb-4 border-b border-slate-800">
-                <h3 class="text-base font-bold text-white flex items-center gap-2">
-                    <i class="fa-solid fa-user-pen text-indigo-400"></i> تعديل الملف الشخصي
-                </h3>
-                <button onclick="toggleEditModal(false)" class="text-gray-400 hover:text-white transition-colors">
-                    <i class="fa-solid fa-xmark text-lg"></i>
+                <h2 class="text-xl font-bold text-white" id="profileName">مستخدم Sovexa</h2>
+                <p class="text-xs text-indigo-300 font-mono" id="profileEmail">user@sovexa.com</p>
+                <button onclick="logout()" class="px-4 py-2 bg-red-600/20 border border-red-500/30 text-red-300 text-xs font-semibold rounded-xl transition-all hover:bg-red-600 hover:text-white">
+                    تسجيل الخروج
                 </button>
             </div>
-
-            <form id="editProfileForm" class="space-y-4 mt-4">
-                <div>
-                    <label class="block text-xs font-semibold text-gray-300 mb-1">الاسم المعروض</label>
-                    <input type="text" id="editNameInput" required placeholder="أدخل اسمك" class="w-full bg-slate-900 border border-slate-700 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-semibold text-gray-300 mb-1">السيرة الذاتية (Bio)</label>
-                    <textarea id="editBioInput" rows="3" placeholder="اكتب نبذة قصيرة عنك..." class="w-full bg-slate-900 border border-slate-700 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none resize-none"></textarea>
-                </div>
-
-                <!-- Avatar Image Selection -->
-                <div>
-                    <label class="block text-xs font-semibold text-gray-300 mb-1">الصورة الشخصية (Avatar)</label>
-                    <div class="flex items-center gap-3">
-                        <button type="button" onclick="document.getElementById('avatarFileInput').click()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-indigo-300 text-xs rounded-xl border border-slate-700 transition-all flex items-center gap-1.5">
-                            <i class="fa-solid fa-image"></i> اختر صورة
-                        </button>
-                        <span id="avatarFileName" class="text-[10px] text-gray-400 truncate max-w-[180px]">لم يتم اختيار صورة</span>
-                    </div>
-                    <input type="file" id="avatarFileInput" accept="image/*" class="hidden" onchange="handleAvatarSelection(event)">
-                </div>
-
-                <!-- Cover Image Selection -->
-                <div>
-                    <label class="block text-xs font-semibold text-gray-300 mb-1">صورة الغلاف (Cover)</label>
-                    <div class="flex items-center gap-3">
-                        <button type="button" onclick="document.getElementById('coverFileInput').click()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-purple-300 text-xs rounded-xl border border-slate-700 transition-all flex items-center gap-1.5">
-                            <i class="fa-solid fa-panorama"></i> اختر غلاف
-                        </button>
-                        <span id="coverFileName" class="text-[10px] text-gray-400 truncate max-w-[180px]">لم يتم اختيار غلاف</span>
-                    </div>
-                    <input type="file" id="coverFileInput" accept="image/*" class="hidden" onchange="handleCoverSelection(event)">
-                </div>
-
-                <div class="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-800">
-                    <button type="button" onclick="toggleEditModal(false)" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-gray-300 text-xs font-semibold rounded-xl transition-all">
-                        إلغاء
-                    </button>
-                    <button type="submit" id="saveProfileBtn" class="px-5 py-2 bg-gradient-to-r from-indigo-600 to-pink-600 hover:opacity-90 text-white text-xs font-bold rounded-xl shadow-lg transition-all flex items-center gap-2">
-                        <span>حفظ التغييرات</span>
-                    </button>
-                </div>
-            </form>
         </div>
     </div>
 
 
-    <!-- ============================================== -->
-    <!-- FIREBASE & CHAT IMAGE SHARING LOGIC -->
-    <!-- ============================================== -->
+    <!-- ==================== FIREBASE SCRIPT ==================== -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, deleteDoc, updateDoc, increment, collection, getDocs, addDoc, onSnapshot, query, orderBy, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyCJm_0O6NzS0UYnoYAv5MUIp-QR9xGN18Q",
@@ -468,377 +242,175 @@
         const db = getFirestore(app);
 
         let currentUser = null;
-        let activeProfileUid = null;
-        let allUsers = [];
         let selectedImageFile = null;
-        let selectedAvatarFile = null;
-        let selectedCoverFile = null;
-        let selectedChatImageFile = null;
 
-        // Toast Notification Function
         window.showToast = (msg) => {
             const container = document.getElementById('toastContainer');
+            if (!container) return;
             const toast = document.createElement('div');
-            toast.className = 'glass-modal px-4 py-2.5 rounded-2xl border border-indigo-500/50 shadow-2xl text-xs font-bold text-white flex items-center gap-2 transform transition-all duration-300 translate-y-[-10px] opacity-0';
+            toast.className = 'glass-modal px-4 py-2.5 rounded-2xl border border-indigo-500/50 shadow-2xl text-xs font-bold text-white flex items-center gap-2';
             toast.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400"></i> ${msg}`;
             container.appendChild(toast);
-
-            setTimeout(() => {
-                toast.classList.remove('translate-y-[-10px]', 'opacity-0');
-            }, 10);
-
-            setTimeout(() => {
-                toast.classList.add('opacity-0');
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
+            setTimeout(() => toast.remove(), 3000);
         };
 
-        // File Selection Handlers
-        window.handleAvatarSelection = (e) => {
+        window.handleImageSelection = (e) => {
             const file = e.target.files[0];
-            if (file) {
-                selectedAvatarFile = file;
-                document.getElementById('avatarFileName').innerText = file.name;
+            if (file) selectedImageFile = file;
+        };
+
+        // Auth State Listener
+        onAuthStateChanged(auth, (user) => {
+            currentUser = user;
+            const loginSection = document.getElementById('loginSection');
+            const mainHeader = document.getElementById('mainHeader');
+            const feedSection = document.getElementById('feedSection');
+
+            if (user) {
+                if (loginSection) loginSection.classList.add('hidden');
+                if (mainHeader) mainHeader.classList.remove('hidden');
+                if (feedSection) feedSection.classList.remove('hidden');
+                
+                const displayName = user.email.split('@')[0];
+                document.querySelectorAll('.userAvatarLetter').forEach(el => el.innerText = displayName.charAt(0).toUpperCase());
+                const profileName = document.getElementById('profileName');
+                if (profileName) profileName.innerText = displayName;
+                const profileEmail = document.getElementById('profileEmail');
+                if (profileEmail) profileEmail.innerText = user.email;
+
+                listenToRealtimePosts();
+                listenToRealtimeChat();
+            } else {
+                if (loginSection) loginSection.classList.remove('hidden');
+                if (mainHeader) mainHeader.classList.add('hidden');
+                if (feedSection) feedSection.classList.add('hidden');
             }
+        });
+
+        // Email Form Submission (No White Screen)
+        const emailForm = document.getElementById('emailForm');
+        if (emailForm) {
+            emailForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('emailInput').value.trim();
+                const password = document.getElementById('passwordInput').value.trim();
+
+                if (!email || !password) {
+                    showToast("يرجى إدخال البريد وكلمة المرور!");
+                    return;
+                }
+
+                try {
+                    showToast("جاري تسجيل الدخول... 🔄");
+                    await signInWithEmailAndPassword(auth, email, password);
+                    showToast("مرحباً بك مجدداً في Sovexa! 🎉");
+                } catch (loginError) {
+                    try {
+                        showToast("جاري إنشاء حساب جديد... 🚀");
+                        await createUserWithEmailAndPassword(auth, email, password);
+                        showToast("تم إنشاء حسابك وتسجيل الدخول بنجاح! ✨");
+                    } catch (createError) {
+                        alert("خطأ في المصادقة: " + createError.message);
+                    }
+                }
+            });
+        }
+
+        window.logout = async () => {
+            await signOut(auth);
+            showToast("تم تسجيل الخروج.");
         };
 
-        window.handleCoverSelection = (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                selectedCoverFile = file;
-                document.getElementById('coverFileName').innerText = file.name;
-            }
+        window.showSection = (sectionName) => {
+            ['feedSection', 'chatSection', 'profileSection'].forEach(sec => {
+                const el = document.getElementById(sec);
+                if (el) el.classList.add('hidden');
+            });
+            const target = document.getElementById(sectionName + 'Section');
+            if (target) target.classList.remove('hidden');
         };
 
-        window.handleImageSelection = (event) => {
-            const file = event.target.files[0];
-            if (file) {
-                selectedImageFile = file;
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    document.getElementById('imagePreview').src = e.target.result;
-                    document.getElementById('imagePreviewContainer').classList.remove('hidden');
-                };
-                reader.readAsDataURL(file);
-            }
-        };
-
-        window.removeSelectedImage = () => {
-            selectedImageFile = null;
-            document.getElementById('mediaFileInput').value = '';
-            document.getElementById('imagePreviewContainer').classList.add('hidden');
-            document.getElementById('imagePreview').src = '';
-        };
-
-        // Chat Image Selection & Preview
-        window.handleChatImageSelection = (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                selectedChatImageFile = file;
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    document.getElementById('chatImagePreview').src = event.target.result;
-                    document.getElementById('chatImagePreviewContainer').classList.remove('hidden');
-                };
-                reader.readAsDataURL(file);
-            }
-        };
-
-        window.removeChatSelectedImage = () => {
-            selectedChatImageFile = null;
-            document.getElementById('chatFileInput').value = '';
-            document.getElementById('chatImagePreviewContainer').classList.add('hidden');
-            document.getElementById('chatImagePreview').src = '';
-        };
-
-        // Create Post
         window.createNewPost = async () => {
             const textInput = document.getElementById('postInput');
             const postText = textInput.value.trim();
-            const submitBtn = document.getElementById('submitPostBtn');
-
-            if (!postText && !selectedImageFile) {
-                showToast("يرجى كتابة نص أو إرفاق صورة أولاً!");
+            if (!postText) {
+                showToast("يرجى كتابة شيء لنشره!");
                 return;
             }
-
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> جاري النشر...';
-
             try {
-                let mediaUrl = null;
-
-                if (selectedImageFile) {
-                    showToast("جاري رفع الصورة إلى Sovexa Cloud... ☁️");
-                    mediaUrl = await window.uploadImageToImgBB(selectedImageFile);
-                }
-
-                const userName = currentUser ? (currentUser.displayName || currentUser.email.split('@')[0]) : 'مستخدم Sovexa';
-                const userPhoto = currentUser ? (currentUser.photoURL || null) : null;
-
                 await addDoc(collection(db, "posts"), {
-                    userId: currentUser ? currentUser.uid : "anonymous",
-                    userName: userName,
-                    userPhoto: userPhoto,
-                    userEmail: currentUser ? currentUser.email : "",
+                    userId: currentUser.uid,
+                    userName: currentUser.email.split('@')[0],
                     text: postText,
-                    mediaUrl: mediaUrl,
                     createdAt: serverTimestamp(),
                     likesCount: 0
                 });
-
                 textInput.value = '';
-                removeSelectedImage();
                 showToast("تم نشر منشورك بنجاح! 🎉");
-
             } catch (err) {
-                console.error("Post Creation Error: ", err);
-                alert("حدث خطأ أثناء النشر: " + err.message);
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<span>نشر</span>';
+                alert("خطأ في النشر: " + err.message);
             }
         };
 
-        // Delete Post
-        window.deletePost = async (postId) => {
-            if (!confirm("هل أنت تأكد من أنك تريد حذف هذا المنشور؟")) return;
-
-            try {
-                await deleteDoc(doc(db, "posts", postId));
-                showToast("تم حذف المنشور بنجاح. 🗑️");
-            } catch (err) {
-                console.error("Delete Post Error: ", err);
-                alert("حدث خطأ أثناء حذف المنشور.");
-            }
-        };
-
-        // Realtime Posts Listener
         function listenToRealtimePosts() {
             const postsQuery = query(collection(db, "posts"), orderBy("createdAt", "desc"));
             onSnapshot(postsQuery, (snapshot) => {
                 const postsContainer = document.getElementById('postsContainer');
                 postsContainer.innerHTML = '';
-
                 if (snapshot.empty) {
-                    postsContainer.innerHTML = `
-                        <div class="glass-card p-6 rounded-2xl border border-slate-800 text-center">
-                            <p class="text-xs text-gray-400">لا توجد منشورات حتى الآن. كن أول من يشارك!</p>
-                        </div>
-                    `;
+                    postsContainer.innerHTML = '<div class="glass-card p-6 rounded-2xl text-center text-xs text-gray-400">لا توجد منشورات بعد.</div>';
                     return;
                 }
-
                 snapshot.forEach((docSnap) => {
                     const post = docSnap.data();
-                    const postId = docSnap.id;
-                    const letter = (post.userName || 'S').charAt(0).toUpperCase();
-
-                    const isOwner = currentUser && currentUser.uid === post.userId;
-
-                    const avatarHTML = post.userPhoto ? 
-                        `<img src="${post.userPhoto}" class="w-10 h-10 rounded-full object-cover border border-indigo-500/30" alt="Avatar">` :
-                        `<div class="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-500 to-pink-500 flex items-center justify-center text-white font-bold text-xs">${letter}</div>`;
-
-                    const mediaHTML = post.mediaUrl ? `
-                        <div class="rounded-xl overflow-hidden border border-slate-800/80 post-media-container mt-2">
-                            <img src="${post.mediaUrl}" loading="lazy" class="w-full max-h-96 object-cover hover:scale-[1.02] transition-all duration-300" alt="Post Attachment">
-                        </div>
-                    ` : '';
-
-                    const deleteMenuHTML = isOwner ? `
-                        <div class="relative group">
-                            <button class="w-7 h-7 rounded-lg hover:bg-slate-800 text-gray-400 hover:text-white flex items-center justify-center transition-all">
-                                <i class="fa-solid fa-ellipsis-vertical text-xs"></i>
-                            </button>
-                            <div class="hidden group-hover:block absolute left-0 top-7 glass-modal p-1.5 rounded-xl border border-slate-700 shadow-xl z-20 w-28">
-                                <button onclick="deletePost('${postId}')" class="w-full text-right px-2 py-1 text-[11px] text-red-400 hover:bg-red-500/10 rounded-lg flex items-center gap-1.5 transition-all">
-                                    <i class="fa-solid fa-trash-can"></i> حذف المنشور
-                                </button>
-                            </div>
-                        </div>
-                    ` : '';
-
-                    const postCard = document.createElement('article');
-                    postCard.className = 'glass-card p-4 rounded-2xl border border-slate-800 space-y-3 relative';
-                    postCard.innerHTML = `
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-3 cursor-pointer" onclick="viewUserProfileByUid('${post.userId}')">
-                                ${avatarHTML}
-                                <div>
-                                    <h4 class="font-bold text-xs text-white hover:text-indigo-400 transition-all">${post.userName || 'مستخدم Sovexa'}</h4>
-                                    <p class="text-[10px] text-gray-400">الآن • <i class="fa-solid fa-globe"></i></p>
-                                </div>
-                            </div>
-                            ${deleteMenuHTML}
-                        </div>
-
-                        ${post.text ? `<p class="text-xs text-gray-200 leading-relaxed">${post.text}</p>` : ''}
-                        
-                        ${mediaHTML}
-
-                        <div class="flex items-center justify-between pt-2 border-t border-slate-800/80 text-xs">
-                            <button id="likeBtn-${postId}" onclick="toggleLike('${postId}')" class="flex items-center gap-2 text-gray-400 hover:text-pink-500 transition-all font-semibold py-1 px-3 rounded-lg hover:bg-slate-900">
-                                <i class="fa-regular fa-heart text-sm" id="likeIcon-${postId}"></i>
-                                <span>إعجاب</span>
-                                <span class="like-count bg-slate-800 text-[10px] px-1.5 py-0.5 rounded-full text-white">${post.likesCount || 0}</span>
-                            </button>
-                            
-                            <button onclick="toggleComments('comments-${postId}')" class="flex items-center gap-2 text-gray-400 hover:text-indigo-400 transition-all font-semibold py-1 px-3 rounded-lg hover:bg-slate-900">
-                                <i class="fa-regular fa-comment text-sm"></i>
-                                <span>التعليقات</span>
-                                <span class="bg-slate-800 text-[10px] px-1.5 py-0.5 rounded-full text-white comment-count" id="commentCount-${postId}">0</span>
-                            </button>
-
-                            <button onclick="showToast('تم نسخ رابط المنشور للمشاركة! 🚀')" class="flex items-center gap-2 text-gray-400 hover:text-emerald-400 transition-all font-semibold py-1 px-3 rounded-lg hover:bg-slate-900">
-                                <i class="fa-solid fa-share text-sm"></i>
-                                <span>مشاركة</span>
-                            </button>
-                        </div>
-
-                        <div id="comments-${postId}" class="hidden pt-3 border-t border-slate-800/50 space-y-3">
-                            <div class="space-y-2 max-h-48 overflow-y-auto comments-list" id="commentsList-${postId}"></div>
-                            <form onsubmit="addComment(event, '${postId}')" class="flex items-center gap-2 pt-1">
-                                <input type="text" placeholder="اكتب تعليقاً..." required class="flex-1 bg-slate-900 border border-slate-700 focus:border-indigo-500 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none">
-                                <button type="submit" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl transition-all">إرسال</button>
-                            </form>
-                        </div>
+                    const card = document.createElement('article');
+                    card.className = 'glass-card p-4 rounded-2xl border border-slate-800 space-y-2';
+                    card.innerHTML = `
+                        <h4 class="font-bold text-xs text-white">${post.userName}</h4>
+                        <p class="text-xs text-gray-200">${post.text}</p>
                     `;
-                    postsContainer.appendChild(postCard);
-
-                    checkUserLikeStatus(postId);
-                    listenToPostComments(postId);
+                    postsContainer.appendChild(card);
                 });
             });
         }
 
-        async function checkUserLikeStatus(postId) {
-            if (!currentUser) return;
-            const likeRef = doc(db, "posts", postId, "likes", currentUser.uid);
-            onSnapshot(likeRef, (docSnap) => {
-                const likeBtn = document.getElementById(`likeBtn-${postId}`);
-                const likeIcon = document.getElementById(`likeIcon-${postId}`);
-                if (docSnap.exists() && likeBtn && likeIcon) {
-                    likeIcon.className = 'fa-solid fa-heart text-pink-500 text-sm';
-                    likeBtn.classList.add('text-pink-500');
-                } else if (likeBtn && likeIcon) {
-                    likeIcon.className = 'fa-regular fa-heart text-sm';
-                    likeBtn.classList.remove('text-pink-500');
-                }
-            });
-        }
-
-        function listenToPostComments(postId) {
-            const commentsQuery = query(collection(db, "posts", postId, "comments"), orderBy("createdAt", "asc"));
-            onSnapshot(commentsQuery, (snapshot) => {
-                const commentsList = document.getElementById(`commentsList-${postId}`);
-                const countBadge = document.getElementById(`commentCount-${postId}`);
-                if (!commentsList) return;
-
-                commentsList.innerHTML = '';
-                if (countBadge) countBadge.innerText = snapshot.size;
-
-                snapshot.forEach((docSnap) => {
-                    const c = docSnap.data();
-                    const letter = (c.userName || 'U').charAt(0).toUpperCase();
-                    const item = document.createElement('div');
-                    item.className = 'flex items-start gap-2.5 bg-slate-900/60 p-2.5 rounded-xl border border-slate-800';
-                    item.innerHTML = `
-                        <div class="w-7 h-7 rounded-full bg-gradient-to-tr from-indigo-500 to-pink-500 flex items-center justify-center text-white text-[10px] font-bold">${letter}</div>
-                        <div>
-                            <h5 class="text-[11px] font-bold text-white">${c.userName || 'مستخدم Sovexa'}</h5>
-                            <p class="text-[11px] text-gray-300">${c.text}</p>
-                        </div>
-                    `;
-                    commentsList.appendChild(item);
-                });
-            });
-        }
-
-        window.toggleLike = async (postId) => {
-            if (!currentUser) {
-                showToast("يرجى تسجيل الدخول أولاً للإعجاب بالمنشورات!");
-                return;
-            }
-
-            const postRef = doc(db, "posts", postId);
-            const likeRef = doc(db, "posts", postId, "likes", currentUser.uid);
-
-            try {
-                const likeDoc = await getDoc(likeRef);
-
-                if (likeDoc.exists()) {
-                    await deleteDoc(likeRef);
-                    await updateDoc(postRef, { likesCount: increment(-1) });
-                    showToast("تم إلغاء الإعجاب.");
-                } else {
-                    await setDoc(likeRef, {
-                        userId: currentUser.uid,
-                        userName: currentUser.displayName || currentUser.email.split('@')[0],
-                        createdAt: serverTimestamp()
-                    });
-                    await updateDoc(postRef, { likesCount: increment(1) });
-                    showToast("أبديت إعجابك بالمنشور! ❤️");
-                }
-            } catch (error) {
-                console.error("خطأ في الإعجاب:", error);
-            }
-        };
-
-        window.addComment = async (e, postId) => {
-            e.preventDefault();
-            if (!currentUser) {
-                showToast("يرجى تسجيل الدخول أولاً للتعليق!");
-                return;
-            }
-
-            const form = e.target;
-            const input = form.querySelector('input');
-            const text = input.value.trim();
-            if (!text) return;
-
-            const userName = currentUser.displayName || currentUser.email.split('@')[0];
-
-            try {
-                await addDoc(collection(db, "posts", postId, "comments"), {
-                    userId: currentUser.uid,
-                    userName: userName,
-                    text: text,
-                    createdAt: serverTimestamp()
-                });
-
-                input.value = '';
-                showToast("تمت إضافة تعليقك بنجاح! 💬");
-            } catch (error) {
-                console.error("خطأ في إضافة التعليق:", error);
-                alert("حدث خطأ أثناء إضافة التعليق.");
-            }
-        };
-
-        // CHAT REALTIME & IMAGE SHARING LOGIC
         function listenToRealtimeChat() {
             const chatQuery = query(collection(db, "global_chat"), orderBy("createdAt", "asc"));
             onSnapshot(chatQuery, (snapshot) => {
                 const chatMessages = document.getElementById('chatMessages');
                 chatMessages.innerHTML = '';
-
                 if (snapshot.empty) {
-                    chatMessages.innerHTML = '<div class="text-center text-gray-400 text-xs py-4">لا توجد رسائل بعد، أرسل أول رسالة! 💬</div>';
+                    chatMessages.innerHTML = '<div class="text-center text-gray-400 text-xs py-4">لا توجد رسائل بعد.</div>';
                     return;
                 }
-
                 snapshot.forEach((docSnap) => {
                     const msg = docSnap.data();
                     const isMe = currentUser && msg.userId === currentUser.uid;
+                    const div = document.createElement('div');
+                    div.className = `flex ${isMe ? 'justify-end' : 'justify-start'}`;
+                    div.innerHTML = `<div class="max-w-[80%] p-3 rounded-2xl text-xs ${isMe ? 'bg-indigo-600 text-white' : 'bg-slate-800 text-gray-200'}"><b>${msg.userName}:</b> ${msg.text}</div>`;
+                    chatMessages.appendChild(div);
+                });
+            });
+        }
 
-                    const msgImageHTML = msg.mediaUrl ? `
-                        <div class="mt-2 rounded-xl overflow-hidden border border-white/10">
-                            <img src="${msg.mediaUrl}" class="max-w-full max-h-60 object-cover" alt="Chat Image">
-                        </div>
-                    ` : '';
-
-                    const msgDiv = document.createElement('div');
-                    msgDiv.className = `flex ${isMe ? 'justify-end' : 'justify-start'}`;
-
-                    msgDiv.innerHTML = `
-                        <div class="max-w-[80%] p-3 rounded-2xl ${isMe ? 
+        window.sendChatMessage = async (e) => {
+            e.preventDefault();
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if (!text) return;
+            try {
+                await addDoc(collection(db, "global_chat"), {
+                    userId: currentUser.uid,
+                    userName: currentUser.email.split('@')[0],
+                    text: text,
+                    createdAt: serverTimestamp()
+                });
+                input.value = '';
+            } catch (err) {
+                console.error(err);
+            }
+        };
+    </script>
+</body>
+</html>
