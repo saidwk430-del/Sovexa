@@ -27,10 +27,10 @@
   .icon-btn { width:2.5rem; height:2.5rem; border-radius:9999px; background:#1f2937; display:flex; align-items:center; justify-content:center; }
   .bubble-me { background:linear-gradient(135deg,#4f46e5,#7c3aed); color:#fff; border-radius:1.1rem 1.1rem 0.3rem 1.1rem; }
   .bubble-other { background:#1f2937; color:#e5e7eb; border-radius:1.1rem 1.1rem 1.1rem 0.3rem; }
-  .no-scrollbar::-webkit-scrollbar { display: none; }
-  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   input, textarea, button { 
     touch-action: manipulation; 
+    -webkit-user-select: none;
+    user-select: none;
     -webkit-touch-callout: none;
   }
   input, textarea {
@@ -40,7 +40,7 @@
 </style>
 </head>
 <body class="min-h-screen">
-<!-- BUILD 6 Fixed -->
+<!-- BUILD 5 -->
 
 <div id="toastContainer" class="fixed top-16 left-1/2 -translate-x-1/2 z-[60] flex flex-col items-center gap-2 pointer-events-none"></div>
 
@@ -53,7 +53,7 @@
       </div>
       <h2 class="text-xl font-bold text-white">مرحباً بك في Sovexa</h2>
       <p class="text-xs text-gray-400">سجل الدخول للمتابعة</p>
-      <p dir="ltr" class="text-[10px] text-gray-600 mt-1">BUILD 6 Fixed</p>
+      <p dir="ltr" class="text-[10px] text-gray-600 mt-1">BUILD 5</p>
     </div>
 
     <button id="googleLoginBtn" type="button" class="w-full py-3 bg-gray-900 border border-gray-700 rounded-xl text-sm font-medium flex items-center justify-center gap-3 mb-3 cursor-pointer">
@@ -151,8 +151,8 @@ const chatIdFor = (a, b) => [a, b].sort().join("_");
 const handleOf = (u) => u.username ? "@" + u.username : "";
 
 let currentUser = null, currentView = "home", currentId = null;
-let allUsers = {}, usersByUsername = {}, postsCache = {}, storiesCache = [];
-let usersUnsub = null, postsUnsub = null, savedUnsub = null, storiesUnsub = null;
+let allUsers = {}, usersByUsername = {}, postsCache = {};
+let usersUnsub = null, postsUnsub = null, savedUnsub = null;
 let unsubs = [], commentUnsubs = {}, openSet = new Set();
 let confirmationResult = null, recaptcha = null;
 let pendingPhoto = null, pendingCover = null, pendingPostImg = null;
@@ -342,47 +342,15 @@ function restoreOpenComments() {
   openSet.forEach(id => { if ($('cbox-' + id)) watchComments(id); });
 }
 
-function renderStoriesBar() {
-  const bar = $('storiesBar');
-  if (!bar) return;
-  const u = me();
-  let html = `
-    <div class="flex flex-col items-center shrink-0 cursor-pointer" data-act="add-story">
-      <div class="w-16 h-16 rounded-full p-0.5 bg-gradient-to-tr from-indigo-500 to-pink-500 relative">
-        <div class="w-full h-full rounded-full bg-[#111827] flex items-center justify-center overflow-hidden">
-          ${u.photoURL ? `<img src="${esc(u.photoURL)}" class="w-full h-full object-cover">` : `<span class="font-bold">${nameOf(u).charAt(0)}</span>`}
-        </div>
-        <div class="absolute bottom-0 right-0 w-5 h-5 bg-indigo-600 rounded-full flex items-center justify-center text-white text-xs ring-2 ring-[#0b0f17]">+</div>
-      </div>
-      <span class="text-[11px] mt-1 text-gray-300 truncate w-16 text-center">قصتك</span>
-    </div>`;
-
-  storiesCache.forEach(s => {
-    html += `
-      <div class="flex flex-col items-center shrink-0 cursor-pointer" data-act="view-story" data-id="${s.id}">
-        <div class="w-16 h-16 rounded-full p-0.5 bg-gradient-to-tr from-purple-500 via-pink-500 to-amber-400">
-          <div class="w-full h-full rounded-full bg-[#111827] flex items-center justify-center overflow-hidden">
-            ${s.userPhoto ? `<img src="${esc(s.userPhoto)}" class="w-full h-full object-cover">` : `<span class="font-bold">${esc(s.userName.charAt(0))}</span>`}
-          </div>
-        </div>
-        <span class="text-[11px] mt-1 text-gray-300 truncate w-16 text-center">${esc(s.userName)}</span>
-      </div>`;
-  });
-  bar.innerHTML = html;
-}
-
 function viewHome() {
   V().innerHTML = `
     <div class="p-3 space-y-3 max-w-xl mx-auto">
-      <div class="card rounded-2xl p-3 overflow-x-auto no-scrollbar flex gap-3 items-center" id="storiesBar"></div>
-
       <section class="card rounded-xl p-3 flex items-center gap-3">
         ${avatarHTML(nameOf(me()), me().photoURL)}
         <button data-go="create" class="flex-1 text-right bg-gray-800 rounded-full px-4 py-2 text-sm text-gray-400">بماذا تفكر يا ${nameOf(me())}؟</button>
       </section>
       <div id="feed" class="space-y-3"></div>
     </div>`;
-  renderStoriesBar();
   refreshPosts();
 }
 
@@ -663,7 +631,7 @@ function viewAbout() {
     <div class="p-3 space-y-3 max-w-xl mx-auto">
       ${backHeader('عن منصة Sovexa 🌌')}
       <div class="card rounded-xl p-4 text-sm leading-7 text-gray-300">تعتبر منصة Sovexa وجهتك الرقمية المتكاملة والمبتكرة للتواصل الاجتماعي والدردشة.</div>
-      <p dir="ltr" class="text-center text-[11px] text-gray-500">BUILD 6 Fixed</p>
+      <p dir="ltr" class="text-center text-[11px] text-gray-500">BUILD 5</p>
     </div>`;
 }
 
@@ -731,7 +699,6 @@ function renderUsersLive() {
   if (!currentUser) return;
   if (currentView === 'search') renderSearch($('q')?.value || '');
   else if (['friends', 'chats', 'profile', 'menu', 'settings'].includes(currentView)) go(currentView, currentId);
-  else if (currentView === 'home') renderStoriesBar();
 }
 
 function showLogoutSheet() {
@@ -802,9 +769,7 @@ onAuthStateChanged(auth, async (user) => {
     if (usersUnsub) { usersUnsub(); usersUnsub = null; }
     if (postsUnsub) { postsUnsub(); postsUnsub = null; }
     if (savedUnsub) { savedUnsub(); savedUnsub = null; }
-    if (storiesUnsub) { storiesUnsub(); storiesUnsub = null; }
     postsCache = {};
-    storiesCache = [];
     savedIds = new Set();
     showLogin();
     return;
@@ -830,12 +795,6 @@ onAuthStateChanged(auth, async (user) => {
       refreshPosts();
       if (currentView === 'saved') renderSavedList();
       if (currentView === 'archive') viewArchive();
-    }, () => {});
-  }
-  if (!storiesUnsub) {
-    storiesUnsub = onSnapshot(query(collection(db, "stories"), orderBy("createdAt", "desc"), limit(50)), (s) => {
-      storiesCache = s.docs.map(d => ({ id: d.id, ...d.data() }));
-      if (currentView === 'home') renderStoriesBar();
     }, () => {});
   }
   if (!savedUnsub) {
@@ -974,47 +933,6 @@ document.addEventListener('click', async (e) => {
     } catch (e) {
       showToast('تعذر تحديث المتابعة');
     }
-  } else if (actTarget === 'add-story') {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.onchange = async (ev) => {
-      const file = ev.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = async (e2) => {
-        try {
-          await addDoc(collection(db, "stories"), {
-            userId: uid(), userName: nameOf(me()), userPhoto: me().photoURL || "",
-            mediaUrl: e2.target.result, createdAt: serverTimestamp()
-          });
-          showToast('تم نشر القصة بنجاح 📸');
-        } catch (err) {
-          showToast('تعذر نشر القصة');
-        }
-      };
-      reader.readAsDataURL(file);
-    };
-    input.click();
-  } else if (actTarget === 'view-story') {
-    const s = storiesCache.find(x => x.id === id);
-    if (!s) return;
-    const modal = document.createElement('div');
-    modal.className = 'fixed inset-0 z-[80] bg-black/90 flex flex-col items-center justify-center p-4';
-    modal.innerHTML = `
-      <div class="relative w-full max-w-sm card rounded-2xl overflow-hidden flex flex-col items-center p-4">
-        <div class="w-full flex items-center justify-between mb-3">
-          <div class="flex items-center gap-2">
-            ${avatarHTML(s.userName, s.userPhoto, 'w-8 h-8 text-xs')}
-            <b class="text-sm">${esc(s.userName)}</b>
-          </div>
-          <button id="closeStory" class="text-gray-400 text-lg px-2"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-        <img src="${esc(s.mediaUrl)}" class="w-full max-h-[70vh] object-cover rounded-xl">
-      </div>`;
-    modal.querySelector('#closeStory').onclick = () => modal.remove();
-    modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
-    document.body.appendChild(modal);
   } else if (actTarget === 'soon') {
     showToast('هذه الميزة ستتوفر قريباً!');
   } else if (actTarget === 'logout-menu') {
@@ -1074,4 +992,33 @@ document.addEventListener('submit', async (e) => {
         likes: [], commentsCount: 0, createdAt: serverTimestamp()
       });
       showToast('تم النشر بنجاح');
-    
+      go('home');
+    } catch (e) {
+      showToast('تعذر النشر');
+    }
+  } else if (ftype === 'edit') {
+    const name = form.elements['name'].value.trim();
+    const username = form.elements['username'].value.trim().toLowerCase();
+    const bio = form.elements['bio'].value.trim();
+    const saveBtn = $('saveBtn');
+    if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'جاري الحفظ...'; }
+    try {
+      const payload = { name, username, bio };
+      if (pendingPhoto) payload.photoURL = pendingPhoto;
+      if (pendingCover) payload.coverURL = pendingCover;
+      await updateDoc(doc(db, "users", uid()), payload);
+      showToast('تم التحديث بنجاح');
+      go('profile', uid());
+    } catch (e) {
+      showToast('تعذر التحديث');
+      if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'حفظ'; }
+    }
+  }
+});
+
+document.addEventListener('input', (e) => {
+  if (e.target.id === 'q') renderSearch(e.target.value);
+});
+</script>
+</body>
+</html>
