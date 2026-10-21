@@ -201,7 +201,6 @@ const uid = () => currentUser?.uid;
 const me = () => allUsers[uid()] || { uid: uid(), name: "", email: currentUser?.email || "" };
 const V = () => $('view');
 const chatIdFor = (a, b) => [a, b].sort().join("_");
-const normUser = (s) => String(s || "").trim().toLowerCase().replace(/^@/, "").replace(/[^a-z0-9_.]/g, "");
 const handleOf = (u) => u.username ? "@" + u.username : "";
 
 let currentUser = null, currentView = "home", currentId = null;
@@ -238,34 +237,6 @@ function followBtn(id) {
   const f = (me().following || []).includes(id);
   const t = currentLang === 'ar' ? (f ? 'إلغاء المتابعة' : 'متابعة') : (f ? 'Unfollow' : 'Follow');
   return `<button data-act="follow" data-id="${id}" class="px-3 py-1.5 rounded-lg text-xs font-bold ${f ? 'bg-gray-700 text-gray-200' : 'bg-indigo-600 text-white'}">${t}</button>`;
-}
-
-function compressImage(file, max, quality) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const img = new Image();
-      img.onload = () => {
-        const s = Math.min(1, max / Math.max(img.width, img.height));
-        const c = document.createElement('canvas');
-        c.width = Math.round(img.width * s);
-        c.height = Math.round(img.height * s);
-        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
-        resolve(c.toDataURL('image/jpeg', quality));
-      };
-      img.onerror = reject;
-      img.src = reader.result;
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
-
-function withTimeout(promise, ms = 15000) {
-  return Promise.race([
-    promise,
-    new Promise((_, rej) => setTimeout(() => rej(new Error("انتهت المهلة، تحقق من الاتصال")), ms))
-  ]);
 }
 
 function backHeader(title) {
@@ -809,7 +780,6 @@ function viewReels() {
     </div>`;
 }
 
-// واجهة الإعدادات مع تفعيل اللغة والخصوصية والإشعارات
 function viewSettings() {
   const t = translations[currentLang];
   V().innerHTML = `
@@ -985,7 +955,9 @@ const getRecaptcha = () => {
   if (!recaptcha) recaptcha = new RecaptchaVerifier(auth, 'recaptcha-container', { size: 'invisible' });
   return recaptcha;
 };
+
 $('togglePhoneBtn').addEventListener('click', () => $('phonePanel').classList.toggle('hidden'));
+
 $('sendCodeBtn').addEventListener('click', async () => {
   const phone = $('phoneInput').value.trim();
   if (!/^\+\d{8,15}$/.test(phone)) return showToast("أدخل الرقم بصيغة دولية مثل +966500000000");
@@ -993,4 +965,43 @@ $('sendCodeBtn').addEventListener('click', async () => {
     confirmationResult = await signInWithPhoneNumber(auth, phone, getRecaptcha());
     $('phoneStep').classList.add('hidden');
     $('codeStep').classList.remove('hidden');
-    showToast("تم إرسال الرمز"
+    showToast("تم إرسال الرمز");
+  } catch (err) {
+    showToast("تعذر إرسال الرمز");
+  }
+});
+
+$('verifyCodeBtn').addEventListener('click', async () => {
+  const code = $('codeInput').value.trim();
+  if (!code) return showToast("أدخل الرمز");
+  try {
+    await confirmationResult.confirm(code);
+    showToast("تم تسجيل الدخول بنجاح");
+  } catch (err) {
+    showToast("الرمز غير صحيح");
+  }
+});
+
+$('backToPhoneBtn').addEventListener('click', () => {
+  $('codeStep').classList.add('hidden');
+  $('phoneStep').classList.remove('hidden');
+});
+
+// الأحداث والتحكم بالتنقل
+document.addEventListener('click', async (e) => {
+  const btn = e.target.closest('[data-go], [data-act]');
+  if (!btn) return;
+  const goTarget = btn.dataset.go;
+  const actTarget = btn.dataset.act;
+  const id = btn.dataset.id;
+
+  if (goTarget) {
+    go(goTarget, id);
+  } else if (actTarget === 'like') {
+    toggleLike(id);
+  } else if (actTarget === 'comments') {
+    openComments(id);
+  } else if (actTarget === 'save') {
+    toggleSave(id);
+  } else if (actTarget === 'share') {
+    if (navigator.sha
