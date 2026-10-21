@@ -1,483 +1,719 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" class="h-full">
+<html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <link rel="manifest" href="manifest.json">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sovexa - منصة التواصل الاجتماعي</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&family=Outfit:wght@400;600;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background-color: #0b0f17; color: #f3f4f6; }
-        .outfit-font { font-family: 'Outfit', sans-serif; }
-        .glass-card {
-            background: rgba(15, 23, 42, 0.75);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-        .glass-modal {
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-        }
-        .glass-nav {
-            background: rgba(11, 15, 23, 0.85);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-        }
-        #bgCanvas {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 0;
-            pointer-events: none;
-        }
-        .glow-text { text-shadow: 0 0 15px rgba(99, 102, 241, 0.5); }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<link rel="manifest" href="manifest.json">
+<title>Sovexa</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700;900&display=swap" rel="stylesheet">
+<style>
+  body { background:#0b0f17; color:#e5e7eb; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; }
+  .card { background:#111827; border:1px solid #1f2937; }
+  .icon-btn { width:2.5rem; height:2.5rem; border-radius:9999px; background:#1f2937; display:flex; align-items:center; justify-content:center; }
+  .safe-top { padding-top: env(safe-area-inset-top, 0px); }
+  .safe-bottom { padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .hidden { display:none !important; }
+</style>
 </head>
-<body class="min-h-screen relative select-none">
+<body class="min-h-screen">
 
-    <canvas id="bgCanvas"></canvas>
+<div id="toastContainer" class="fixed top-16 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-2 pointer-events-none"></div>
 
-    <div id="toastContainer" class="fixed top-16 left-1/2 transform -translate-x-1/2 z-50 flex flex-col items-center gap-2 pointer-events-none"></div>
-
-    <!-- ==================== LOGIN VIEW ==================== -->
-    <div id="loginSection" class="relative z-10 flex flex-col justify-between items-center min-h-screen p-4">
-        <header class="w-full p-4 flex justify-between items-center max-w-7xl mx-auto">
-            <div class="flex items-center gap-2">
-                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span class="text-xs font-semibold tracking-wider text-gray-300 uppercase outfit-font">Sovexa Network</span>
-            </div>
-        </header>
-
-        <main class="flex flex-col items-center justify-center my-auto w-full max-w-md">
-            <div class="mb-5 flex flex-col items-center">
-                <div class="w-24 h-24 rounded-3xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 p-[2px] shadow-2xl shadow-indigo-500/50">
-                    <div class="w-full h-full rounded-[22px] bg-slate-950/80 backdrop-blur-xl flex items-center justify-center border border-white/20">
-                        <span class="outfit-font font-black text-5xl text-transparent bg-clip-text bg-gradient-to-tr from-indigo-400 via-pink-400 to-purple-300">S</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="w-full glass-card p-6 rounded-3xl shadow-2xl">
-                <div class="text-center mb-5">
-                    <h2 class="text-xl font-bold text-white mb-1">مرحباً بك في Sovexa</h2>
-                    <p class="text-xs text-gray-300">سجل الدخول للمتابعة إلى المنصة</p>
-                </div>
-
-                <button id="googleLoginBtn" class="w-full py-2.5 px-4 bg-slate-900/90 hover:bg-slate-800 border border-gray-700 text-white font-medium text-xs rounded-xl transition-all flex items-center justify-center gap-3 shadow-md mb-3">
-                    <svg class="w-4 h-4" viewBox="0 0 24 24">
-                        <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.7 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.2 9 5 12 5z"/>
-                        <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.8z"/>
-                        <path fill="#FBBC05" d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.3s.2-1.6.4-2.3L1.9 7.3C.7 9.7 0 10.8 0 12.3s.7 2.6 1.9 5l3.7-2.5z"/>
-                        <path fill="#34A853" d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.2-6.4-5.2L1.9 16C3.7 19.7 7.5 23 12 23z"/>
-                    </svg>
-                    <span>متابعة باستخدام Google</span>
-                </button>
-
-                <button id="togglePhoneBtn" class="w-full py-2.5 px-4 bg-slate-900/90 hover:bg-slate-800 border border-gray-700 text-white font-medium text-xs rounded-xl transition-all flex items-center justify-center gap-3 shadow-md mb-4">
-                    <i class="fa-solid fa-phone text-emerald-400"></i>
-                    <span>متابعة برقم الهاتف</span>
-                </button>
-
-                <div id="phonePanel" class="hidden mb-4 space-y-3">
-                    <div id="phoneStep">
-                        <label class="block text-[11px] font-semibold text-gray-300 mb-1">رقم الهاتف (مع رمز الدولة)</label>
-                        <input type="tel" id="phoneInput" placeholder="+966500000000" dir="ltr" class="w-full bg-slate-900/90 border border-gray-700 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none">
-                        <button id="sendCodeBtn" type="button" class="w-full mt-3 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:opacity-90 text-white font-bold text-xs rounded-xl shadow-lg transition-all">
-                            إرسال رمز التحقق
-                        </button>
-                    </div>
-
-                    <div id="codeStep" class="hidden">
-                        <label class="block text-[11px] font-semibold text-gray-300 mb-1">أدخل الرمز المرسل إلى هاتفك</label>
-                        <input type="text" id="codeInput" inputmode="numeric" maxlength="6" placeholder="123456" dir="ltr" class="w-full bg-slate-900/90 border border-gray-700 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-xs text-white text-center tracking-widest focus:outline-none">
-                        <button id="verifyCodeBtn" type="button" class="w-full mt-3 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:opacity-90 text-white font-bold text-xs rounded-xl shadow-lg transition-all">
-                            تأكيد الرمز
-                        </button>
-                        <button id="backToPhoneBtn" type="button" class="w-full mt-2 text-[11px] text-gray-400 hover:text-white">
-                            تغيير الرقم
-                        </button>
-                    </div>
-                </div>
-
-                <div class="relative flex py-2 items-center mb-4">
-                    <div class="flex-grow border-t border-gray-700/80"></div>
-                    <span class="flex-shrink mx-3 text-[11px] text-gray-400">أو بالبريد الإلكتروني</span>
-                    <div class="flex-grow border-t border-gray-700/80"></div>
-                </div>
-
-                <form id="emailForm" class="space-y-3">
-                    <div>
-                        <label class="block text-[11px] font-semibold text-gray-300 mb-1">البريد الإلكتروني</label>
-                        <input type="email" id="emailInput" required placeholder="name@sovexa.com" class="w-full bg-slate-900/90 border border-gray-700 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-[11px] font-semibold text-gray-300 mb-1">كلمة المرور</label>
-                        <input type="password" id="passwordInput" required placeholder="••••••••" class="w-full bg-slate-900/90 border border-gray-700 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none">
-                    </div>
-                    <button type="submit" class="w-full py-3 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:opacity-90 text-white font-bold text-xs rounded-xl shadow-lg shadow-indigo-500/30 transition-all">
-                        تسجيل الدخول / إنشاء حساب
-                    </button>
-                </form>
-            </div>
-
-            <div id="recaptcha-container"></div>
-        </main>
-
-        <footer class="w-full pb-6 text-center">
-            <h1 class="outfit-font font-black text-2xl tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-white via-indigo-200 to-pink-300 uppercase">Sovexa</h1>
-        </footer>
+<!-- ============ LOGIN ============ -->
+<div id="loginSection" class="min-h-screen flex flex-col items-center justify-center p-4">
+  <div class="w-full max-w-md card rounded-3xl p-6 shadow-2xl">
+    <div class="text-center mb-5">
+      <div class="mx-auto w-20 h-20 rounded-3xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center mb-3">
+        <span class="font-black text-4xl text-white" style="font-family:Outfit">S</span>
+      </div>
+      <h2 class="text-xl font-bold text-white">مرحباً بك في Sovexa</h2>
+      <p class="text-xs text-gray-400">سجل الدخول للمتابعة</p>
     </div>
 
-    <!-- ==================== MAIN NAVBAR ==================== -->
-    <header id="mainHeader" class="sticky top-0 z-50 w-full glass-nav px-4 py-2.5 hidden">
-        <div class="max-w-4xl mx-auto flex items-center justify-between gap-4">
-            <div class="flex items-center gap-3">
-                <button onclick="showSection('feed')" class="flex items-center gap-2 focus:outline-none">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 p-[1.5px] shadow-lg">
-                        <div class="w-full h-full rounded-[10px] bg-slate-950 flex items-center justify-center">
-                            <span class="outfit-font font-black text-xl text-transparent bg-clip-text bg-gradient-to-tr from-indigo-400 to-pink-400">S</span>
-                        </div>
-                    </div>
-                    <span class="outfit-font font-black text-2xl tracking-wider text-white hidden sm:block glow-text">Sovexa</span>
-                </button>
-            </div>
-            <div class="flex items-center gap-2">
-                <button onclick="showSection('feed')" class="px-3 py-1.5 rounded-xl bg-slate-900/80 border border-slate-800 text-gray-300 hover:text-white text-xs font-semibold transition-all">
-                    <i class="fa-solid fa-house ml-1"></i> الرئيسية
-                </button>
-                <button onclick="showSection('chat')" class="px-3 py-1.5 rounded-xl bg-purple-600/30 border border-purple-500/40 text-purple-300 hover:text-white text-xs font-semibold transition-all">
-                    <i class="fa-solid fa-comments ml-1"></i> الدردشة
-                </button>
-                <button onclick="showSection('profile')" class="px-3 py-1.5 rounded-xl bg-indigo-600/30 border border-indigo-500/40 text-indigo-300 hover:text-white text-xs font-semibold transition-all">
-                    <i class="fa-solid fa-user ml-1"></i> ملفي
-                </button>
-            </div>
-        </div>
-    </header>
+    <button id="googleLoginBtn" class="w-full py-2.5 bg-gray-900 border border-gray-700 rounded-xl text-sm font-medium flex items-center justify-center gap-3 mb-3">
+      <svg class="w-4 h-4" viewBox="0 0 24 24">
+        <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.7 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.2 9 5 12 5z"/>
+        <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.8z"/>
+        <path fill="#FBBC05" d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.3s.2-1.6.4-2.3L1.9 7.3C.7 9.7 0 10.8 0 12.3s.7 2.6 1.9 5l3.7-2.5z"/>
+        <path fill="#34A853" d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.2-6.4-5.2L1.9 16C3.7 19.7 7.5 23 12 23z"/>
+      </svg>
+      متابعة باستخدام Google
+    </button>
 
-    <!-- ==================== FEED ==================== -->
-    <div id="feedSection" class="relative z-10 hidden min-h-screen pb-20">
-        <div class="max-w-3xl mx-auto px-4 pt-4 space-y-4">
-            <section class="glass-card p-4 rounded-2xl border border-slate-800">
-                <div class="flex items-center gap-3 pb-3 border-b border-slate-800/80">
-                    <div class="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-tr from-indigo-600 to-pink-500 flex items-center justify-center text-white font-bold userAvatarContainer">
-                        <span class="userAvatarLetter">S</span>
-                    </div>
-                    <input type="text" id="postInput" placeholder="بماذا تفكر اليوم؟" class="w-full bg-slate-900/80 border border-slate-800 rounded-full px-4 py-2.5 text-xs text-white focus:outline-none">
-                </div>
-                <div class="flex items-center justify-end pt-3 text-xs">
-                    <button id="submitPostBtn" onclick="createNewPost()" class="px-5 py-1.5 bg-gradient-to-r from-indigo-600 to-pink-600 hover:opacity-90 text-white font-bold rounded-xl transition-all shadow-md">
-                        نشر
-                    </button>
-                </div>
-            </section>
-            <div id="postsContainer" class="space-y-4"></div>
-        </div>
+    <button id="togglePhoneBtn" class="w-full py-2.5 bg-gray-900 border border-gray-700 rounded-xl text-sm font-medium flex items-center justify-center gap-3 mb-3">
+      <i class="fa-solid fa-phone text-emerald-400"></i> متابعة برقم الهاتف
+    </button>
+
+    <div id="phonePanel" class="hidden space-y-3 mb-3">
+      <div id="phoneStep">
+        <input type="tel" id="phoneInput" placeholder="+966500000000" dir="ltr" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2.5 text-sm outline-none">
+        <button id="sendCodeBtn" type="button" class="w-full mt-2 py-2.5 bg-emerald-600 rounded-xl text-sm font-bold">إرسال رمز التحقق</button>
+      </div>
+      <div id="codeStep" class="hidden">
+        <input type="text" id="codeInput" inputmode="numeric" maxlength="6" placeholder="123456" dir="ltr" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2.5 text-sm text-center tracking-widest outline-none">
+        <button id="verifyCodeBtn" type="button" class="w-full mt-2 py-2.5 bg-emerald-600 rounded-xl text-sm font-bold">تأكيد الرمز</button>
+        <button id="backToPhoneBtn" type="button" class="w-full mt-2 text-xs text-gray-400">تغيير الرقم</button>
+      </div>
     </div>
 
-    <!-- ==================== CHAT ==================== -->
-    <div id="chatSection" class="relative z-10 hidden min-h-[calc(100vh-80px)] pb-10">
-        <div class="max-w-4xl mx-auto px-4 pt-4">
-            <div class="glass-card rounded-3xl border border-slate-800 overflow-hidden flex flex-col h-[75vh]">
-                <div class="p-3.5 border-b border-slate-800 bg-slate-950/60">
-                    <h4 class="text-xs font-bold text-white">الدردشة العامة Sovexa</h4>
-                </div>
-                <div class="flex-1 p-4 overflow-y-auto space-y-3" id="chatMessages">
-                    <div class="text-center text-gray-400 text-xs py-4">جاري تحميل الرسائل...</div>
-                </div>
-                <form id="chatForm" class="p-3 border-t border-slate-800 flex items-center gap-2 bg-slate-950/60">
-                    <input type="text" id="chatInput" placeholder="اكتب رسالتك..." required class="flex-1 bg-slate-900 border border-slate-700 focus:border-purple-500 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none">
-                    <button type="submit" class="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-xs font-bold rounded-xl">إرسال</button>
-                </form>
-            </div>
-        </div>
-    </div>
+    <div class="flex items-center gap-3 my-4 text-xs text-gray-500"><div class="flex-1 border-t border-gray-700"></div>أو بالبريد<div class="flex-1 border-t border-gray-700"></div></div>
 
-    <!-- ==================== PROFILE ==================== -->
-    <div id="profileSection" class="relative z-10 hidden min-h-screen pb-20">
-        <div class="max-w-3xl mx-auto px-4 pt-4">
-            <div class="glass-card rounded-3xl overflow-hidden border border-slate-800 p-6 text-center space-y-3 shadow-2xl">
-                <div class="w-24 h-24 mx-auto rounded-full bg-gradient-to-tr from-indigo-500 to-pink-500 flex items-center justify-center text-3xl font-black text-white userAvatarContainer">
-                    <span class="userAvatarLetter">S</span>
-                </div>
-                <h2 class="text-xl font-bold text-white" id="profileName">مستخدم Sovexa</h2>
-                <p class="text-xs text-indigo-300 font-mono" id="profileEmail">user@sovexa.com</p>
-                <button id="logoutBtn" class="px-4 py-2 bg-red-600/20 border border-red-500/30 text-red-300 text-xs font-semibold rounded-xl transition-all hover:bg-red-600 hover:text-white">
-                    تسجيل الخروج
-                </button>
-            </div>
-        </div>
-    </div>
+    <form id="emailForm" class="space-y-3">
+      <input type="email" id="emailInput" required placeholder="البريد الإلكتروني" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2.5 text-sm outline-none">
+      <input type="password" id="passwordInput" required placeholder="كلمة المرور" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2.5 text-sm outline-none">
+      <button type="submit" class="w-full py-3 bg-gradient-to-r from-indigo-600 to-pink-600 rounded-xl text-sm font-bold">تسجيل الدخول / إنشاء حساب</button>
+    </form>
+    <div id="recaptcha-container"></div>
+  </div>
+</div>
 
-    <script type="module">
+<!-- ============ APP ============ -->
+<div id="appSection" class="hidden min-h-screen flex flex-col">
+  <header class="sticky top-0 z-40 bg-[#111827] border-b border-gray-800 safe-top">
+    <div class="flex items-center justify-between px-4 h-14">
+      <span class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-pink-400" style="font-family:Outfit">Sovexa</span>
+      <div class="flex gap-2">
+        <button data-go="search" class="icon-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
+        <button data-go="chats" class="icon-btn"><i class="fa-brands fa-facebook-messenger"></i></button>
+      </div>
+    </div>
+  </header>
+
+  <main id="view" class="flex-1 pb-20"></main>
+
+  <nav class="fixed bottom-0 inset-x-0 z-40 bg-[#111827] border-t border-gray-800 safe-bottom">
+    <div class="grid grid-cols-5 h-14 text-gray-400 text-lg">
+      <button data-go="home" class="flex items-center justify-center"><i class="fa-solid fa-house"></i></button>
+      <button data-go="reels" class="flex items-center justify-center"><i class="fa-solid fa-clapperboard"></i></button>
+      <button data-go="create" class="flex items-center justify-center text-indigo-400"><i class="fa-solid fa-square-plus"></i></button>
+      <button data-go="friends" class="flex items-center justify-center"><i class="fa-solid fa-user-group"></i></button>
+      <button data-go="menu" class="flex items-center justify-center"><i class="fa-solid fa-bars"></i></button>
+    </div>
+  </nav>
+</div>
+
+<script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import {
-    getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult,
-    signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut,
-    RecaptchaVerifier, signInWithPhoneNumber
+  getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult,
+  signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut,
+  RecaptchaVerifier, signInWithPhoneNumber
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import {
-    getFirestore, collection, doc, getDoc, setDoc, addDoc, onSnapshot, query, orderBy, serverTimestamp
+  getFirestore, collection, doc, getDoc, setDoc, updateDoc, deleteDoc, addDoc, onSnapshot,
+  query, where, orderBy, limit, serverTimestamp, arrayUnion, arrayRemove
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-const firebaseConfig = {
-    apiKey: "AIzaSyCJm_0O6NzS0UYnoYAv5MUIp-QR9xGN18Q",
-    authDomain: "sovexa-fbc93.firebaseapp.com",
-    projectId: "sovexa-fbc93",
-    storageBucket: "sovexa-fbc93.firebasestorage.app",
-    messagingSenderId: "147264654219",
-    appId: "1:147264654219:web:7487b91cc6c5fa041efd8e"
-};
-
-const app = initializeApp(firebaseConfig);
+const app = initializeApp({
+  apiKey: "AIzaSyCJm_0O6NzS0UYnoYAv5MUIp-QR9xGN18Q",
+  authDomain: "sovexa-fbc93.firebaseapp.com",
+  projectId: "sovexa-fbc93",
+  storageBucket: "sovexa-fbc93.firebasestorage.app",
+  messagingSenderId: "147264654219",
+  appId: "1:147264654219:web:7487b91cc6c5fa041efd8e"
+});
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+// ---------- helpers ----------
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-const nameOf = (u) => u.displayName || (u.email ? u.email.split("@")[0] : "") || u.phoneNumber || "مستخدم";
+const nameOf = (u) => u.name || u.displayName || (u.email ? u.email.split("@")[0] : "") || u.phoneNumber || "مستخدم";
+const uid = () => currentUser?.uid;
+const me = () => allUsers[uid()] || { uid: uid(), name: "" };
+const V = () => $('view');
+const chatIdFor = (a, b) => [a, b].sort().join("_");
 
 let currentUser = null;
-let listening = false;
+let currentView = "home";
+let currentId = null;
+let allUsers = {};
+let usersUnsub = null;
+let unsubs = [];
+let commentUnsubs = {};
+let openSet = new Set();
 let confirmationResult = null;
 let recaptcha = null;
+let pendingPhoto = null;
+let pendingPostImg = null;
 
 window.showToast = (msg) => {
-    const container = $('toastContainer');
-    if (!container) return;
-    const toast = document.createElement('div');
-    toast.className = 'glass-modal px-4 py-2.5 rounded-2xl border border-indigo-500/50 shadow-2xl text-xs font-bold text-white flex items-center gap-2';
-    toast.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-400"></i> ' + esc(msg);
-    container.appendChild(toast);
-    setTimeout(() => toast.remove(), 3000);
+  const box = document.createElement('div');
+  box.className = 'card px-4 py-2 rounded-xl text-xs font-bold text-white shadow-xl';
+  box.textContent = msg;
+  $('toastContainer').appendChild(box);
+  setTimeout(() => box.remove(), 2800);
 };
+const showToast = window.showToast;
 
-function showLogin() {
-    $('loginSection').classList.remove('hidden');
-    $('mainHeader').classList.add('hidden');
-    ['feedSection', 'chatSection', 'profileSection'].forEach(s => $(s).classList.add('hidden'));
+function avatarHTML(name, photo, cls = 'w-10 h-10 text-sm') {
+  return photo
+    ? `<img src="${esc(photo)}" class="${cls} rounded-full object-cover shrink-0">`
+    : `<div class="${cls} rounded-full bg-gradient-to-tr from-indigo-600 to-pink-500 flex items-center justify-center font-bold text-white shrink-0">${esc((name || "?").charAt(0).toUpperCase())}</div>`;
 }
 
-window.showSection = (sectionName) => {
-    ['feedSection', 'chatSection', 'profileSection'].forEach(sec => $(sec).classList.add('hidden'));
-    $(sectionName + 'Section').classList.remove('hidden');
-};
+function timeAgo(ts) {
+  if (!ts) return "الآن";
+  const d = ts.toDate ? ts.toDate() : new Date(ts);
+  return d.toLocaleString('ar', { dateStyle: 'medium', timeStyle: 'short' });
+}
 
-function showApp(user) {
-    $('loginSection').classList.add('hidden');
-    $('mainHeader').classList.remove('hidden');
-    window.showSection('feed');
+function followBtn(id) {
+  const f = (me().following || []).includes(id);
+  return `<button data-act="follow" data-id="${id}" class="px-3 py-1.5 rounded-lg text-xs font-bold ${f ? 'bg-gray-700 text-gray-200' : 'bg-indigo-600 text-white'}">${f ? 'إلغاء المتابعة' : 'متابعة'}</button>`;
+}
 
-    const name = nameOf(user);
-    document.querySelectorAll('.userAvatarContainer').forEach(box => {
-        box.innerHTML = user.photoURL
-            ? `<img src="${esc(user.photoURL)}" alt="" class="w-full h-full object-cover rounded-full">`
-            : `<span class="userAvatarLetter">${esc(name.charAt(0).toUpperCase())}</span>`;
-    });
-    $('profileName').textContent = name;
-    $('profileEmail').textContent = user.email || user.phoneNumber || "";
+function compressImage(file, max, quality) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const s = Math.min(1, max / Math.max(img.width, img.height));
+        const c = document.createElement('canvas');
+        c.width = Math.round(img.width * s);
+        c.height = Math.round(img.height * s);
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        resolve(c.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = reject;
+      img.src = reader.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+// ---------- router ----------
+function clearListeners() {
+  unsubs.forEach(f => f());
+  unsubs = [];
+  Object.values(commentUnsubs).forEach(f => f && f());
+  commentUnsubs = {};
+  openSet.clear();
+}
+
+function go(view, id) {
+  clearListeners();
+  currentView = view;
+  currentId = id || null;
+  document.querySelectorAll('nav [data-go]').forEach(b => b.classList.toggle('text-indigo-400', b.dataset.go === view));
+  const views = {
+    home: viewHome, reels: viewReels, create: viewCreate, friends: viewFriends,
+    menu: viewMenu, search: viewSearch, chats: viewChats, profile: viewProfile,
+    chat: viewChat, edit: viewEdit, settings: viewSettings
+  };
+  (views[view] || viewHome)(id);
+  window.scrollTo(0, 0);
+}
+
+// ---------- posts & comments ----------
+function postCard(id, p) {
+  const liked = (p.likes || []).includes(uid());
+  const count = (p.likes || []).length;
+  return `
+  <article class="card rounded-xl overflow-hidden">
+    <div class="flex items-center gap-3 p-3">
+      ${avatarHTML(p.userName, p.userPhoto)}
+      <div class="flex-1 min-w-0">
+        <b class="block text-sm text-white truncate">${esc(p.userName)}</b>
+        <span class="text-xs text-gray-500">${timeAgo(p.createdAt)}</span>
+      </div>
+      ${p.userId === uid() ? `<button data-act="delpost" data-id="${id}" class="text-gray-500 px-2"><i class="fa-solid fa-trash"></i></button>` : ''}
+    </div>
+    ${p.text ? `<p class="px-3 pb-3 text-sm whitespace-pre-wrap">${esc(p.text)}</p>` : ''}
+    ${p.image ? `<img src="${esc(p.image)}" class="w-full max-h-[480px] object-cover">` : ''}
+    <div class="flex justify-around border-t border-gray-800 text-sm text-gray-400">
+      <button data-act="like" data-id="${id}" data-liked="${liked ? 1 : 0}" class="flex-1 py-2 ${liked ? 'text-indigo-400' : ''}"><i class="fa-solid fa-thumbs-up"></i> ${count} إعجاب</button>
+      <button data-act="comments" data-id="${id}" class="flex-1 py-2"><i class="fa-regular fa-comment"></i> تعليق</button>
+    </div>
+    <div id="cbox-${id}" class="hidden p-3 border-t border-gray-800 space-y-2"></div>
+  </article>`;
+}
+
+function watchComments(id) {
+  commentUnsubs[id] && commentUnsubs[id]();
+  const box0 = $('cbox-' + id);
+  if (box0) box0.classList.remove('hidden');
+  const q = query(collection(db, "posts", id, "comments"), orderBy("createdAt", "asc"), limit(50));
+  commentUnsubs[id] = onSnapshot(q, (snap) => {
+    const box = $('cbox-' + id);
+    if (!box) return;
+    box.innerHTML = snap.docs.map(d => {
+      const c = d.data();
+      return `<div class="flex gap-2">${avatarHTML(c.userName, c.userPhoto, 'w-7 h-7 text-xs')}
+        <div class="bg-gray-800 rounded-xl px-3 py-2 text-xs"><b>${esc(c.userName)}</b><p>${esc(c.text)}</p></div></div>`;
+    }).join('') + `
+      <form data-form="comment" data-id="${id}" class="flex gap-2 pt-1">
+        <input name="t" autocomplete="off" placeholder="اكتب تعليقاً..." class="flex-1 bg-gray-800 rounded-full px-3 py-2 text-xs outline-none">
+        <button class="text-indigo-400 text-xs font-bold px-2">إرسال</button>
+      </form>`;
+  });
+}
+
+function openComments(id) {
+  if (openSet.has(id)) {
+    openSet.delete(id);
+    commentUnsubs[id] && commentUnsubs[id]();
+    delete commentUnsubs[id];
+    $('cbox-' + id)?.classList.add('hidden');
+    return;
+  }
+  openSet.add(id);
+  watchComments(id);
+}
+
+function restoreOpenComments() {
+  openSet.forEach(id => { if ($('cbox-' + id)) watchComments(id); });
+}
+
+// ---------- views ----------
+function viewHome() {
+  V().innerHTML = `
+    <div class="p-3 space-y-3 max-w-xl mx-auto">
+      <section class="card rounded-xl p-3 flex items-center gap-3">
+        ${avatarHTML(nameOf(me()), me().photoURL)}
+        <button data-go="create" class="flex-1 text-right bg-gray-800 rounded-full px-4 py-2 text-sm text-gray-400">بماذا تفكر يا ${esc(nameOf(me()))}؟</button>
+      </section>
+      <div id="feed" class="space-y-3"></div>
+    </div>`;
+  unsubs.push(onSnapshot(query(collection(db, "posts"), orderBy("createdAt", "desc"), limit(50)), (snap) => {
+    const feed = $('feed');
+    if (!feed) return;
+    feed.innerHTML = snap.empty
+      ? '<p class="text-center text-gray-500 py-10">لا توجد منشورات بعد</p>'
+      : snap.docs.map(d => postCard(d.id, d.data())).join('');
+    restoreOpenComments();
+  }));
+}
+
+function viewReels() {
+  V().innerHTML = `
+    <div class="p-6 text-center mt-16 space-y-3">
+      <i class="fa-solid fa-clapperboard text-5xl text-indigo-400"></i>
+      <h2 class="text-lg font-bold">الريلز</h2>
+      <p class="text-sm text-gray-400">رفع الفيديوهات يحتاج Firebase Storage، وهي المرحلة التالية بعد استقرار الميزات الحالية.</p>
+    </div>`;
+}
+
+function viewCreate() {
+  pendingPostImg = null;
+  V().innerHTML = `
+    <form data-form="create" class="p-4 space-y-3 max-w-xl mx-auto">
+      <div class="flex items-center justify-between">
+        <h2 class="font-bold">إنشاء منشور</h2>
+        <button class="px-4 py-1.5 rounded-lg bg-gradient-to-r from-indigo-600 to-pink-600 text-sm font-bold">نشر</button>
+      </div>
+      <div class="flex items-center gap-3">
+        ${avatarHTML(nameOf(me()), me().photoURL)}
+        <b class="text-sm">${esc(nameOf(me()))}</b>
+      </div>
+      <textarea name="text" rows="5" placeholder="بماذا تفكر؟" class="w-full bg-transparent text-base outline-none resize-none"></textarea>
+      <div id="postPrev"></div>
+      <label class="card rounded-xl p-3 flex items-center gap-2 text-emerald-400 text-sm cursor-pointer">
+        <i class="fa-solid fa-image"></i> إضافة صورة
+        <input type="file" id="postImg" accept="image/*" class="hidden">
+      </label>
+    </form>`;
+}
+
+function viewSearch() {
+  V().innerHTML = `
+    <div class="p-3 space-y-3 max-w-xl mx-auto">
+      <input id="q" type="search" placeholder="ابحث عن أشخاص..." class="w-full bg-gray-800 rounded-full px-4 py-2.5 text-sm outline-none">
+      <div id="res" class="space-y-2"></div>
+    </div>`;
+  renderSearch('');
+}
+
+function userRow(u) {
+  return `
+    <div class="card rounded-xl p-3 flex items-center gap-3">
+      <button data-go="profile" data-id="${u.uid}" class="flex items-center gap-3 flex-1 min-w-0 text-right">
+        ${avatarHTML(nameOf(u), u.photoURL)}
+        <div class="min-w-0">
+          <b class="block text-sm truncate">${esc(nameOf(u))}</b>
+          <span class="text-xs text-gray-500 truncate block">${esc(u.bio || '')}</span>
+        </div>
+      </button>
+      ${followBtn(u.uid)}
+    </div>`;
+}
+
+function renderSearch(term) {
+  const t = term.trim().toLowerCase();
+  const list = Object.values(allUsers)
+    .filter(u => u.uid !== uid() && (nameOf(u) + ' ' + (u.email || '')).toLowerCase().includes(t))
+    .slice(0, 30);
+  const res = $('res');
+  if (!res) return;
+  res.innerHTML = list.length ? list.map(userRow).join('') : '<p class="text-center text-gray-500 py-8">لا توجد نتائج</p>';
+}
+
+function viewFriends() {
+  const following = (me().following || []).map(id => allUsers[id]).filter(Boolean);
+  const suggestions = Object.values(allUsers).filter(u => u.uid !== uid() && !(me().following || []).includes(u.uid));
+  V().innerHTML = `
+    <div class="p-3 space-y-4 max-w-xl mx-auto">
+      <h2 class="font-bold text-lg">الأصدقاء</h2>
+      <section class="space-y-2">
+        <h3 class="text-sm text-gray-400">أصدقاؤك (${following.length})</h3>
+        ${following.length ? following.map(userRow).join('') : '<p class="text-xs text-gray-500">لم تتابع أحداً بعد</p>'}
+      </section>
+      <section class="space-y-2">
+        <h3 class="text-sm text-gray-400">اقتراحات لك</h3>
+        ${suggestions.length ? suggestions.map(userRow).join('') : '<p class="text-xs text-gray-500">لا توجد اقتراحات</p>'}
+      </section>
+    </div>`;
+}
+
+function viewChats() {
+  const following = (me().following || []).map(id => allUsers[id]).filter(Boolean);
+  V().innerHTML = `
+    <div class="p-3 space-y-2 max-w-xl mx-auto">
+      <h2 class="font-bold text-lg mb-2">الدردشات</h2>
+      ${following.length ? following.map(u => `
+        <button data-go="chat" data-id="${u.uid}" class="card rounded-xl p-3 w-full flex items-center gap-3 text-right">
+          ${avatarHTML(nameOf(u), u.photoURL)}
+          <b class="text-sm">${esc(nameOf(u))}</b>
+        </button>`).join('') : '<p class="text-center text-gray-500 py-8">تابع أشخاصاً لتبدأ الدردشة معهم</p>'}
+    </div>`;
+}
+
+function viewChat(otherId) {
+  const o = allUsers[otherId] || { uid: otherId, name: "مستخدم" };
+  const cid = chatIdFor(uid(), otherId);
+  setDoc(doc(db, "chats", cid), { members: [uid(), otherId] }, { merge: true }).catch(() => {});
+  V().innerHTML = `
+    <div class="flex flex-col h-[calc(100vh-7.5rem)]">
+      <div class="flex items-center gap-3 p-3 border-b border-gray-800">
+        <button data-go="chats" class="px-2"><i class="fa-solid fa-arrow-right"></i></button>
+        ${avatarHTML(nameOf(o), o.photoURL, 'w-9 h-9 text-xs')}
+        <b class="text-sm">${esc(nameOf(o))}</b>
+      </div>
+      <div id="msgs" class="flex-1 overflow-y-auto p-3 space-y-2"></div>
+      <form data-form="msg" data-id="${otherId}" class="p-3 flex gap-2 border-t border-gray-800">
+        <input name="t" autocomplete="off" placeholder="اكتب رسالة..." class="flex-1 bg-gray-800 rounded-full px-4 py-2 text-sm outline-none">
+        <button class="px-4 rounded-full bg-indigo-600 text-sm font-bold">إرسال</button>
+      </form>
+    </div>`;
+  unsubs.push(onSnapshot(query(collection(db, "chats", cid, "messages"), orderBy("createdAt", "asc"), limit(200)), (snap) => {
+    const el = $('msgs');
+    if (!el) return;
+    el.innerHTML = snap.docs.map(d => {
+      const m = d.data();
+      const mine = m.senderId === uid();
+      return `<div class="flex ${mine ? 'justify-end' : 'justify-start'}">
+        <div class="max-w-[75%] px-3 py-2 rounded-2xl text-sm ${mine ? 'bg-indigo-600 text-white' : 'bg-gray-800'}">${esc(m.text)}</div></div>`;
+    }).join('');
+    el.scrollTop = el.scrollHeight;
+  }));
+}
+
+function viewProfile(id) {
+  const target = id || uid();
+  const u = allUsers[target] || { uid: target, name: "مستخدم" };
+  const own = target === uid();
+  const followers = Object.values(allUsers).filter(x => (x.following || []).includes(target)).length;
+  const following = (u.following || []).length;
+  V().innerHTML = `
+    <div class="h-32 bg-gradient-to-r from-indigo-700 via-purple-700 to-pink-600"></div>
+    <div class="px-4 -mt-12 text-center">
+      <div class="inline-block ring-4 ring-[#0b0f17] rounded-full">${avatarHTML(nameOf(u), u.photoURL, 'w-24 h-24 text-3xl')}</div>
+      <h2 class="text-xl font-black mt-2">${esc(nameOf(u))}</h2>
+      <p class="text-sm text-gray-400">${esc(u.bio || '')}</p>
+      <p class="text-xs text-gray-500 mt-1">${followers} متابع · ${following} يتابع</p>
+      <div class="flex gap-2 justify-center mt-3">
+        ${own
+          ? `<button data-go="edit" class="px-6 py-2 rounded-lg bg-gray-700 text-sm font-bold">تعديل الملف الشخصي</button>
+             <button data-go="settings" class="px-4 py-2 rounded-lg bg-gray-700 text-sm font-bold"><i class="fa-solid fa-gear"></i></button>`
+          : `${followBtn(target)}<button data-go="chat" data-id="${target}" class="px-4 py-2 rounded-lg bg-gray-700 text-xs font-bold">مراسلة</button>`}
+      </div>
+    </div>
+    <div id="uposts" class="p-3 space-y-3 mt-4 max-w-xl mx-auto"></div>`;
+  unsubs.push(onSnapshot(query(collection(db, "posts"), where("userId", "==", target)), (snap) => {
+    const el = $('uposts');
+    if (!el) return;
+    const t = (d) => d.data().createdAt?.seconds ?? Date.now() / 1000;
+    const docs = [...snap.docs].sort((a, b) => t(b) - t(a));
+    el.innerHTML = docs.length
+      ? docs.map(d => postCard(d.id, d.data())).join('')
+      : '<p class="text-center text-gray-500 py-8">لا توجد منشورات</p>';
+    restoreOpenComments();
+  }));
+}
+
+function viewEdit() {
+  const u = me();
+  pendingPhoto = null;
+  V().innerHTML = `
+    <form data-form="edit" class="p-4 space-y-4 max-w-md mx-auto">
+      <h2 class="text-lg font-bold">تعديل الملف الشخصي</h2>
+      <div class="flex flex-col items-center gap-2">
+        <div id="photoPrev">${avatarHTML(nameOf(u), u.photoURL, 'w-24 h-24 text-3xl')}</div>
+        <label class="text-indigo-400 text-sm cursor-pointer">تغيير الصورة
+          <input type="file" id="photoIn" accept="image/*" class="hidden">
+        </label>
+      </div>
+      <label class="block text-xs text-gray-400">الاسم
+        <input name="name" required value="${esc(nameOf(u))}" class="mt-1 w-full bg-gray-800 rounded-lg px-3 py-2 text-sm outline-none">
+      </label>
+      <label class="block text-xs text-gray-400">النبذة
+        <textarea name="bio" rows="3" class="mt-1 w-full bg-gray-800 rounded-lg px-3 py-2 text-sm outline-none">${esc(u.bio || '')}</textarea>
+      </label>
+      <button class="w-full py-2.5 rounded-lg bg-gradient-to-r from-indigo-600 to-pink-600 font-bold text-sm">حفظ</button>
+      <button type="button" data-go="profile" data-id="${uid()}" class="w-full py-2 text-sm text-gray-400">إلغاء</button>
+    </form>`;
+}
+
+function viewMenu() {
+  const u = me();
+  const item = (icon, label, attrs) => `
+    <button ${attrs} class="card rounded-xl p-3 w-full flex items-center gap-3 text-right">
+      <i class="fa-solid ${icon} w-5 text-indigo-400"></i><span class="text-sm">${label}</span>
+    </button>`;
+  V().innerHTML = `
+    <div class="p-3 space-y-2 max-w-xl mx-auto">
+      <button data-go="profile" data-id="${uid()}" class="card rounded-xl p-3 w-full flex items-center gap-3 text-right mb-3">
+        ${avatarHTML(nameOf(u), u.photoURL, 'w-12 h-12')}
+        <div><b class="block">${esc(nameOf(u))}</b><span class="text-xs text-gray-500">عرض ملفك الشخصي</span></div>
+      </button>
+      ${item('fa-user', 'الملف الشخصي', `data-go="profile" data-id="${uid()}"`)}
+      ${item('fa-user-group', 'الأصدقاء', `data-go="friends"`)}
+      ${item('fa-comments', 'الدردشات', `data-go="chats"`)}
+      ${item('fa-magnifying-glass', 'البحث', `data-go="search"`)}
+      ${item('fa-clapperboard', 'الريلز', `data-go="reels"`)}
+      ${item('fa-gear', 'الإعدادات', `data-go="settings"`)}
+      ${item('fa-right-from-bracket', 'تسجيل الخروج', `data-act="logout"`)}
+    </div>`;
+}
+
+function viewSettings() {
+  V().innerHTML = `
+    <div class="p-3 space-y-3 max-w-xl mx-auto">
+      <h2 class="text-lg font-bold">الإعدادات</h2>
+      <div class="card rounded-xl p-4 space-y-1 text-sm">
+        <p class="text-gray-400 text-xs">الحساب</p>
+        <p>${esc(currentUser?.email || currentUser?.phoneNumber || '')}</p>
+      </div>
+      <button data-go="edit" class="card rounded-xl p-3 w-full text-right text-sm">تعديل الملف الشخصي</button>
+      <button data-act="logout" class="w-full rounded-xl p-3 bg-red-600/20 border border-red-500/30 text-red-300 text-sm font-bold">تسجيل الخروج</button>
+    </div>`;
+}
+
+function renderUsersLive() {
+  if (!currentUser) return;
+  if (currentView === 'search') renderSearch($('q')?.value || '');
+  else if (['friends', 'chats', 'profile', 'settings', 'menu', 'edit'].includes(currentView) && currentView !== 'edit') go(currentView, currentId);
+}
+
+// ---------- auth ----------
+function showLogin() {
+  $('loginSection').classList.remove('hidden');
+  $('appSection').classList.add('hidden');
+}
+function showApp() {
+  $('loginSection').classList.add('hidden');
+  $('appSection').classList.remove('hidden');
 }
 
 async function ensureUserProfile(user) {
-    const ref = doc(db, "users", user.uid);
-    const snap = await getDoc(ref);
-    const data = {
-        uid: user.uid,
-        name: nameOf(user),
-        email: user.email || "",
-        phone: user.phoneNumber || "",
-        photoURL: user.photoURL || "",
-        updatedAt: serverTimestamp()
-    };
-    if (!snap.exists()) data.createdAt = serverTimestamp();
-    await setDoc(ref, data, { merge: true });
+  const ref = doc(db, "users", user.uid);
+  const snap = await getDoc(ref);
+  if (!snap.exists()) {
+    await setDoc(ref, {
+      uid: user.uid,
+      name: nameOf(user),
+      email: user.email || "",
+      phone: user.phoneNumber || "",
+      photoURL: user.photoURL || "",
+      bio: "",
+      following: [],
+      createdAt: serverTimestamp()
+    });
+  } else {
+    await setDoc(ref, { email: user.email || "", phone: user.phoneNumber || "" }, { merge: true });
+  }
 }
 
 onAuthStateChanged(auth, async (user) => {
-    currentUser = user;
-    if (!user) {
-        showLogin();
-        return;
-    }
-    showApp(user);
-    try {
-        await ensureUserProfile(user);
-    } catch (e) {
-        console.error(e);
-        showToast("تعذر حفظ الملف الشخصي، تحقق من قواعد Firestore");
-    }
-    if (!listening) {
-        listening = true;
-        listenPosts();
-        listenChat();
-    }
+  currentUser = user;
+  if (!user) {
+    clearListeners();
+    if (usersUnsub) { usersUnsub(); usersUnsub = null; }
+    showLogin();
+    return;
+  }
+  showApp();
+  try { await ensureUserProfile(user); } catch (e) { showToast("تعذر حفظ الملف: " + e.message); }
+  if (!usersUnsub) {
+    usersUnsub = onSnapshot(collection(db, "users"), (s) => {
+      allUsers = {};
+      s.forEach(d => allUsers[d.id] = { uid: d.id, ...d.data() });
+      renderUsersLive();
+    }, (err) => showToast("تعذر تحميل المستخدمين: " + err.message));
+  }
+  go('home');
 });
 
 getRedirectResult(auth).catch(err => showToast("خطأ Google: " + err.message));
-
 const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({ prompt: "select_account" });
 
 $('googleLoginBtn').addEventListener('click', async () => {
-    try {
-        await signInWithPopup(auth, googleProvider);
-    } catch (err) {
-        if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') return;
-        if (err.code === 'auth/popup-blocked' || err.code === 'auth/operation-not-supported-in-this-environment') {
-            await signInWithRedirect(auth, googleProvider);
-            return;
-        }
-        showToast("خطأ Google: " + err.message);
+  try { await signInWithPopup(auth, googleProvider); }
+  catch (err) {
+    if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') return;
+    if (err.code === 'auth/popup-blocked' || err.code === 'auth/operation-not-supported-in-this-environment') {
+      await signInWithRedirect(auth, googleProvider); return;
     }
+    showToast("خطأ Google: " + err.message);
+  }
 });
 
 $('emailForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const email = $('emailInput').value.trim();
-    const password = $('passwordInput').value;
-    if (!email || !password) return showToast("يرجى إدخال البريد وكلمة المرور");
-    try {
-        await signInWithEmailAndPassword(auth, email, password);
-    } catch (err) {
-        if (err.code === 'auth/invalid-credential' || err.code === 'auth/user-not-found') {
-            try {
-                await createUserWithEmailAndPassword(auth, email, password);
-                showToast("تم إنشاء حسابك بنجاح ✨");
-            } catch (e2) {
-                showToast(e2.code === 'auth/email-already-in-use'
-                    ? "كلمة المرور غير صحيحة لهذا البريد"
-                    : "خطأ: " + e2.message);
-            }
-        } else {
-            showToast("خطأ: " + err.message);
-        }
+  e.preventDefault();
+  const email = $('emailInput').value.trim();
+  const password = $('passwordInput').value;
+  if (!email || !password) return showToast("أدخل البريد وكلمة المرور");
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+  } catch (err) {
+    if (err.code === 'auth/invalid-credential' || err.code === 'auth/user-not-found') {
+      try {
+        await createUserWithEmailAndPassword(auth, email, password);
+        showToast("تم إنشاء حسابك");
+      } catch (e2) {
+        showToast(e2.code === 'auth/email-already-in-use' ? "كلمة المرور غير صحيحة لهذا البريد" : "خطأ: " + e2.message);
+      }
+    } else {
+      showToast("خطأ: " + err.message);
     }
+  }
 });
 
 const getRecaptcha = () => {
-    if (!recaptcha) recaptcha = new RecaptchaVerifier(auth, 'recaptcha-container', { size: 'invisible' });
-    return recaptcha;
+  if (!recaptcha) recaptcha = new RecaptchaVerifier(auth, 'recaptcha-container', { size: 'invisible' });
+  return recaptcha;
 };
-
 $('togglePhoneBtn').addEventListener('click', () => $('phonePanel').classList.toggle('hidden'));
-
 $('sendCodeBtn').addEventListener('click', async () => {
-    const phone = $('phoneInput').value.trim();
-    if (!/^\+\d{8,15}$/.test(phone)) return showToast("أدخل الرقم بصيغة دولية مثل +966500000000");
-    try {
-        confirmationResult = await signInWithPhoneNumber(auth, phone, getRecaptcha());
-        $('phoneStep').classList.add('hidden');
-        $('codeStep').classList.remove('hidden');
-        showToast("تم إرسال الرمز 📩");
-    } catch (err) {
-        if (recaptcha) { recaptcha.clear(); recaptcha = null; }
-        showToast("خطأ الهاتف: " + err.message);
-    }
+  const phone = $('phoneInput').value.trim();
+  if (!/^\+\d{8,15}$/.test(phone)) return showToast("أدخل الرقم بصيغة دولية مثل +966500000000");
+  try {
+    confirmationResult = await signInWithPhoneNumber(auth, phone, getRecaptcha());
+    $('phoneStep').classList.add('hidden');
+    $('codeStep').classList.remove('hidden');
+    showToast("تم إرسال الرمز");
+  } catch (err) {
+    if (recaptcha) { try { recaptcha.clear(); } catch (_) {} }
+    recaptcha = null;
+    $('recaptcha-container').innerHTML = '';
+    showToast("خطأ الهاتف: " + err.message);
+  }
 });
-
 $('verifyCodeBtn').addEventListener('click', async () => {
-    if (!confirmationResult) return;
-    try {
-        await confirmationResult.confirm($('codeInput').value.trim());
-    } catch (err) {
-        showToast("رمز غير صحيح");
-    }
+  if (!confirmationResult) return;
+  try { await confirmationResult.confirm($('codeInput').value.trim()); }
+  catch (err) { showToast("رمز غير صحيح"); }
 });
-
 $('backToPhoneBtn').addEventListener('click', () => {
-    $('codeStep').classList.add('hidden');
-    $('phoneStep').classList.remove('hidden');
-    confirmationResult = null;
+  $('codeStep').classList.add('hidden');
+  $('phoneStep').classList.remove('hidden');
+  confirmationResult = null;
 });
 
-$('logoutBtn').addEventListener('click', async () => {
-    await signOut(auth);
-    showToast("تم تسجيل الخروج");
-});
-
-window.createNewPost = async () => {
-    const input = $('postInput');
-    const text = input.value.trim();
-    if (!text) return showToast("يرجى كتابة شيء لنشره!");
-    if (!currentUser) return;
-    try {
-        await addDoc(collection(db, "posts"), {
-            userId: currentUser.uid,
-            userName: nameOf(currentUser),
-            text,
-            createdAt: serverTimestamp(),
-            likesCount: 0
-        });
-        input.value = '';
-        showToast("تم النشر 🎉");
-    } catch (err) {
-        showToast("خطأ في النشر: " + err.message);
+// ---------- global events (delegation) ----------
+document.addEventListener('click', async (e) => {
+  const g = e.target.closest('[data-go]');
+  if (g) { go(g.dataset.go, g.dataset.id); return; }
+  const a = e.target.closest('[data-act]');
+  if (!a) return;
+  const { act, id } = a.dataset;
+  try {
+    if (act === 'like') {
+      const liked = a.dataset.liked === '1';
+      await updateDoc(doc(db, "posts", id), { likes: liked ? arrayRemove(uid()) : arrayUnion(uid()) });
+    } else if (act === 'comments') {
+      openComments(id);
+    } else if (act === 'delpost') {
+      if (confirm('حذف هذا المنشور؟')) await deleteDoc(doc(db, "posts", id));
+    } else if (act === 'follow') {
+      const isF = (me().following || []).includes(id);
+      await updateDoc(doc(db, "users", uid()), { following: isF ? arrayRemove(id) : arrayUnion(id) });
+    } else if (act === 'logout') {
+      await signOut(auth);
     }
-};
-
-function listenPosts() {
-    const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
-    onSnapshot(q, (snapshot) => {
-        const box = $('postsContainer');
-        box.innerHTML = '';
-        if (snapshot.empty) {
-            box.innerHTML = '<div class="glass-card p-6 rounded-2xl text-center text-xs text-gray-400">لا توجد منشورات بعد.</div>';
-            return;
-        }
-        snapshot.forEach((d) => {
-            const p = d.data();
-            const card = document.createElement('article');
-            card.className = 'glass-card p-4 rounded-2xl border border-slate-800 space-y-2';
-            card.innerHTML = `<h4 class="font-bold text-xs text-white">${esc(p.userName)}</h4><p class="text-xs text-gray-200">${esc(p.text)}</p>`;
-            box.appendChild(card);
-        });
-    }, (err) => showToast("تعذر تحميل المنشورات: " + err.message));
-}
-
-function listenChat() {
-    const q = query(collection(db, "global_chat"), orderBy("createdAt", "asc"));
-    onSnapshot(q, (snapshot) => {
-        const box = $('chatMessages');
-        box.innerHTML = '';
-        if (snapshot.empty) {
-            box.innerHTML = '<div class="text-center text-gray-400 text-xs py-4">لا توجد رسائل بعد.</div>';
-            return;
-        }
-        snapshot.forEach((d) => {
-            const m = d.data();
-            const isMe = currentUser && m.userId === currentUser.uid;
-            const div = document.createElement('div');
-            div.className = `flex ${isMe ? 'justify-end' : 'justify-start'}`;
-            div.innerHTML = `<div class="max-w-[80%] p-3 rounded-2xl text-xs ${isMe ? 'bg-indigo-600 text-white' : 'bg-slate-800 text-gray-200'}"><b>${esc(m.userName)}:</b> ${esc(m.text)}</div>`;
-            box.appendChild(div);
-        });
-    }, (err) => showToast("تعذر تحميل الدردشة: " + err.message));
-}
-
-$('chatForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const input = $('chatInput');
-    const text = input.value.trim();
-    if (!text || !currentUser) return;
-    try {
-        await addDoc(collection(db, "global_chat"), {
-            userId: currentUser.uid,
-            userName: nameOf(currentUser),
-            text,
-            createdAt: serverTimestamp()
-        });
-        input.value = '';
-    } catch (err) {
-        showToast("خطأ في الإرسال: " + err.message);
-    }
+  } catch (err) {
+    showToast("خطأ: " + err.message);
+  }
 });
-    </script>
+
+document.addEventListener('input', (e) => {
+  if (e.target.id === 'q') renderSearch(e.target.value);
+});
+
+document.addEventListener('change', async (e) => {
+  const f = e.target.files?.[0];
+  if (!f) return;
+  try {
+    if (e.target.id === 'photoIn') {
+      pendingPhoto = await compressImage(f, 400, 0.8);
+      $('photoPrev').innerHTML = `<img src="${pendingPhoto}" class="w-24 h-24 rounded-full object-cover">`;
+    } else if (e.target.id === 'postImg') {
+      pendingPostImg = await compressImage(f, 800, 0.7);
+      $('postPrev').innerHTML = `<img src="${pendingPostImg}" class="w-full rounded-xl">`;
+    }
+  } catch (err) { showToast("تعذر معالجة الصورة"); }
+});
+
+document.addEventListener('submit', async (e) => {
+  const f = e.target;
+  const type = f.dataset.form;
+  if (!type) return;
+  e.preventDefault();
+  const fd = new FormData(f);
+  try {
+    if (type === 'comment') {
+      const t = (fd.get('t') || '').toString().trim();
+      if (!t) return;
+      await addDoc(collection(db, "posts", f.dataset.id, "comments"), {
+        userId: uid(), userName: nameOf(me()), userPhoto: me().photoURL || '', text: t, createdAt: serverTimestamp()
+      });
+      f.reset();
+    } else if (type === 'msg') {
+      const t = (fd.get('t') || '').toString().trim();
+      if (!t) return;
+      const cid = chatIdFor(uid(), f.dataset.id);
+      await addDoc(collection(db, "chats", cid, "messages"), { text: t, senderId: uid(), createdAt: serverTimestamp() });
+      f.reset();
+    } else if (type === 'create') {
+      const text = (fd.get('text') || '').toString().trim();
+      if (!text && !pendingPostImg) return showToast("اكتب شيئاً أو أضف صورة");
+      await addDoc(collection(db, "posts"), {
+        userId: uid(), userName: nameOf(me()), userPhoto: me().photoURL || '',
+        text, image: pendingPostImg || '', likes: [], createdAt: serverTimestamp()
+      });
+      pendingPostImg = null;
+      showToast("تم النشر");
+      go('home');
+    } else if (type === 'edit') {
+      const data = {
+        name: (fd.get('name') || '').toString().trim() || nameOf(me()),
+        bio: (fd.get('bio') || '').toString().trim()
+      };
+      if (pendingPhoto) data.photoURL = pendingPhoto;
+      await setDoc(doc(db, "users", uid()), data, { merge: true });
+      pendingPhoto = null;
+      showToast("تم حفظ التعديلات");
+      go('profile', uid());
+    }
+  } catch (err) {
+    showToast("خطأ: " + err.message);
+  }
+});
+</script>
 </body>
-    </html>
+</html>
