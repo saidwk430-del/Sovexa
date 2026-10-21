@@ -17,7 +17,6 @@
   .btn-busy { opacity:.6; pointer-events:none; }
   .tab-btn { height:2.75rem; border-radius:0.9rem; background:#111827; border:1px solid #1f2937; color:#9ca3af; display:flex; align-items:center; justify-content:center; font-size:1.05rem; position:relative; }
   .tab-on { background:rgba(99,102,241,.22); color:#a5b4fc; border-color:rgba(129,140,248,.5); }
-  .tab-dot { position:absolute; top:4px; left:calc(50% + 10px); background:#ec4899; color:#fff; font-size:10px; border-radius:9999px; padding:0 5px; }
   .icon-btn { width:2.5rem; height:2.5rem; border-radius:9999px; background:#1f2937; display:flex; align-items:center; justify-content:center; }
   .bubble-me { background:linear-gradient(135deg,#4f46e5,#7c3aed); color:#fff; border-radius:1.1rem 1.1rem 0.3rem 1.1rem; }
   .bubble-other { background:#1f2937; color:#e5e7eb; border-radius:1.1rem 1.1rem 1.1rem 0.3rem; }
@@ -105,7 +104,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
 import {
   getFirestore, collection, doc, getDoc, setDoc, updateDoc, deleteDoc, addDoc, onSnapshot,
-  query, where, orderBy, limit, serverTimestamp, arrayUnion, arrayRemove, increment
+  query, orderBy, limit, serverTimestamp, arrayUnion, arrayRemove, increment
 } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
 const app = initializeApp({
@@ -119,12 +118,18 @@ const app = initializeApp({
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+// ---------- verification settings ----------
+const ADMIN_EMAIL = "shanks377s8@gmail.com";
+const SUB_PRICE = "9.99$ شهرياً";
+const isVerified = (u) => !!u && (u.email === ADMIN_EMAIL || u.verified === true);
+const badgeHTML = (on) => on ? ' <i class="fa-solid fa-circle-check text-indigo-400 text-xs"></i>' : '';
+
 // ---------- helpers ----------
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const nameOf = (u) => u.name || u.displayName || (u.email ? u.email.split("@")[0] : "") || u.phoneNumber || "مستخدم";
 const uid = () => currentUser?.uid;
-const me = () => allUsers[uid()] || { uid: uid(), name: "" };
+const me = () => allUsers[uid()] || { uid: uid(), name: "", email: currentUser?.email || "" };
 const V = () => $('view');
 const chatIdFor = (a, b) => [a, b].sort().join("_");
 const normUser = (s) => String(s || "").trim().toLowerCase().replace(/^@/, "").replace(/[^a-z0-9_.]/g, "");
@@ -136,6 +141,7 @@ let usersUnsub = null, postsUnsub = null;
 let unsubs = [], commentUnsubs = {}, openSet = new Set();
 let confirmationResult = null, recaptcha = null;
 let pendingPhoto = null, pendingCover = null, pendingPostImg = null;
+let profileTarget = null;
 
 window.showToast = (msg) => {
   const box = document.createElement('div');
@@ -201,10 +207,7 @@ function clearListeners() {
 }
 
 function setActiveTab(view) {
-  document.querySelectorAll('[data-tab]').forEach(b => {
-    const on = b.dataset.tab === view;
-    b.classList.toggle('tab-on', on);
-  });
+  document.querySelectorAll('[data-tab]').forEach(b => b.classList.toggle('tab-on', b.dataset.tab === view));
 }
 
 function go(view, id) {
@@ -222,8 +225,6 @@ function go(view, id) {
 }
 
 // ---------- posts ----------
-let profileTarget = null;
-
 function actionsHTML(p) {
   const likes = p.likes || [];
   const liked = likes.includes(uid());
@@ -247,7 +248,7 @@ function postCard(p) {
     <div class="flex items-center gap-3 p-3">
       ${avatarHTML(p.userName, p.userPhoto)}
       <div class="flex-1 min-w-0">
-        <b class="block text-sm text-white truncate">${esc(p.userName)}</b>
+        <b class="block text-sm text-white truncate">${esc(p.userName)}${badgeHTML(p.verified)}</b>
         <span class="text-xs text-gray-500">${timeAgo(p.createdAt)}</span>
       </div>
       ${p.userId === uid() ? `<button data-act="delpost" data-id="${p.id}" class="text-gray-500 px-2"><i class="fa-solid fa-trash"></i></button>` : ''}
@@ -303,7 +304,7 @@ function watchComments(id) {
     box.innerHTML = snap.docs.map(d => {
       const c = d.data();
       return `<div class="flex gap-2">${avatarHTML(c.userName, c.userPhoto, 'w-7 h-7 text-xs')}
-        <div class="bg-gray-800 rounded-xl px-3 py-2 text-xs"><b>${esc(c.userName)}</b><p>${esc(c.text)}</p></div></div>`;
+        <div class="bg-gray-800 rounded-xl px-3 py-2 text-xs"><b>${esc(c.userName)}${badgeHTML(c.verified)}</b><p>${esc(c.text)}</p></div></div>`;
     }).join('') + `
       <form data-form="comment" data-id="${id}" class="flex gap-2 pt-1">
         <input name="t" autocomplete="off" placeholder="اكتب تعليقاً..." class="flex-1 bg-gray-800 rounded-full px-3 py-2 text-xs outline-none">
@@ -369,7 +370,7 @@ function viewCreate() {
       </div>
       <div class="flex items-center gap-3">
         ${avatarHTML(nameOf(me()), me().photoURL)}
-        <b class="text-sm">${esc(nameOf(me()))}</b>
+        <b class="text-sm">${esc(nameOf(me()))}${badgeHTML(isVerified(me()))}</b>
       </div>
       <textarea name="text" rows="5" placeholder="بماذا تفكر؟" class="w-full bg-transparent text-base outline-none resize-none"></textarea>
       <div id="postPrev"></div>
@@ -395,7 +396,7 @@ function userRow(u) {
       <button data-go="profile" data-id="${u.uid}" class="flex items-center gap-3 flex-1 min-w-0 text-right">
         ${avatarHTML(nameOf(u), u.photoURL)}
         <div class="min-w-0">
-          <b class="block text-sm truncate">${esc(nameOf(u))}</b>
+          <b class="block text-sm truncate">${esc(nameOf(u))}${badgeHTML(isVerified(u))}</b>
           <span class="text-xs text-indigo-300 truncate block">${esc(handleOf(u))}</span>
         </div>
       </button>
@@ -442,7 +443,7 @@ function viewChats() {
       ${following.length ? following.map(u => `
         <button data-go="chat" data-id="${u.uid}" class="card rounded-xl p-3 w-full flex items-center gap-3 text-right">
           ${avatarHTML(nameOf(u), u.photoURL)}
-          <div><b class="text-sm block">${esc(nameOf(u))}</b><span class="text-xs text-gray-500">${esc(handleOf(u))}</span></div>
+          <div><b class="text-sm block">${esc(nameOf(u))}${badgeHTML(isVerified(u))}</b><span class="text-xs text-gray-500">${esc(handleOf(u))}</span></div>
         </button>`).join('') : '<p class="text-center text-gray-500 py-8 text-sm">تابع أشخاصاً لتبدأ الدردشة معهم</p>'}
     </div>`;
 }
@@ -483,7 +484,7 @@ function viewChat(otherId) {
       const mine = m.senderId === uid();
       const sender = allUsers[m.senderId];
       const senderLine = (!mine && isGlobal)
-        ? `<div class="text-[11px] text-indigo-300 mb-0.5 px-1">${esc(sender ? nameOf(sender) : (m.senderName || ''))}</div>` : '';
+        ? `<div class="text-[11px] text-indigo-300 mb-0.5 px-1">${esc(sender ? nameOf(sender) : (m.senderName || ''))}${badgeHTML(isVerified(sender))}</div>` : '';
       return `
         <div class="flex items-end gap-2 ${mine ? 'justify-end' : 'justify-start'}">
           ${!mine ? avatarHTML(sender ? nameOf(sender) : (m.senderName || '?'), sender?.photoURL, 'w-7 h-7 text-[10px]') : ''}
@@ -509,7 +510,7 @@ function viewProfile(id) {
     <div class="h-32 bg-gradient-to-r from-indigo-700 via-purple-700 to-pink-600 bg-cover bg-center" style="${u.coverURL ? `background-image:url('${esc(u.coverURL)}')` : ''}"></div>
     <div class="px-4 -mt-12 text-center">
       <div class="inline-block ring-4 ring-[#0b0f17] rounded-full">${avatarHTML(nameOf(u), u.photoURL, 'w-24 h-24 text-3xl')}</div>
-      <h2 class="text-xl font-black mt-2">${esc(nameOf(u))}</h2>
+      <h2 class="text-xl font-black mt-2">${esc(nameOf(u))}${badgeHTML(isVerified(u))}</h2>
       <p class="text-xs text-indigo-300">${esc(handleOf(u))}</p>
       <p class="text-sm text-gray-400 mt-1">${esc(u.bio || '')}</p>
       <p class="text-xs text-gray-500 mt-1">${postsCount} منشور · ${followers} متابع · ${following} يتابع</p>
@@ -556,9 +557,12 @@ function viewEdit() {
 
 const MENU_GROUPS = [
   { title: "حسابي", items: [
-    ['fa-user', 'الملف الشخصي', 'data-go="profile" data-id="' + '"'],
+    ['fa-user', 'الملف الشخصي', 'profile'],
     ['fa-pen', 'تعديل الملف الشخصي', 'data-go="edit"'],
     ['fa-gear', 'الإعدادات', 'data-go="settings"'],
+  ]},
+  { title: "الاشتراك", items: [
+    ['fa-crown', 'الاشتراك في التوثيق', 'data-act="subscribe"'],
   ]},
   { title: "التواصل", items: [
     ['fa-user-group', 'الأصدقاء', 'data-go="friends"'],
@@ -581,12 +585,12 @@ const MENU_GROUPS = [
 
 function viewMenu() {
   const u = me();
-  const groups = MENU_GROUPS.map((g, gi) => {
+  const groups = MENU_GROUPS.map((g) => {
     const items = g.items.map(([icon, label, attrs], i) => {
-      const fixed = (label === 'الملف الشخصي') ? `data-go="profile" data-id="${uid()}"` : attrs;
+      const actionAttrs = attrs === 'profile' ? `data-go="profile" data-id="${uid()}"` : attrs;
       const danger = label === 'تسجيل الخروج';
       return `
-        <button ${fixed} class="w-full flex items-center gap-3 px-4 py-3 text-right ${i ? 'border-t border-gray-800' : ''}">
+        <button ${actionAttrs} class="w-full flex items-center gap-3 px-4 py-3 text-right ${i ? 'border-t border-gray-800' : ''}">
           <span class="w-8 h-8 rounded-lg flex items-center justify-center ${danger ? 'bg-red-600/20 text-red-400' : 'bg-gray-800 text-indigo-300'}"><i class="fa-solid ${icon} text-sm"></i></span>
           <span class="text-sm flex-1 ${danger ? 'text-red-400' : ''}">${label}</span>
           <i class="fa-solid fa-chevron-left text-[10px] text-gray-600"></i>
@@ -599,7 +603,7 @@ function viewMenu() {
       <button data-go="profile" data-id="${uid()}" class="card rounded-xl p-4 w-full flex items-center gap-3 text-right">
         ${avatarHTML(nameOf(u), u.photoURL, 'w-14 h-14 text-lg')}
         <div class="flex-1 min-w-0">
-          <b class="block truncate">${esc(nameOf(u))}</b>
+          <b class="block truncate">${esc(nameOf(u))}${badgeHTML(isVerified(u))}</b>
           <span class="text-xs text-indigo-300">${esc(handleOf(u) || 'عرض الملف الشخصي')}</span>
         </div>
         <i class="fa-solid fa-chevron-left text-xs text-gray-500"></i>
@@ -660,6 +664,31 @@ function showLogoutSheet() {
   document.body.appendChild(sheet);
 }
 
+// ---------- subscription sheet ----------
+function showSubscribeSheet() {
+  document.getElementById('subSheet')?.remove();
+  const sheet = document.createElement('div');
+  sheet.id = 'subSheet';
+  sheet.className = 'fixed inset-0 z-[70] bg-black/60 flex items-end justify-center';
+  const verified = isVerified(me());
+  sheet.innerHTML = `
+    <div class="card w-full max-w-md rounded-t-3xl p-5 space-y-3 safe-bottom">
+      <div class="mx-auto w-12 h-1.5 rounded-full bg-gray-600 mb-2"></div>
+      <div class="text-center">
+        <i class="fa-solid fa-circle-check text-indigo-400 text-4xl"></i>
+        <h3 class="text-lg font-bold mt-2">التوثيق Sovexa</h3>
+        <p class="text-sm text-gray-400 mt-1">${verified ? 'حسابك موثّق بالفعل ✔' : 'علامة زرقاء بجوار اسمك تدل على حساب موثّق'}</p>
+      </div>
+      ${verified ? '' : `
+        <div class="card rounded-xl p-3 text-sm text-center"><b class="text-indigo-300">${SUB_PRICE}</b></div>
+        <button data-act="subscribe-confirm" class="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-pink-600 font-bold text-sm">طلب الاشتراك</button>
+        <p class="text-[11px] text-gray-500 text-center">سيتم تفعيل التوثيق بعد تأكيد الدفع</p>`}
+      <button data-act="subscribe-cancel" class="w-full py-2 text-sm text-gray-400">إغلاق</button>
+    </div>`;
+  sheet.addEventListener('click', (e) => { if (e.target === sheet) sheet.remove(); });
+  document.body.appendChild(sheet);
+}
+
 // ---------- auth ----------
 function showLogin() {
   $('loginSection').classList.remove('hidden');
@@ -678,7 +707,7 @@ async function ensureUserProfile(user) {
       uid: user.uid, name: nameOf(user), username: "",
       email: user.email || "", phone: user.phoneNumber || "",
       photoURL: user.photoURL || "", coverURL: "", bio: "",
-      following: [], createdAt: serverTimestamp()
+      following: [], verified: false, createdAt: serverTimestamp()
     });
   } else {
     await setDoc(ref, { email: user.email || "", phone: user.phoneNumber || "" }, { merge: true });
@@ -811,6 +840,16 @@ document.addEventListener('click', async (e) => {
     } else if (act === 'follow') {
       const isF = (me().following || []).includes(id);
       await updateDoc(doc(db, "users", uid()), { following: isF ? arrayRemove(id) : arrayUnion(id) });
+    } else if (act === 'subscribe') {
+      showSubscribeSheet();
+    } else if (act === 'subscribe-confirm') {
+      await setDoc(doc(db, "subscriptions", uid()), {
+        userId: uid(), status: "pending", price: SUB_PRICE, createdAt: serverTimestamp()
+      });
+      document.getElementById('subSheet')?.remove();
+      showToast("تم تسجيل طلب الاشتراك، بانتظار تأكيد الدفع");
+    } else if (act === 'subscribe-cancel') {
+      document.getElementById('subSheet')?.remove();
     } else if (act === 'soon') {
       showToast("هذه الميزة قريباً");
     } else if (act === 'about') {
@@ -866,7 +905,8 @@ document.addEventListener('submit', async (e) => {
       if (!t) return;
       const postId = f.dataset.id;
       await addDoc(collection(db, "posts", postId, "comments"), {
-        userId: uid(), userName: nameOf(me()), userPhoto: me().photoURL || '', text: t, createdAt: serverTimestamp()
+        userId: uid(), userName: nameOf(me()), userPhoto: me().photoURL || '',
+        text: t, verified: isVerified(me()), createdAt: serverTimestamp()
       });
       await updateDoc(doc(db, "posts", postId), { commentsCount: increment(1) });
       f.reset();
@@ -882,6 +922,7 @@ document.addEventListener('submit', async (e) => {
       if (!text && !pendingPostImg) return showToast("اكتب شيئاً أو أضف صورة");
       await addDoc(collection(db, "posts"), {
         userId: uid(), userName: nameOf(me()), userPhoto: me().photoURL || '',
+        verified: isVerified(me()),
         text, image: pendingPostImg || '', likes: [], commentsCount: 0, createdAt: serverTimestamp()
       });
       pendingPostImg = null;
@@ -912,4 +953,4 @@ document.addEventListener('submit', async (e) => {
 });
 </script>
 </body>
-</html>
+  </html>
