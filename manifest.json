@@ -7,9 +7,10 @@
   "theme_color": "#6366f1",
   "icons": [
     {
-      "src": "https://i.ibb.co/6R223ZC/sovexa-icon.png",
+      "src": "1792540045866.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
