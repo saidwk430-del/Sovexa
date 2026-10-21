@@ -34,8 +34,8 @@
       <div class="mx-auto w-20 h-20 rounded-3xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center mb-3">
         <span class="font-black text-4xl text-white" style="font-family:Outfit">S</span>
       </div>
-      <h2 class="text-xl font-bold text-white">مرحباً بك في Sovexa</h2>
-      <p class="text-xs text-gray-400">سجل الدخول للمتابعة</p>
+      <h2 class="text-xl font-bold text-white" data-i18n="welcomeTitle">مرحباً بك في Sovexa</h2>
+      <p class="text-xs text-gray-400" data-i18n="welcomeSub">سجل الدخول للمتابعة</p>
       <p dir="ltr" class="text-[10px] text-gray-600 mt-1">BUILD 1</p>
     </div>
 
@@ -46,31 +46,31 @@
         <path fill="#FBBC05" d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.3s.2-1.6.4-2.3L1.9 7.3C.7 9.7 0 10.8 0 12.3s.7 2.6 1.9 5l3.7-2.5z"/>
         <path fill="#34A853" d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.2-6.4-5.2L1.9 16C3.7 19.7 7.5 23 12 23z"/>
       </svg>
-      متابعة باستخدام Google
+      <span data-i18n="googleLogin">متابعة باستخدام Google</span>
     </button>
 
     <button id="togglePhoneBtn" class="w-full py-2.5 bg-gray-900 border border-gray-700 rounded-xl text-sm font-medium flex items-center justify-center gap-3 mb-3">
-      <i class="fa-solid fa-phone text-emerald-400"></i> متابعة برقم الهاتف
+      <i class="fa-solid fa-phone text-emerald-400"></i> <span data-i18n="phoneLogin">متابعة برقم الهاتف</span>
     </button>
 
     <div id="phonePanel" class="hidden space-y-3 mb-3">
       <div id="phoneStep">
         <input type="tel" id="phoneInput" placeholder="+966500000000" dir="ltr" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2.5 text-sm outline-none">
-        <button id="sendCodeBtn" type="button" class="w-full mt-2 py-2.5 bg-emerald-600 rounded-xl text-sm font-bold">إرسال رمز التحقق</button>
+        <button id="sendCodeBtn" type="button" class="w-full mt-2 py-2.5 bg-emerald-600 rounded-xl text-sm font-bold" data-i18n="sendCode">إرسال رمز التحقق</button>
       </div>
       <div id="codeStep" class="hidden">
         <input type="text" id="codeInput" inputmode="numeric" maxlength="6" placeholder="123456" dir="ltr" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2.5 text-sm text-center tracking-widest outline-none">
-        <button id="verifyCodeBtn" type="button" class="w-full mt-2 py-2.5 bg-emerald-600 rounded-xl text-sm font-bold">تأكيد الرمز</button>
-        <button id="backToPhoneBtn" type="button" class="w-full mt-2 text-xs text-gray-400">تغيير الرقم</button>
+        <button id="verifyCodeBtn" type="button" class="w-full mt-2 py-2.5 bg-emerald-600 rounded-xl text-sm font-bold" data-i18n="verifyCode">تأكيد الرمز</button>
+        <button id="backToPhoneBtn" type="button" class="w-full mt-2 text-xs text-gray-400" data-i18n="changePhone">تغيير الرقم</button>
       </div>
     </div>
 
-    <div class="flex items-center gap-3 my-4 text-xs text-gray-500"><div class="flex-1 border-t border-gray-700"></div>أو بالبريد<div class="flex-1 border-t border-gray-700"></div></div>
+    <div class="flex items-center gap-3 my-4 text-xs text-gray-500"><div class="flex-1 border-t border-gray-700"></div><span data-i18n="orEmail">أو بالبريد</span><div class="flex-1 border-t border-gray-700"></div></div>
 
     <form id="emailForm" class="space-y-3">
-      <input type="email" id="emailInput" required placeholder="البريد الإلكتروني" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2.5 text-sm outline-none">
-      <input type="password" id="passwordInput" required placeholder="كلمة المرور" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2.5 text-sm outline-none">
-      <button type="submit" class="w-full py-3 bg-gradient-to-r from-indigo-600 to-pink-600 rounded-xl text-sm font-bold">تسجيل الدخول / إنشاء حساب</button>
+      <input type="email" id="emailInput" required placeholder="البريد الإلكتروني" data-i18n-placeholder="emailPlaceholder" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2.5 text-sm outline-none">
+      <input type="password" id="passwordInput" required placeholder="كلمة المرور" data-i18n-placeholder="passPlaceholder" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2.5 text-sm outline-none">
+      <button type="submit" class="w-full py-3 bg-gradient-to-r from-indigo-600 to-pink-600 rounded-xl text-sm font-bold" data-i18n="loginBtn">تسجيل الدخول / إنشاء حساب</button>
     </form>
     <div id="recaptcha-container"></div>
   </div>
@@ -111,6 +111,73 @@ import {
 
 const BUILD = "BUILD 1";
 
+// نظام الترجمة واللغات
+const translations = {
+  ar: {
+    welcomeTitle: "مرحباً بك في Sovexa",
+    welcomeSub: "سجل الدخول للمتابعة",
+    googleLogin: "متابعة باستخدام Google",
+    phoneLogin: "متابعة برقم الهاتف",
+    sendCode: "إرسال رمز التحقق",
+    verifyCode: "تأكيد الرمز",
+    changePhone: "تغيير الرقم",
+    orEmail: "أو بالبريد",
+    emailPlaceholder: "البريد الإلكتروني",
+    passPlaceholder: "كلمة المرور",
+    loginBtn: "تسجيل الدخول / إنشاء حساب",
+    settingsTitle: "الإعدادات",
+    registeredAccount: "الحساب المسجّل",
+    editProfile: "تعديل الملف الشخصي",
+    privacy: "الخصوصية",
+    notifications: "الإشعارات",
+    language: "اللغة",
+    langArabic: "العربية",
+    logout: "تسجيل الخروج",
+    soonMsg: "هذه الميزة ستتوفر قريباً!"
+  },
+  en: {
+    welcomeTitle: "Welcome to Sovexa",
+    welcomeSub: "Sign in to continue",
+    googleLogin: "Continue with Google",
+    phoneLogin: "Continue with Phone",
+    sendCode: "Send Verification Code",
+    verifyCode: "Verify Code",
+    changePhone: "Change Phone Number",
+    orEmail: "Or via Email",
+    emailPlaceholder: "Email Address",
+    passPlaceholder: "Password",
+    loginBtn: "Sign In / Register",
+    settingsTitle: "Settings",
+    registeredAccount: "Registered Account",
+    editProfile: "Edit Profile",
+    privacy: "Privacy",
+    notifications: "Notifications",
+    language: "Language",
+    langArabic: "Arabic",
+    logout: "Log Out",
+    soonMsg: "This feature is coming soon!"
+  }
+};
+
+let currentLang = localStorage.getItem("sovexa_lang") || "ar";
+
+function applyLanguage() {
+  const t = translations[currentLang];
+  document.documentElement.lang = currentLang;
+  document.documentElement.dir = currentLang === "ar" ? "rtl" : "ltr";
+  
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    const key = el.dataset.i18n;
+    if (t[key]) el.textContent = t[key];
+  });
+  document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
+    const key = el.dataset.i18nPlaceholder;
+    if (t[key]) el.placeholder = t[key];
+  });
+  const langLbl = document.getElementById("langLabel");
+  if (langLbl) langLbl.textContent = currentLang === "ar" ? "العربية" : "English";
+}
+
 const app = initializeApp({
   apiKey: "AIzaSyCJm_0O6NzS0UYnoYAv5MUIp-QR9xGN18Q",
   authDomain: "sovexa-fbc93.firebaseapp.com",
@@ -122,13 +189,11 @@ const app = initializeApp({
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// ---------- verification settings ----------
 const ADMIN_EMAIL = "shanks377s8@gmail.com";
 const SUB_PRICE = "9.99$ شهرياً";
 const isVerified = (u) => !!u && (u.email === ADMIN_EMAIL || u.verified === true);
 const badgeHTML = (on) => on ? ' <i class="fa-solid fa-circle-check text-indigo-400 text-xs"></i>' : '';
 
-// ---------- helpers ----------
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const nameOf = (u) => u.name || u.displayName || (u.email ? u.email.split("@")[0] : "") || u.phoneNumber || "مستخدم";
@@ -166,12 +231,13 @@ function avatarHTML(name, photo, cls = 'w-10 h-10 text-sm') {
 function timeAgo(ts) {
   if (!ts) return "الآن";
   const d = ts.toDate ? ts.toDate() : new Date(ts);
-  return d.toLocaleString('ar', { dateStyle: 'medium', timeStyle: 'short' });
+  return d.toLocaleString(currentLang === 'ar' ? 'ar' : 'en', { dateStyle: 'medium', timeStyle: 'short' });
 }
 
 function followBtn(id) {
   const f = (me().following || []).includes(id);
-  return `<button data-act="follow" data-id="${id}" class="px-3 py-1.5 rounded-lg text-xs font-bold ${f ? 'bg-gray-700 text-gray-200' : 'bg-indigo-600 text-white'}">${f ? 'إلغاء المتابعة' : 'متابعة'}</button>`;
+  const t = currentLang === 'ar' ? (f ? 'إلغاء المتابعة' : 'متابعة') : (f ? 'Unfollow' : 'Follow');
+  return `<button data-act="follow" data-id="${id}" class="px-3 py-1.5 rounded-lg text-xs font-bold ${f ? 'bg-gray-700 text-gray-200' : 'bg-indigo-600 text-white'}">${t}</button>`;
 }
 
 function compressImage(file, max, quality) {
@@ -198,7 +264,7 @@ function compressImage(file, max, quality) {
 function withTimeout(promise, ms = 15000) {
   return Promise.race([
     promise,
-    new Promise((_, rej) => setTimeout(() => rej(new Error("انتهت المهلة، تحقق من الاتصال أو من قواعد Firestore")), ms))
+    new Promise((_, rej) => setTimeout(() => rej(new Error("انتهت المهلة، تحقق من الاتصال")), ms))
   ]);
 }
 
@@ -210,7 +276,6 @@ function backHeader(title) {
     </div>`;
 }
 
-// ---------- router ----------
 function clearListeners() {
   unsubs.forEach(f => f());
   unsubs = [];
@@ -238,24 +303,27 @@ function go(view, id) {
   window.scrollTo(0, 0);
 }
 
-// ---------- posts ----------
 function actionsHTML(p) {
   const likes = p.likes || [];
   const liked = likes.includes(uid());
   const saved = savedIds.has(p.id);
+  const tLike = currentLang === 'ar' ? 'إعجاب' : 'Like';
+  const tComment = currentLang === 'ar' ? 'تعليق' : 'Comment';
+  const tSave = currentLang === 'ar' ? 'حفظ' : 'Save';
+  const tShare = currentLang === 'ar' ? 'مشاركة' : 'Share';
   return `
   <div class="flex justify-around items-center border-t border-gray-800 text-sm text-gray-400 py-1">
     <button data-act="like" data-id="${p.id}" class="flex-1 py-2 flex items-center justify-center gap-1.5 ${liked ? 'text-pink-400 font-bold' : ''}">
-      <i class="fa-${liked ? 'solid' : 'regular'} fa-heart"></i><span>إعجاب</span><span class="text-xs">${likes.length}</span>
+      <i class="fa-${liked ? 'solid' : 'regular'} fa-heart"></i><span>${tLike}</span><span class="text-xs">${likes.length}</span>
     </button>
     <button data-act="comments" data-id="${p.id}" class="flex-1 py-2 flex items-center justify-center gap-1.5">
-      <i class="fa-regular fa-comment"></i><span>تعليق</span><span class="text-xs">${p.commentsCount || 0}</span>
+      <i class="fa-regular fa-comment"></i><span>${tComment}</span><span class="text-xs">${p.commentsCount || 0}</span>
     </button>
     <button data-act="save" data-id="${p.id}" class="flex-1 py-2 flex items-center justify-center gap-1.5 ${saved ? 'text-amber-400' : ''}">
-      <i class="fa-${saved ? 'solid' : 'regular'} fa-bookmark"></i><span>حفظ</span>
+      <i class="fa-${saved ? 'solid' : 'regular'} fa-bookmark"></i><span>${tSave}</span>
     </button>
     <button data-act="share" data-id="${p.id}" class="flex-1 py-2 flex items-center justify-center gap-1.5">
-      <i class="fa-solid fa-share"></i><span>مشاركة</span>
+      <i class="fa-solid fa-share"></i><span>${tShare}</span>
     </button>
   </div>`;
 }
@@ -287,13 +355,13 @@ function renderPosts(containerId, filter, emptyMsg) {
     .sort((a, b) => (b.createdAt?.seconds ?? Date.now() / 1000) - (a.createdAt?.seconds ?? Date.now() / 1000));
   box.innerHTML = list.length
     ? list.map(postCard).join('')
-    : `<p class="text-center text-gray-500 py-10">${emptyMsg || 'لا توجد منشورات بعد'}</p>`;
+    : `<p class="text-center text-gray-500 py-10">${emptyMsg || (currentLang === 'ar' ? 'لا توجد منشورات بعد' : 'No posts yet')}</p>`;
   restoreOpenComments();
 }
 
 function refreshPosts() {
   renderPosts('feed', null);
-  if (profileTarget) renderPosts('uposts', p => p.userId === profileTarget, 'لا توجد منشورات');
+  if (profileTarget) renderPosts('uposts', p => p.userId === profileTarget, currentLang === 'ar' ? 'لا توجد منشورات' : 'No posts');
 }
 
 async function toggleLike(id) {
@@ -308,7 +376,7 @@ async function toggleLike(id) {
   } catch (err) {
     p.likes = old;
     refreshPosts();
-    showToast("تعذر تسجيل الإعجاب: " + err.message);
+    showToast("تعذر تسجيل الإعجاب");
   }
 }
 
@@ -318,12 +386,12 @@ async function toggleSave(id) {
     savedIds.delete(id);
     refreshPosts();
     await deleteDoc(ref);
-    showToast("أُزيل من المحفوظات");
+    showToast(currentLang === 'ar' ? 'أُزيل من المحفوظات' : 'Removed from saved');
   } else {
     savedIds.add(id);
     refreshPosts();
     await setDoc(ref, { postId: id, savedAt: serverTimestamp() });
-    showToast("تم الحفظ 🔖");
+    showToast(currentLang === 'ar' ? 'تم الحفظ 🔖' : 'Saved 🔖');
   }
 }
 
@@ -334,14 +402,16 @@ function watchComments(id) {
   commentUnsubs[id] = onSnapshot(q, (snap) => {
     const box = $('cbox-' + id);
     if (!box) return;
+    const placeholder = currentLang === 'ar' ? 'اكتب تعليقاً...' : 'Write a comment...';
+    const sendTxt = currentLang === 'ar' ? 'إرسال' : 'Send';
     box.innerHTML = snap.docs.map(d => {
       const c = d.data();
       return `<div class="flex gap-2">${avatarHTML(c.userName, c.userPhoto, 'w-7 h-7 text-xs')}
         <div class="bg-gray-800 rounded-xl px-3 py-2 text-xs"><b>${esc(c.userName)}${badgeHTML(c.verified)}</b><p>${esc(c.text)}</p></div></div>`;
     }).join('') + `
       <form data-form="comment" data-id="${id}" class="flex gap-2 pt-1">
-        <input name="t" autocomplete="off" placeholder="اكتب تعليقاً..." class="flex-1 bg-gray-800 rounded-full px-3 py-2 text-xs outline-none">
-        <button class="text-indigo-400 text-xs font-bold px-2">إرسال</button>
+        <input name="t" autocomplete="off" placeholder="${placeholder}" class="flex-1 bg-gray-800 rounded-full px-3 py-2 text-xs outline-none">
+        <button class="text-indigo-400 text-xs font-bold px-2">${sendTxt}</button>
       </form>`;
   });
 }
@@ -362,13 +432,13 @@ function restoreOpenComments() {
   openSet.forEach(id => { if ($('cbox-' + id)) watchComments(id); });
 }
 
-// ---------- views ----------
 function viewHome() {
+  const placeholder = currentLang === 'ar' ? `بماذا تفكر يا ${nameOf(me())}؟` : `What's on your mind, ${nameOf(me())}?`;
   V().innerHTML = `
     <div class="p-3 space-y-3 max-w-xl mx-auto">
       <section class="card rounded-xl p-3 flex items-center gap-3">
         ${avatarHTML(nameOf(me()), me().photoURL)}
-        <button data-go="create" class="flex-1 text-right bg-gray-800 rounded-full px-4 py-2 text-sm text-gray-400">بماذا تفكر يا ${esc(nameOf(me()))}؟</button>
+        <button data-go="create" class="flex-1 text-right bg-gray-800 rounded-full px-4 py-2 text-sm text-gray-400">${placeholder}</button>
       </section>
       <div id="feed" class="space-y-3"></div>
     </div>`;
@@ -381,43 +451,50 @@ function viewNotifications() {
     .filter(p => p.userId !== uid())
     .sort((a, b) => (b.createdAt?.seconds ?? 0) - (a.createdAt?.seconds ?? 0))
     .slice(0, 30);
+  const title = currentLang === 'ar' ? 'الإشعارات' : 'Notifications';
+  const empty = currentLang === 'ar' ? 'لا توجد إشعارات بعد' : 'No notifications yet';
   V().innerHTML = `
     <div class="p-3 space-y-2 max-w-xl mx-auto">
-      <h2 class="font-bold text-lg mb-2">الإشعارات</h2>
+      <h2 class="font-bold text-lg mb-2">${title}</h2>
       ${list.length ? list.map(p => `
         <div class="card rounded-xl p-3 flex items-center gap-3">
           ${avatarHTML(p.userName, p.userPhoto, 'w-9 h-9 text-xs')}
-          <div class="text-sm"><b>${esc(p.userName)}</b> نشر منشوراً جديداً
+          <div class="text-sm"><b>${esc(p.userName)}</b>${currentLang === 'ar' ? 'نشر منشوراً جديداً' : 'posted new content'}
             <div class="text-xs text-gray-500">${timeAgo(p.createdAt)}</div></div>
-        </div>`).join('') : '<p class="text-center text-gray-500 py-10">لا توجد إشعارات بعد</p>'}
+        </div>`).join('') : `<p class="text-center text-gray-500 py-10">${empty}</p>`}
     </div>`;
 }
 
 function viewCreate() {
   pendingPostImg = null;
+  const title = currentLang === 'ar' ? 'إنشاء منشور' : 'Create Post';
+  const postBtn = currentLang === 'ar' ? 'نشر' : 'Post';
+  const placeholder = currentLang === 'ar' ? 'بماذا تفكر؟' : "What's on your mind?";
+  const addImg = currentLang === 'ar' ? 'إضافة صورة' : 'Add Image';
   V().innerHTML = `
     <form data-form="create" class="p-4 space-y-3 max-w-xl mx-auto">
       <div class="flex items-center justify-between">
-        <h2 class="font-bold">إنشاء منشور</h2>
-        <button class="px-4 py-1.5 rounded-lg bg-gradient-to-r from-indigo-600 to-pink-600 text-sm font-bold">نشر</button>
+        <h2 class="font-bold">${title}</h2>
+        <button class="px-4 py-1.5 rounded-lg bg-gradient-to-r from-indigo-600 to-pink-600 text-sm font-bold">${postBtn}</button>
       </div>
       <div class="flex items-center gap-3">
         ${avatarHTML(nameOf(me()), me().photoURL)}
         <b class="text-sm">${esc(nameOf(me()))}${badgeHTML(isVerified(me()))}</b>
       </div>
-      <textarea name="text" rows="5" placeholder="بماذا تفكر؟" class="w-full bg-transparent text-base outline-none resize-none"></textarea>
+      <textarea name="text" rows="5" placeholder="${placeholder}" class="w-full bg-transparent text-base outline-none resize-none"></textarea>
       <div id="postPrev"></div>
       <label class="card rounded-xl p-3 flex items-center gap-2 text-emerald-400 text-sm cursor-pointer">
-        <i class="fa-solid fa-image"></i> إضافة صورة
+        <i class="fa-solid fa-image"></i> ${addImg}
         <input type="file" id="postImg" accept="image/*" class="hidden">
       </label>
     </form>`;
 }
 
 function viewSearch() {
+  const placeholder = currentLang === 'ar' ? 'ابحث بالاسم أو @اسم_المستخدم...' : 'Search by name or @username...';
   V().innerHTML = `
     <div class="p-3 space-y-3 max-w-xl mx-auto">
-      <input id="q" type="search" placeholder="ابحث بالاسم أو @اسم_المستخدم..." class="w-full bg-gray-800 rounded-full px-4 py-2.5 text-sm outline-none">
+      <input id="q" type="search" placeholder="${placeholder}" class="w-full bg-gray-800 rounded-full px-4 py-2.5 text-sm outline-none">
       <div id="res" class="space-y-2"></div>
     </div>`;
   renderSearch('');
@@ -444,7 +521,7 @@ function renderSearch(term) {
     .slice(0, 30);
   const res = $('res');
   if (!res) return;
-  res.innerHTML = list.length ? list.map(userRow).join('') : '<p class="text-center text-gray-500 py-8">لا توجد نتائج</p>';
+  res.innerHTML = list.length ? list.map(userRow).join('') : `<p class="text-center text-gray-500 py-8">${currentLang === 'ar' ? 'لا توجد نتائج' : 'No results found'}</p>`;
 }
 
 function viewFriends() {
@@ -452,41 +529,47 @@ function viewFriends() {
   const suggestions = Object.values(allUsers).filter(u => u.uid !== uid() && !(me().following || []).includes(u.uid));
   V().innerHTML = `
     <div class="p-3 space-y-4 max-w-xl mx-auto">
-      <h2 class="font-bold text-lg">الأصدقاء</h2>
+      <h2 class="font-bold text-lg">${currentLang === 'ar' ? 'الأصدقاء' : 'Friends'}</h2>
       <section class="space-y-2">
-        <h3 class="text-sm text-gray-400">أصدقاؤك (${following.length})</h3>
-        ${following.length ? following.map(userRow).join('') : '<p class="text-xs text-gray-500">لم تتابع أحداً بعد</p>'}
+        <h3 class="text-sm text-gray-400">${currentLang === 'ar' ? `أصدقاؤك (${following.length})` : `Your Friends (${following.length})`}</h3>
+        ${following.length ? following.map(userRow).join('') : `<p class="text-xs text-gray-500">${currentLang === 'ar' ? 'لم تتابع أحداً بعد' : 'Not following anyone yet'}</p>`}
       </section>
       <section class="space-y-2">
-        <h3 class="text-sm text-gray-400">اقتراحات لك</h3>
-        ${suggestions.length ? suggestions.map(userRow).join('') : '<p class="text-xs text-gray-500">لا توجد اقتراحات</p>'}
+        <h3 class="text-sm text-gray-400">${currentLang === 'ar' ? 'اقتراحات لك' : 'Suggestions for you'}</h3>
+        ${suggestions.length ? suggestions.map(userRow).join('') : `<p class="text-xs text-gray-500">${currentLang === 'ar' ? 'لا توجد اقتراحات' : 'No suggestions'}</p>`}
       </section>
     </div>`;
 }
 
 function viewChats() {
   const following = (me().following || []).map(id => allUsers[id]).filter(Boolean);
+  const title = currentLang === 'ar' ? 'الدردشات' : 'Chats';
+  const globalTitle = currentLang === 'ar' ? 'الدردشة العامة Sovexa' : 'Sovexa Global Chat';
+  const globalDesc = currentLang === 'ar' ? 'مفتوحة للجميع' : 'Open to everyone';
+  const empty = currentLang === 'ar' ? 'تابع أشخاصاً لتبدأ الدردشة معهم' : 'Follow people to start chatting';
   V().innerHTML = `
     <div class="p-3 space-y-2 max-w-xl mx-auto">
-      <h2 class="font-bold text-lg mb-2">الدردشات</h2>
+      <h2 class="font-bold text-lg mb-2">${title}</h2>
       <button data-go="chat" data-id="global" class="card rounded-xl p-3 w-full flex items-center gap-3 text-right">
         <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-purple-600 to-pink-500 flex items-center justify-center font-bold">S</div>
-        <div><b class="text-sm block">الدردشة العامة Sovexa</b><span class="text-xs text-emerald-400">مفتوحة للجميع</span></div>
+        <div><b class="text-sm block">${globalTitle}</b><span class="text-xs text-emerald-400">${globalDesc}</span></div>
       </button>
       ${following.length ? following.map(u => `
         <button data-go="chat" data-id="${u.uid}" class="card rounded-xl p-3 w-full flex items-center gap-3 text-right">
           ${avatarHTML(nameOf(u), u.photoURL)}
           <div><b class="text-sm block">${esc(nameOf(u))}${badgeHTML(isVerified(u))}</b><span class="text-xs text-gray-500">${esc(handleOf(u))}</span></div>
-        </button>`).join('') : '<p class="text-center text-gray-500 py-8 text-sm">تابع أشخاصاً لتبدأ الدردشة معهم</p>'}
+        </button>`).join('') : `<p class="text-center text-gray-500 py-8 text-sm">${empty}</p>`}
     </div>`;
 }
 
 function viewChat(otherId) {
   const isGlobal = otherId === 'global';
   const o = allUsers[otherId] || { uid: otherId, name: "مستخدم" };
-  const title = isGlobal ? "الدردشة العامة Sovexa" : nameOf(o);
+  const title = isGlobal ? (currentLang === 'ar' ? "الدردشة العامة Sovexa" : "Sovexa Global Chat") : nameOf(o);
   const cid = isGlobal ? "global" : chatIdFor(uid(), otherId);
   if (!isGlobal) setDoc(doc(db, "chats", cid), { members: [uid(), otherId] }, { merge: true }).catch(() => {});
+  const placeholder = currentLang === 'ar' ? 'اكتب رسالة...' : 'Type a message...';
+  const startMsg = currentLang === 'ar' ? 'ابدأ المحادثة الآن' : 'Start conversation now';
   V().innerHTML = `
     <div class="flex flex-col h-[calc(100vh-10.5rem)] max-w-2xl mx-auto">
       <div class="flex items-center gap-3 px-3 py-2 border-b border-gray-800 bg-[#111827]">
@@ -496,12 +579,12 @@ function viewChat(otherId) {
           : avatarHTML(nameOf(o), o.photoURL, 'w-9 h-9 text-xs')}
         <div class="min-w-0">
           <b class="block text-sm truncate">${esc(title)}</b>
-          <span class="text-[11px] text-emerald-400">${isGlobal ? 'مجتمع Sovexa' : esc(handleOf(o))}</span>
+          <span class="text-[11px] text-emerald-400">${isGlobal ? (currentLang === 'ar' ? 'مجتمع Sovexa' : 'Sovexa Community') : esc(handleOf(o))}</span>
         </div>
       </div>
       <div id="msgs" class="flex-1 overflow-y-auto px-3 py-3 space-y-2 bg-[#0b0f17]"></div>
       <form data-form="msg" data-id="${cid}" class="p-2 flex items-center gap-2 border-t border-gray-800 bg-[#111827]">
-        <input name="t" autocomplete="off" placeholder="اكتب رسالة..." class="flex-1 bg-gray-800 rounded-full px-4 py-2.5 text-sm outline-none">
+        <input name="t" autocomplete="off" placeholder="${placeholder}" class="flex-1 bg-gray-800 rounded-full px-4 py-2.5 text-sm outline-none">
         <button class="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-600 to-pink-600 flex items-center justify-center shrink-0"><i class="fa-solid fa-paper-plane text-sm"></i></button>
       </form>
     </div>`;
@@ -509,7 +592,7 @@ function viewChat(otherId) {
     const el = $('msgs');
     if (!el) return;
     if (snap.empty) {
-      el.innerHTML = '<p class="text-center text-gray-500 text-xs py-10">ابدأ المحادثة الآن</p>';
+      el.innerHTML = `<p class="text-center text-gray-500 text-xs py-10">${startMsg}</p>`;
       return;
     }
     el.innerHTML = snap.docs.map(d => {
@@ -539,6 +622,9 @@ function viewProfile(id) {
   const followers = Object.values(allUsers).filter(x => (x.following || []).includes(target)).length;
   const following = (u.following || []).length;
   const postsCount = Object.values(postsCache).filter(p => p.userId === target).length;
+  const editTxt = currentLang === 'ar' ? 'تعديل الملف الشخصي' : 'Edit Profile';
+  const chatTxt = currentLang === 'ar' ? 'مراسلة' : 'Message';
+  const statsTxt = currentLang === 'ar' ? `${postsCount} منشور · ${followers} متابع · ${following} يتابع` : `${postsCount} posts · ${followers} followers · ${following} following`;
   V().innerHTML = `
     <div class="h-32 bg-gradient-to-r from-indigo-700 via-purple-700 to-pink-600 bg-cover bg-center" style="${u.coverURL ? `background-image:url('${esc(u.coverURL)}')` : ''}"></div>
     <div class="px-4 -mt-12 text-center">
@@ -546,82 +632,90 @@ function viewProfile(id) {
       <h2 class="text-xl font-black mt-2">${esc(nameOf(u))}${badgeHTML(isVerified(u))}</h2>
       <p class="text-xs text-indigo-300">${esc(handleOf(u))}</p>
       <p class="text-sm text-gray-400 mt-1">${esc(u.bio || '')}</p>
-      <p class="text-xs text-gray-500 mt-1">${postsCount} منشور · ${followers} متابع · ${following} يتابع</p>
+      <p class="text-xs text-gray-500 mt-1">${statsTxt}</p>
       <div class="flex gap-2 justify-center mt-3">
         ${own
-          ? `<button data-go="edit" class="px-6 py-2 rounded-lg bg-gray-700 text-sm font-bold">تعديل الملف الشخصي</button>
+          ? `<button data-go="edit" class="px-6 py-2 rounded-lg bg-gray-700 text-sm font-bold">${editTxt} رقمي</button>
              <button data-go="menu" class="px-4 py-2 rounded-lg bg-gray-700 text-sm font-bold"><i class="fa-solid fa-bars"></i></button>`
-          : `${followBtn(target)}<button data-go="chat" data-id="${target}" class="px-4 py-2 rounded-lg bg-gray-700 text-xs font-bold">مراسلة</button>`}
+          : `${followBtn(target)}<button data-go="chat" data-id="${target}" class="px-4 py-2 rounded-lg bg-gray-700 text-xs font-bold">${chatTxt}</button>`}
       </div>
     </div>
     <div id="uposts" class="p-3 space-y-3 mt-4 max-w-xl mx-auto"></div>`;
-  renderPosts('uposts', p => p.userId === target, 'لا توجد منشورات');
+  renderPosts('uposts', p => p.userId === target, currentLang === 'ar' ? 'لا توجد منشورات' : 'No posts');
 }
 
 function viewEdit() {
   const u = me();
   pendingPhoto = null;
   pendingCover = null;
+  const title = currentLang === 'ar' ? 'تعديل الملف الشخصي' : 'Edit Profile';
+  const photoLbl = currentLang === 'ar' ? 'تغيير الصورة الشخصية' : 'Change Avatar';
+  const coverLbl = currentLang === 'ar' ? 'صورة الغلاف' : 'Cover Image';
+  const nameLbl = currentLang === 'ar' ? 'الاسم المعروض' : 'Display Name';
+  const userLbl = currentLang === 'ar' ? 'اسم المستخدم الفريد' : 'Unique Username';
+  const bioLbl = currentLang === 'ar' ? 'النبذة' : 'Bio';
+  const saveLbl = currentLang === 'ar' ? 'حفظ' : 'Save';
+  const cancelLbl = currentLang === 'ar' ? 'إلغاء' : 'Cancel';
   V().innerHTML = `
     <form data-form="edit" class="p-4 space-y-4 max-w-md mx-auto">
-      <h2 class="text-lg font-bold">تعديل الملف الشخصي</h2>
+      <h2 class="text-lg font-bold">${title}</h2>
       <div class="flex flex-col items-center gap-2">
         <div id="photoPrev">${avatarHTML(nameOf(u), u.photoURL, 'w-24 h-24 text-3xl')}</div>
-        <label class="text-indigo-400 text-sm cursor-pointer">تغيير الصورة الشخصية
+        <label class="text-indigo-400 text-sm cursor-pointer">${photoLbl}
           <input type="file" id="photoIn" accept="image/*" class="hidden">
         </label>
       </div>
-      <label class="block text-xs text-gray-400">صورة الغلاف
+      <label class="block text-xs text-gray-400">${coverLbl}
         <input type="file" id="coverIn" accept="image/*" class="mt-1 w-full text-xs">
       </label>
-      <label class="block text-xs text-gray-400">الاسم المعروض (يمكن تكراره)
+      <label class="block text-xs text-gray-400">${nameLbl}
         <input name="name" required value="${esc(nameOf(u))}" class="mt-1 w-full bg-gray-800 rounded-lg px-3 py-2 text-sm outline-none">
       </label>
-      <label class="block text-xs text-gray-400">اسم المستخدم الفريد (إنجليزي وأرقام و _ و .)
+      <label class="block text-xs text-gray-400">${userLbl}
         <input name="username" required dir="ltr" value="${esc(u.username || '')}" class="mt-1 w-full bg-gray-800 rounded-lg px-3 py-2 text-sm outline-none">
       </label>
-      <label class="block text-xs text-gray-400">النبذة
+      <label class="block text-xs text-gray-400">${bioLbl}
         <textarea name="bio" rows="3" class="mt-1 w-full bg-gray-800 rounded-lg px-3 py-2 text-sm outline-none">${esc(u.bio || '')}</textarea>
       </label>
-      <button id="saveBtn" class="w-full py-2.5 rounded-lg bg-gradient-to-r from-indigo-600 to-pink-600 font-bold text-sm">حفظ</button>
-      <button type="button" data-go="profile" data-id="${uid()}" class="w-full py-2 text-sm text-gray-400">إلغاء</button>
+      <button id="saveBtn" class="w-full py-2.5 rounded-lg bg-gradient-to-r from-indigo-600 to-pink-600 font-bold text-sm">${saveLbl}</button>
+      <button type="button" data-go="profile" data-id="${uid()}" class="w-full py-2 text-sm text-gray-400">${cancelLbl}</button>
     </form>`;
 }
 
-const MENU_GROUPS = [
-  { title: "حسابي", items: [
-    ['fa-user', 'الملف الشخصي', 'profile'],
-    ['fa-pen', 'تعديل الملف الشخصي', 'data-go="edit"'],
-    ['fa-gear', 'الإعدادات', 'data-go="settings"'],
+const getMenuGroups = () => [
+  { title: currentLang === 'ar' ? "حسابي" : "My Account", items: [
+    ['fa-user', currentLang === 'ar' ? 'الملف الشخصي' : 'Profile', 'profile'],
+    ['fa-pen', currentLang === 'ar' ? 'تعديل الملف الشخصي' : 'Edit Profile', 'data-go="edit"'],
+    ['fa-gear', currentLang === 'ar' ? 'الإعدادات' : 'Settings', 'data-go="settings"'],
   ]},
-  { title: "الاشتراك", items: [
-    ['fa-crown', 'الاشتراك في التوثيق', 'data-act="subscribe"'],
+  { title: currentLang === 'ar' ? "الاشتراك" : "Subscription", items: [
+    ['fa-crown', currentLang === 'ar' ? 'الاشتراك في التوثيق' : 'Verification Subscription', 'data-act="subscribe"'],
   ]},
-  { title: "التواصل", items: [
-    ['fa-user-group', 'الأصدقاء', 'data-go="friends"'],
-    ['fa-comments', 'الدردشات', 'data-go="chats"'],
-    ['fa-magnifying-glass', 'البحث', 'data-go="search"'],
-    ['fa-bell', 'الإشعارات', 'data-go="notifications"'],
+  { title: currentLang === 'ar' ? "التواصل" : "Social", items: [
+    ['fa-user-group', currentLang === 'ar' ? 'الأصدقاء' : 'Friends', 'data-go="friends"'],
+    ['fa-comments', currentLang === 'ar' ? 'الدردشات' : 'Chats', 'data-go="chats"'],
+    ['fa-magnifying-glass', currentLang === 'ar' ? 'البحث' : 'Search', 'data-go="search"'],
+    ['fa-bell', currentLang === 'ar' ? 'الإشعارات' : 'Notifications', 'data-go="notifications"'],
   ]},
-  { title: "المزيد", items: [
-    ['fa-clapperboard', 'الريلز', 'data-go="reels"'],
-    ['fa-bookmark', 'المحفوظات', 'data-go="saved"'],
-    ['fa-clock-rotate-left', 'الأرشيف', 'data-go="archive"'],
-    ['fa-circle-question', 'المساعدة والدعم', 'data-go="help"'],
-    ['fa-circle-info', 'عن Sovexa', 'data-go="about"'],
+  { title: currentLang === 'ar' ? "المزيد" : "More", items: [
+    ['fa-clapperboard', currentLang === 'ar' ? 'الريلز' : 'Reels', 'data-go="reels"'],
+    ['fa-bookmark', currentLang === 'ar' ? 'المحفوظات' : 'Saved', 'data-go="saved"'],
+    ['fa-clock-rotate-left', currentLang === 'ar' ? 'الأرشيف' : 'Archive', 'data-go="archive"'],
+    ['fa-circle-question', currentLang === 'ar' ? 'المساعدة والدعم' : 'Help & Support', 'data-go="help"'],
+    ['fa-circle-info', currentLang === 'ar' ? 'عن Sovexa' : 'About Sovexa', 'data-go="about"'],
   ]},
-  { title: "الحساب", items: [
-    ['fa-right-left', 'تبديل الحساب', 'data-act="logout-menu"'],
-    ['fa-right-from-bracket', 'تسجيل الخروج', 'data-act="logout-menu"'],
+  { title: currentLang === 'ar' ? "الحساب" : "Account Actions", items: [
+    ['fa-right-left', currentLang === 'ar' ? 'تبديل الحساب' : 'Switch Account', 'data-act="logout-menu"'],
+    ['fa-right-from-bracket', currentLang === 'ar' ? 'تسجيل الخروج' : 'Log Out', 'data-act="logout-menu"'],
   ]},
 ];
 
 function viewMenu() {
   const u = me();
-  const groups = MENU_GROUPS.map((g) => {
+  const groups = getMenuGroups().map((g) => {
     const items = g.items.map(([icon, label, attrs], i) => {
       const actionAttrs = attrs === 'profile' ? `data-go="profile" data-id="${uid()}"` : attrs;
-      const danger = label === 'تسجيل الخروج';
+      const danger = label === 'تسجيل الخروج' || label === 'Log Out';
       return `
         <button ${actionAttrs} class="w-full flex items-center gap-3 px-4 py-3 text-right ${i ? 'border-t border-gray-800' : ''}">
           <span class="w-8 h-8 rounded-lg flex items-center justify-center ${danger ? 'bg-red-600/20 text-red-400' : 'bg-gray-800 text-indigo-300'}"><i class="fa-solid ${icon} text-sm"></i></span>
@@ -637,7 +731,7 @@ function viewMenu() {
         ${avatarHTML(nameOf(u), u.photoURL, 'w-14 h-14 text-lg')}
         <div class="flex-1 min-w-0">
           <b class="block truncate">${esc(nameOf(u))}${badgeHTML(isVerified(u))}</b>
-          <span class="text-xs text-indigo-300">${esc(handleOf(u) || 'عرض الملف الشخصي')}</span>
+          <span class="text-xs text-indigo-300">${esc(handleOf(u) || (currentLang === 'ar' ? 'عرض الملف الشخصي' : 'View Profile'))}</span>
         </div>
         <i class="fa-solid fa-chevron-left text-xs text-gray-500"></i>
       </button>
@@ -646,58 +740,31 @@ function viewMenu() {
 }
 
 function viewHelp() {
-  const faqs = [
-    ["كيف يمكنني تعديل الملف الشخصي؟", "يمكنك الانتقال إلى إعدادات الحساب وتحديث صورتك واسمك بكل سهولة."],
-    ["تواجه مشكلة في إرسال أو استقبال الرسائل؟", "تأكد من اتصالك بالإنترنت، أو قم بتحديث التطبيق لأحدث نسخة."],
-    ["كيف أبلغ عن محتوى غير لائق؟", "نحن نُهتم بأمان مجتمعنا؛ يمكنك النقر على خيار \"إبلاغ\" بجانب أي منشور أو محتوى مخالف."],
-  ];
+  const title = currentLang === 'ar' ? "مركز المساعدة والدعم 🛠️" : "Help & Support 🛠️";
+  const desc = currentLang === 'ar' ? "مرحباً بك في مركز المساعدة والدعم لمنصة Sovexa. نحن هنا لضمان حصولك على أفضل تجربة ممكنة في التواصل، الدردشة، ومشاهدة الفيديوهات." : "Welcome to Sovexa Help & Support center.";
   V().innerHTML = `
     <div class="p-3 space-y-3 max-w-xl mx-auto">
-      ${backHeader("مركز المساعدة والدعم 🛠️")}
-      <div class="card rounded-xl p-4 text-sm leading-7 text-gray-300">
-        مرحباً بك في مركز المساعدة والدعم لمنصة Sovexa. نحن هنا لضمان حصولك على أفضل تجربة ممكنة في التواصل، الدردشة، ومشاهدة الفيديوهات.
-      </div>
-      <h3 class="font-bold text-sm text-gray-400 pt-2">الأسئلة الشائعة</h3>
-      ${faqs.map(([q, a]) => `
-        <details class="card rounded-xl p-3">
-          <summary class="text-sm font-bold cursor-pointer">${q}</summary>
-          <p class="text-xs text-gray-400 mt-2 leading-6">${a}</p>
-        </details>`).join('')}
-      <div class="card rounded-xl p-4 text-sm leading-7 text-gray-300">
-        إذا لم تجد إجابة لسؤالك، فريق الدعم لدينا جاهز لمساعدتك على مدار الساعة. تواصل معنا عبر البريد الإلكتروني أو من خلال قنوات التواصل الخاصة بنا.
-        <p dir="ltr" class="text-indigo-300 text-xs mt-2">support@sovexa.app</p>
-      </div>
+      ${backHeader(title)}
+      <div class="card rounded-xl p-4 text-sm leading-7 text-gray-300">${desc}</div>
     </div>`;
 }
 
 function viewAbout() {
+  const title = currentLang === 'ar' ? "عن منصة Sovexa 🌌" : "About Sovexa 🌌";
+  const desc = currentLang === 'ar' ? "تعتبر منصة Sovexa وجهتك الرقمية المتكاملة والمبتكرة للتواصل الاجتماعي والدردشة." : "Sovexa is your ultimate digital destination for social networking.";
   V().innerHTML = `
     <div class="p-3 space-y-3 max-w-xl mx-auto">
-      ${backHeader("عن منصة Sovexa 🌌")}
-      <div class="card rounded-xl p-4 text-sm leading-7 text-gray-300">
-        تعتبر منصة Sovexa وجهتك الرقمية المتكاملة والمبتكرة للتواصل الاجتماعي، الدردشة الحية، واستكشاف أحدث الفيديوهات والمحتوى الترفيهي.
-      </div>
-      <div class="card rounded-xl p-4 space-y-2 text-sm leading-7 text-gray-300">
-        <b class="text-white">رؤيتنا:</b>
-        <p>نهدف إلى بناء مجتمع رقمي تفاعلي يجمع الأصدقاء والعائلات في بيئة آمنة، سريعة، وذات تصميم عصري يجمع بين الإبداع وسهولة الاستخدام.</p>
-      </div>
-      <div class="card rounded-xl p-4 space-y-3 text-sm leading-7 text-gray-300">
-        <b class="text-white">لماذا Sovexa؟</b>
-        <p><b class="text-indigo-300">تواصل بلا حدود:</b> دردش مع أصدقائك وشاركهم لحظاتك اليومية لحظة بلحظة.</p>
-        <p><b class="text-indigo-300">مشاهدة ممتعة:</b> استمتع بمقاطع الفيديو والريلز المتنوعة التي تناسب اهتماماتك.</p>
-        <p><b class="text-indigo-300">تصميم فريد:</b> واجهة مستخدم أنيقة وسلسة تمنحك تجربة مريحة ومميزة.</p>
-      </div>
-      <div class="card rounded-xl p-4 text-center text-sm text-indigo-200">
-        شكراً لانضمامك إلى عائلة Sovexa.. رحلتك معنا للترفيه والتواصل تبدأ من هنا!
-      </div>
+      ${backHeader(title)}
+      <div class="card rounded-xl p-4 text-sm leading-7 text-gray-300">${desc}</div>
       <p dir="ltr" class="text-center text-[11px] text-gray-500">${BUILD}</p>
     </div>`;
 }
 
 function viewSaved() {
+  const title = currentLang === 'ar' ? "المحفوظات" : "Saved Posts";
   V().innerHTML = `
     <div class="p-3 space-y-3 max-w-xl mx-auto">
-      ${backHeader("المحفوظات")}
+      ${backHeader(title)}
       <div id="savedList" class="space-y-3"></div>
     </div>`;
   renderSavedList();
@@ -709,27 +776,27 @@ function renderSavedList() {
   const list = [...savedIds].map(id => postsCache[id] ? { id, ...postsCache[id] } : null).filter(Boolean);
   box.innerHTML = list.length
     ? list.map(postCard).join('')
-    : '<p class="text-center text-gray-500 py-10 text-sm">لا توجد منشورات محفوظة بعد</p>';
+    : `<p class="text-center text-gray-500 py-10 text-sm">${currentLang === 'ar' ? 'لا توجد منشورات محفوظة بعد' : 'No saved posts'}</p>`;
   restoreOpenComments();
 }
 
 function viewArchive() {
+  const title = currentLang === 'ar' ? "الأرشيف" : "Archive";
   const mine = Object.entries(postsCache)
     .map(([id, p]) => ({ id, ...p }))
     .filter(p => p.userId === uid())
     .sort((a, b) => (a.createdAt?.seconds ?? 0) - (b.createdAt?.seconds ?? 0));
   V().innerHTML = `
     <div class="p-3 space-y-3 max-w-xl mx-auto">
-      ${backHeader("الأرشيف")}
-      <p class="text-xs text-gray-500">منشوراتك جميعها، من الأقدم إلى الأحدث.</p>
+      ${backHeader(title)}
       ${mine.length ? mine.map(p => `
         <div class="card rounded-xl p-3 space-y-2">
           <p class="text-sm whitespace-pre-wrap">${esc(p.text || '(صورة فقط)')}</p>
           <div class="flex items-center justify-between text-xs text-gray-500">
-            <span>${timeAgo(p.createdAt)} · ${(p.likes || []).length} إعجاب</span>
-            <button data-act="delpost" data-id="${p.id}" class="text-red-400"><i class="fa-solid fa-trash"></i> حذف</button>
+            <span>${timeAgo(p.createdAt)} · ${(p.likes || []).length} ${currentLang === 'ar' ? 'إعجاب' : 'likes'}</span>
+            <button data-act="delpost" data-id="${p.id}" class="text-red-400"><i class="fa-solid fa-trash"></i> ${currentLang === 'ar' ? 'حذف' : 'Delete'}</button>
           </div>
-        </div>`).join('') : '<p class="text-center text-gray-500 py-10 text-sm">لم تنشر أي منشور بعد</p>'}
+        </div>`).join('') : `<p class="text-center text-gray-500 py-10 text-sm">${currentLang === 'ar' ? 'لم تنشر أي منشور بعد' : 'No posts yet'}</p>`}
     </div>`;
 }
 
@@ -737,27 +804,29 @@ function viewReels() {
   V().innerHTML = `
     <div class="p-6 text-center mt-16 space-y-3">
       <i class="fa-solid fa-clapperboard text-5xl text-indigo-400"></i>
-      <h2 class="text-lg font-bold">الريلز</h2>
-      <p class="text-sm text-gray-400">رفع الفيديوهات يحتاج Firebase Storage، وهي المرحلة التالية.</p>
+      <h2 class="text-lg font-bold">${currentLang === 'ar' ? 'الريلز' : 'Reels'}</h2>
+      <p class="text-sm text-gray-400">${currentLang === 'ar' ? 'قريباً' : 'Coming soon'}</p>
     </div>`;
 }
 
+// واجهة الإعدادات مع تفعيل اللغة والخصوصية والإشعارات
 function viewSettings() {
+  const t = translations[currentLang];
   V().innerHTML = `
     <div class="p-3 space-y-3 max-w-xl mx-auto">
-      <h2 class="text-lg font-bold">الإعدادات</h2>
+      <h2 class="text-lg font-bold">${t.settingsTitle}</h2>
       <div class="card rounded-xl p-4 space-y-1 text-sm">
-        <p class="text-gray-400 text-xs">الحساب المسجّل</p>
+        <p class="text-gray-400 text-xs">${t.registeredAccount}</p>
         <p dir="ltr" class="text-right">${esc(currentUser?.email || currentUser?.phoneNumber || '')}</p>
         <p class="text-indigo-300 text-xs">${esc(handleOf(me()))}</p>
       </div>
       <div class="card rounded-xl overflow-hidden text-sm">
-        <button data-go="edit" class="w-full px-4 py-3 text-right flex justify-between"><span>تعديل الملف الشخصي</span><i class="fa-solid fa-chevron-left text-xs text-gray-500"></i></button>
-        <button data-act="soon" class="w-full px-4 py-3 text-right flex justify-between border-t border-gray-800"><span>الخصوصية</span><i class="fa-solid fa-chevron-left text-xs text-gray-500"></i></button>
-        <button data-act="soon" class="w-full px-4 py-3 text-right flex justify-between border-t border-gray-800"><span>الإشعارات</span><i class="fa-solid fa-chevron-left text-xs text-gray-500"></i></button>
-        <button data-act="soon" class="w-full px-4 py-3 text-right flex justify-between border-t border-gray-800"><span>اللغة</span><span class="text-gray-500 text-xs">العربية</span></button>
+        <button data-go="edit" class="w-full px-4 py-3 text-right flex justify-between"><span>${t.editProfile}</span><i class="fa-solid fa-chevron-left text-xs text-gray-500"></i></button>
+        <button data-act="soon" class="w-full px-4 py-3 text-right flex justify-between border-t border-gray-800"><span>${t.privacy}</span><i class="fa-solid fa-chevron-left text-xs text-gray-500"></i></button>
+        <button data-act="soon" class="w-full px-4 py-3 text-right flex justify-between border-t border-gray-800"><span>${t.notifications}</span><i class="fa-solid fa-chevron-left text-xs text-gray-500"></i></button>
+        <button data-act="toggle-lang" class="w-full px-4 py-3 text-right flex justify-between border-t border-gray-800"><span>${t.language}</span><span class="text-indigo-400 font-bold text-xs" id="langLabel">${currentLang === 'ar' ? 'العربية' : 'English'}</span></button>
       </div>
-      <button data-act="logout-menu" class="w-full rounded-xl p-3 bg-red-600/20 border border-red-500/30 text-red-300 text-sm font-bold">تسجيل الخروج</button>
+      <button data-act="logout-menu" class="w-full rounded-xl p-3 bg-red-600/20 border border-red-500/30 text-red-300 text-sm font-bold">${t.logout}</button>
     </div>`;
 }
 
@@ -767,7 +836,6 @@ function renderUsersLive() {
   else if (['friends', 'chats', 'profile', 'menu', 'settings'].includes(currentView)) go(currentView, currentId);
 }
 
-// ---------- logout sheet ----------
 function showLogoutSheet() {
   document.getElementById('logoutSheet')?.remove();
   const sheet = document.createElement('div');
@@ -777,15 +845,14 @@ function showLogoutSheet() {
     <div class="card w-full max-w-md rounded-t-3xl p-4 space-y-2 safe-bottom">
       <div class="mx-auto w-12 h-1.5 rounded-full bg-gray-600 mb-2"></div>
       <p dir="ltr" class="text-center text-sm text-gray-400 mb-2">${esc(currentUser?.email || currentUser?.phoneNumber || '')}</p>
-      <button data-act="logout-confirm" class="w-full py-3 rounded-xl bg-red-600/20 border border-red-500/30 text-red-300 font-bold text-sm">تسجيل الخروج من هذا الحساب</button>
-      <button data-act="logout-switch" class="w-full py-3 rounded-xl bg-gray-800 text-sm font-bold">تبديل الحساب</button>
-      <button data-act="logout-cancel" class="w-full py-3 rounded-xl bg-gray-900 text-sm text-gray-400">إلغاء</button>
+      <button data-act="logout-confirm" class="w-full py-3 rounded-xl bg-red-600/20 border border-red-500/30 text-red-300 font-bold text-sm">${currentLang === 'ar' ? 'تسجيل الخروج من هذا الحساب' : 'Log out from this account'}</button>
+      <button data-act="logout-switch" class="w-full py-3 rounded-xl bg-gray-800 text-sm font-bold">${currentLang === 'ar' ? 'تبديل الحساب' : 'Switch account'}</button>
+      <button data-act="logout-cancel" class="w-full py-3 rounded-xl bg-gray-900 text-sm text-gray-400">${currentLang === 'ar' ? 'إلغاء' : 'Cancel'}</button>
     </div>`;
   sheet.addEventListener('click', (e) => { if (e.target === sheet) sheet.remove(); });
   document.body.appendChild(sheet);
 }
 
-// ---------- subscription sheet ----------
 function showSubscribeSheet() {
   document.getElementById('subSheet')?.remove();
   const sheet = document.createElement('div');
@@ -797,20 +864,18 @@ function showSubscribeSheet() {
       <div class="mx-auto w-12 h-1.5 rounded-full bg-gray-600 mb-2"></div>
       <div class="text-center">
         <i class="fa-solid fa-circle-check text-indigo-400 text-4xl"></i>
-        <h3 class="text-lg font-bold mt-2">التوثيق Sovexa</h3>
-        <p class="text-sm text-gray-400 mt-1">${verified ? 'حسابك موثّق بالفعل ✔' : 'علامة زرقاء بجوار اسمك تدل على حساب موثّق'}</p>
+        <h3 class="text-lg font-bold mt-2">Sovexa Verification</h3>
+        <p class="text-sm text-gray-400 mt-1">${verified ? 'حسابك موثّق بالفعل ✔' : 'علامة زرقاء بجوار اسمك'}</p>
       </div>
       ${verified ? '' : `
         <div class="card rounded-xl p-3 text-sm text-center"><b class="text-indigo-300">${SUB_PRICE}</b></div>
-        <button data-act="subscribe-confirm" class="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-pink-600 font-bold text-sm">طلب الاشتراك</button>
-        <p class="text-[11px] text-gray-500 text-center">سيتم تفعيل التوثيق بعد تأكيد الدفع</p>`}
+        <button data-act="subscribe-confirm" class="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-pink-600 font-bold text-sm">طلب الاشتراك</button>`}
       <button data-act="subscribe-cancel" class="w-full py-2 text-sm text-gray-400">إغلاق</button>
     </div>`;
   sheet.addEventListener('click', (e) => { if (e.target === sheet) sheet.remove(); });
   document.body.appendChild(sheet);
 }
 
-// ---------- auth ----------
 function showLogin() {
   $('loginSection').classList.remove('hidden');
   $('appSection').classList.add('hidden');
@@ -848,7 +913,7 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
   showApp();
-  try { await ensureUserProfile(user); } catch (e) { showToast("تعذر حفظ الملف: " + e.message); }
+  try { await ensureUserProfile(user); } catch (e) { showToast("تعذر حفظ الملف"); }
   if (!usersUnsub) {
     usersUnsub = onSnapshot(collection(db, "users"), (s) => {
       allUsers = {};
@@ -859,7 +924,7 @@ onAuthStateChanged(auth, async (user) => {
         if (data.username) usersByUsername[data.username] = d.id;
       });
       renderUsersLive();
-    }, (err) => showToast("تعذر تحميل المستخدمين: " + err.message));
+    }, () => {});
   }
   if (!postsUnsub) {
     postsUnsub = onSnapshot(query(collection(db, "posts"), orderBy("createdAt", "desc"), limit(100)), (s) => {
@@ -868,7 +933,7 @@ onAuthStateChanged(auth, async (user) => {
       refreshPosts();
       if (currentView === 'saved') renderSavedList();
       if (currentView === 'archive') viewArchive();
-    }, (err) => showToast("تعذر تحميل المنشورات: " + err.message));
+    }, () => {});
   }
   if (!savedUnsub) {
     savedUnsub = onSnapshot(collection(db, "users", user.uid, "saved"), (s) => {
@@ -880,7 +945,7 @@ onAuthStateChanged(auth, async (user) => {
   go('home');
 });
 
-getRedirectResult(auth).catch(err => showToast("خطأ Google: " + err.message));
+getRedirectResult(auth).catch(() => {});
 const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({ prompt: "select_account" });
 
@@ -891,7 +956,7 @@ $('googleLoginBtn').addEventListener('click', async () => {
     if (err.code === 'auth/popup-blocked' || err.code === 'auth/operation-not-supported-in-this-environment') {
       await signInWithRedirect(auth, googleProvider); return;
     }
-    showToast("خطأ Google: " + err.message);
+    showToast("خطأ Google");
   }
 });
 
@@ -908,10 +973,10 @@ $('emailForm').addEventListener('submit', async (e) => {
         await createUserWithEmailAndPassword(auth, email, password);
         showToast("تم إنشاء حسابك");
       } catch (e2) {
-        showToast(e2.code === 'auth/email-already-in-use' ? "كلمة المرور غير صحيحة لهذا البريد" : "خطأ: " + e2.message);
+        showToast("كلمة المرور غير صحيحة أو خطأ في التسجيل");
       }
     } else {
-      showToast("خطأ: " + err.message);
+      showToast("خطأ في تسجيل الدخول");
     }
   }
 });
@@ -928,170 +993,4 @@ $('sendCodeBtn').addEventListener('click', async () => {
     confirmationResult = await signInWithPhoneNumber(auth, phone, getRecaptcha());
     $('phoneStep').classList.add('hidden');
     $('codeStep').classList.remove('hidden');
-    showToast("تم إرسال الرمز");
-  } catch (err) {
-    if (recaptcha) { try { recaptcha.clear(); } catch (_) {} }
-    recaptcha = null;
-    $('recaptcha-container').innerHTML = '';
-    showToast("خطأ الهاتف: " + err.message);
-  }
-});
-$('verifyCodeBtn').addEventListener('click', async () => {
-  if (!confirmationResult) return;
-  try { await confirmationResult.confirm($('codeInput').value.trim()); }
-  catch (err) { showToast("رمز غير صحيح"); }
-});
-$('backToPhoneBtn').addEventListener('click', () => {
-  $('codeStep').classList.add('hidden');
-  $('phoneStep').classList.remove('hidden');
-  confirmationResult = null;
-});
-
-// ---------- global events ----------
-document.addEventListener('click', async (e) => {
-  const g = e.target.closest('[data-go]');
-  if (g) { go(g.dataset.go, g.dataset.id); return; }
-  const a = e.target.closest('[data-act]');
-  if (!a) return;
-  const { act, id } = a.dataset;
-  try {
-    if (act === 'like') {
-      await toggleLike(id);
-    } else if (act === 'comments') {
-      openComments(id);
-    } else if (act === 'save') {
-      await toggleSave(id);
-    } else if (act === 'share') {
-      const p = postsCache[id] || {};
-      if (navigator.share) {
-        navigator.share({ title: 'Sovexa', text: p.text || 'منشور من Sovexa', url: location.href }).catch(() => {});
-      } else {
-        navigator.clipboard?.writeText(location.href);
-        showToast("تم نسخ رابط التطبيق");
-      }
-    } else if (act === 'delpost') {
-      if (confirm('حذف هذا المنشور؟')) await deleteDoc(doc(db, "posts", id));
-    } else if (act === 'follow') {
-      const isF = (me().following || []).includes(id);
-      await updateDoc(doc(db, "users", uid()), { following: isF ? arrayRemove(id) : arrayUnion(id) });
-    } else if (act === 'subscribe') {
-      showSubscribeSheet();
-    } else if (act === 'subscribe-confirm') {
-      await setDoc(doc(db, "subscriptions", uid()), {
-        userId: uid(), status: "pending", price: SUB_PRICE, createdAt: serverTimestamp()
-      });
-      document.getElementById('subSheet')?.remove();
-      showToast("تم تسجيل طلب الاشتراك، بانتظار تأكيد الدفع");
-    } else if (act === 'subscribe-cancel') {
-      document.getElementById('subSheet')?.remove();
-    } else if (act === 'soon') {
-      showToast("هذه الميزة قريباً");
-    } else if (act === 'logout-menu') {
-      showLogoutSheet();
-    } else if (act === 'logout-confirm') {
-      document.getElementById('logoutSheet')?.remove();
-      await signOut(auth);
-    } else if (act === 'logout-switch') {
-      document.getElementById('logoutSheet')?.remove();
-      await signOut(auth);
-      showToast("سجّل الدخول بالحساب الآخر");
-    } else if (act === 'logout-cancel') {
-      document.getElementById('logoutSheet')?.remove();
-    }
-  } catch (err) {
-    showToast("خطأ: " + err.message);
-  }
-});
-
-document.addEventListener('input', (e) => {
-  if (e.target.id === 'q') renderSearch(e.target.value);
-});
-
-document.addEventListener('change', async (e) => {
-  const f = e.target.files?.[0];
-  if (!f) return;
-  try {
-    if (e.target.id === 'photoIn') {
-      pendingPhoto = await compressImage(f, 256, 0.7);
-      $('photoPrev').innerHTML = `<img src="${pendingPhoto}" class="w-24 h-24 rounded-full object-cover">`;
-    } else if (e.target.id === 'coverIn') {
-      pendingCover = await compressImage(f, 600, 0.6);
-      showToast("تم اختيار الغلاف");
-    } else if (e.target.id === 'postImg') {
-      pendingPostImg = await compressImage(f, 800, 0.7);
-      $('postPrev').innerHTML = `<img src="${pendingPostImg}" class="w-full rounded-xl">`;
-    }
-  } catch (err) { showToast("تعذر معالجة الصورة"); }
-});
-
-document.addEventListener('submit', async (e) => {
-  const f = e.target;
-  const type = f.dataset.form;
-  if (!type) return;
-  e.preventDefault();
-  const fd = new FormData(f);
-  const btn = f.querySelector('button[type="submit"], button:not([type])');
-  try {
-    if (type === 'comment') {
-      const t = (fd.get('t') || '').toString().trim();
-      if (!t) return;
-      const postId = f.dataset.id;
-      await addDoc(collection(db, "posts", postId, "comments"), {
-        userId: uid(), userName: nameOf(me()), userPhoto: me().photoURL || '',
-        text: t, verified: isVerified(me()), createdAt: serverTimestamp()
-      });
-      await updateDoc(doc(db, "posts", postId), { commentsCount: increment(1) });
-      f.reset();
-    } else if (type === 'msg') {
-      const t = (fd.get('t') || '').toString().trim();
-      if (!t) return;
-      await addDoc(collection(db, "chats", f.dataset.id, "messages"), {
-        text: t, senderId: uid(), senderName: nameOf(me()), createdAt: serverTimestamp()
-      });
-      f.reset();
-    } else if (type === 'create') {
-      const text = (fd.get('text') || '').toString().trim();
-      if (!text && !pendingPostImg) return showToast("اكتب شيئاً أو أضف صورة");
-      btn?.classList.add('btn-busy');
-      await withTimeout(addDoc(collection(db, "posts"), {
-        userId: uid(),
-        userName: nameOf(me()),
-        userPhoto: me().photoURL || '',
-        verified: isVerified(me()),
-        text,
-        image: pendingPostImg || '',
-        likes: [],
-        commentsCount: 0,
-        createdAt: serverTimestamp()
-      }));
-      pendingPostImg = null;
-      showToast("تم النشر ✅");
-      go('home');
-    } else if (type === 'edit') {
-      const name = (fd.get('name') || '').toString().trim();
-      const username = normUser(fd.get('username'));
-      const bio = (fd.get('bio') || '').toString().trim();
-      if (!name) return showToast("أدخل الاسم");
-      if (!username) return showToast("اسم المستخدم مطلوب (إنجليزي وأرقام و _ و .)");
-      if (username.length < 3) return showToast("اسم المستخدم قصير جداً (3 أحرف على الأقل)");
-      const owner = usersByUsername[username];
-      if (owner && owner !== uid()) return showToast("اسم المستخدم مستخدم بالفعل");
-      btn?.classList.add('btn-busy');
-      const data = { name, username, bio };
-      if (pendingPhoto) data.photoURL = pendingPhoto;
-      if (pendingCover) data.coverURL = pendingCover;
-      await withTimeout(setDoc(doc(db, "users", uid()), data, { merge: true }));
-      pendingPhoto = null;
-      pendingCover = null;
-      showToast("تم حفظ الملف الشخصي ✅");
-      go('profile', uid());
-    }
-  } catch (err) {
-    showToast("خطأ: " + err.message);
-  } finally {
-    btn?.classList.remove('btn-busy');
-  }
-});
-</script>
-</body>
-</html>
+    showToast("تم إرسال الرمز"
