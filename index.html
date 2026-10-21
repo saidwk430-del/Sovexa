@@ -5,11 +5,8 @@
     <link rel="manifest" href="manifest.json">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sovexa - منصة التواصل الاجتماعي</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&family=Outfit:wght@400;600;800;900&display=swap" rel="stylesheet">
-    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
@@ -34,11 +31,6 @@
             -webkit-backdrop-filter: blur(20px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         }
-        .post-media-container {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-        }
         #bgCanvas {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -50,13 +42,11 @@
 </head>
 <body class="min-h-screen relative select-none">
 
-    <!-- Interactive Background Canvas -->
     <canvas id="bgCanvas"></canvas>
 
-    <!-- Toast Notification Popup Container -->
     <div id="toastContainer" class="fixed top-16 left-1/2 transform -translate-x-1/2 z-50 flex flex-col items-center gap-2 pointer-events-none"></div>
 
-    <!-- ==================== PART 1: LOGIN VIEW ==================== -->
+    <!-- ==================== LOGIN VIEW ==================== -->
     <div id="loginSection" class="relative z-10 flex flex-col justify-between items-center min-h-screen p-4">
         <header class="w-full p-4 flex justify-between items-center max-w-7xl mx-auto">
             <div class="flex items-center gap-2">
@@ -80,7 +70,6 @@
                     <p class="text-xs text-gray-300">سجل الدخول للمتابعة إلى المنصة</p>
                 </div>
 
-                <!-- Google Login -->
                 <button id="googleLoginBtn" class="w-full py-2.5 px-4 bg-slate-900/90 hover:bg-slate-800 border border-gray-700 text-white font-medium text-xs rounded-xl transition-all flex items-center justify-center gap-3 shadow-md mb-3">
                     <svg class="w-4 h-4" viewBox="0 0 24 24">
                         <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.7 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.2 9 5 12 5z"/>
@@ -91,31 +80,27 @@
                     <span>متابعة باستخدام Google</span>
                 </button>
 
-                <!-- Phone Login Toggle -->
                 <button id="togglePhoneBtn" class="w-full py-2.5 px-4 bg-slate-900/90 hover:bg-slate-800 border border-gray-700 text-white font-medium text-xs rounded-xl transition-all flex items-center justify-center gap-3 shadow-md mb-4">
                     <i class="fa-solid fa-phone text-emerald-400"></i>
                     <span>متابعة برقم الهاتف</span>
                 </button>
 
-                <!-- Phone Login Panel -->
                 <div id="phonePanel" class="hidden mb-4 space-y-3">
-                    <!-- Step 1: phone number -->
                     <div id="phoneStep">
                         <label class="block text-[11px] font-semibold text-gray-300 mb-1">رقم الهاتف (مع رمز الدولة)</label>
                         <input type="tel" id="phoneInput" placeholder="+966500000000" dir="ltr" class="w-full bg-slate-900/90 border border-gray-700 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none">
-                        <button id="sendCodeBtn" class="w-full mt-3 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:opacity-90 text-white font-bold text-xs rounded-xl shadow-lg transition-all">
+                        <button id="sendCodeBtn" type="button" class="w-full mt-3 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:opacity-90 text-white font-bold text-xs rounded-xl shadow-lg transition-all">
                             إرسال رمز التحقق
                         </button>
                     </div>
 
-                    <!-- Step 2: verification code -->
                     <div id="codeStep" class="hidden">
                         <label class="block text-[11px] font-semibold text-gray-300 mb-1">أدخل الرمز المرسل إلى هاتفك</label>
                         <input type="text" id="codeInput" inputmode="numeric" maxlength="6" placeholder="123456" dir="ltr" class="w-full bg-slate-900/90 border border-gray-700 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-xs text-white text-center tracking-widest focus:outline-none">
-                        <button id="verifyCodeBtn" class="w-full mt-3 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:opacity-90 text-white font-bold text-xs rounded-xl shadow-lg transition-all">
+                        <button id="verifyCodeBtn" type="button" class="w-full mt-3 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:opacity-90 text-white font-bold text-xs rounded-xl shadow-lg transition-all">
                             تأكيد الرمز
                         </button>
-                        <button id="backToPhoneBtn" class="w-full mt-2 text-[11px] text-gray-400 hover:text-white">
+                        <button id="backToPhoneBtn" type="button" class="w-full mt-2 text-[11px] text-gray-400 hover:text-white">
                             تغيير الرقم
                         </button>
                     </div>
@@ -142,7 +127,6 @@
                 </form>
             </div>
 
-            <!-- Invisible reCAPTCHA container (required for phone login) -->
             <div id="recaptcha-container"></div>
         </main>
 
@@ -150,7 +134,6 @@
             <h1 class="outfit-font font-black text-2xl tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-white via-indigo-200 to-pink-300 uppercase">Sovexa</h1>
         </footer>
     </div>
-
 
     <!-- ==================== MAIN NAVBAR ==================== -->
     <header id="mainHeader" class="sticky top-0 z-50 w-full glass-nav px-4 py-2.5 hidden">
@@ -165,17 +148,13 @@
                     <span class="outfit-font font-black text-2xl tracking-wider text-white hidden sm:block glow-text">Sovexa</span>
                 </button>
             </div>
-
-            <!-- Navigation Buttons -->
             <div class="flex items-center gap-2">
                 <button onclick="showSection('feed')" class="px-3 py-1.5 rounded-xl bg-slate-900/80 border border-slate-800 text-gray-300 hover:text-white text-xs font-semibold transition-all">
                     <i class="fa-solid fa-house ml-1"></i> الرئيسية
                 </button>
-
                 <button onclick="showSection('chat')" class="px-3 py-1.5 rounded-xl bg-purple-600/30 border border-purple-500/40 text-purple-300 hover:text-white text-xs font-semibold transition-all">
                     <i class="fa-solid fa-comments ml-1"></i> الدردشة
                 </button>
-
                 <button onclick="showSection('profile')" class="px-3 py-1.5 rounded-xl bg-indigo-600/30 border border-indigo-500/40 text-indigo-300 hover:text-white text-xs font-semibold transition-all">
                     <i class="fa-solid fa-user ml-1"></i> ملفي
                 </button>
@@ -183,12 +162,9 @@
         </div>
     </header>
 
-
-    <!-- ==================== PART 2: MAIN FEED VIEW ==================== -->
+    <!-- ==================== FEED ==================== -->
     <div id="feedSection" class="relative z-10 hidden min-h-screen pb-20">
         <div class="max-w-3xl mx-auto px-4 pt-4 space-y-4">
-
-            <!-- Create Post Box with Image Support -->
             <section class="glass-card p-4 rounded-2xl border border-slate-800">
                 <div class="flex items-center gap-3 pb-3 border-b border-slate-800/80">
                     <div class="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-tr from-indigo-600 to-pink-500 flex items-center justify-center text-white font-bold userAvatarContainer">
@@ -196,40 +172,27 @@
                     </div>
                     <input type="text" id="postInput" placeholder="بماذا تفكر اليوم؟" class="w-full bg-slate-900/80 border border-slate-800 rounded-full px-4 py-2.5 text-xs text-white focus:outline-none">
                 </div>
-
-                <!-- Hidden Native File Input -->
-                <input type="file" id="mediaFileInput" accept="image/*" class="hidden" onchange="handleImageSelection(event)">
-
-                <div class="flex items-center justify-between pt-3 text-xs">
-                    <button onclick="document.getElementById('mediaFileInput').click()" class="flex items-center gap-2 text-emerald-400 hover:text-emerald-300 font-semibold transition-all">
-                        <i class="fa-solid fa-image text-sm"></i> صورة
-                    </button>
-                    <button id="submitPostBtn" onclick="createNewPost()" class="px-5 py-1.5 bg-gradient-to-r from-indigo-600 to-pink-600 hover:opacity-90 text-white font-bold rounded-xl transition-all shadow-md flex items-center gap-1.5">
-                        <span>نشر</span>
+                <div class="flex items-center justify-end pt-3 text-xs">
+                    <button id="submitPostBtn" onclick="createNewPost()" class="px-5 py-1.5 bg-gradient-to-r from-indigo-600 to-pink-600 hover:opacity-90 text-white font-bold rounded-xl transition-all shadow-md">
+                        نشر
                     </button>
                 </div>
             </section>
-
-            <!-- Dynamic Feed Posts List -->
             <div id="postsContainer" class="space-y-4"></div>
-
         </div>
     </div>
 
-
-    <!-- ==================== PART 3: CHAT VIEW ==================== -->
+    <!-- ==================== CHAT ==================== -->
     <div id="chatSection" class="relative z-10 hidden min-h-[calc(100vh-80px)] pb-10">
         <div class="max-w-4xl mx-auto px-4 pt-4">
             <div class="glass-card rounded-3xl border border-slate-800 overflow-hidden flex flex-col h-[75vh]">
                 <div class="p-3.5 border-b border-slate-800 bg-slate-950/60">
                     <h4 class="text-xs font-bold text-white">الدردشة العامة Sovexa</h4>
                 </div>
-
                 <div class="flex-1 p-4 overflow-y-auto space-y-3" id="chatMessages">
                     <div class="text-center text-gray-400 text-xs py-4">جاري تحميل الرسائل...</div>
                 </div>
-
-                <form id="chatForm" onsubmit="sendChatMessage(event)" class="p-3 border-t border-slate-800 flex items-center gap-2 bg-slate-950/60">
+                <form id="chatForm" class="p-3 border-t border-slate-800 flex items-center gap-2 bg-slate-950/60">
                     <input type="text" id="chatInput" placeholder="اكتب رسالتك..." required class="flex-1 bg-slate-900 border border-slate-700 focus:border-purple-500 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none">
                     <button type="submit" class="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-xs font-bold rounded-xl">إرسال</button>
                 </form>
@@ -237,8 +200,7 @@
         </div>
     </div>
 
-
-    <!-- ==================== PART 4: PROFILE VIEW ==================== -->
+    <!-- ==================== PROFILE ==================== -->
     <div id="profileSection" class="relative z-10 hidden min-h-screen pb-20">
         <div class="max-w-3xl mx-auto px-4 pt-4">
             <div class="glass-card rounded-3xl overflow-hidden border border-slate-800 p-6 text-center space-y-3 shadow-2xl">
@@ -247,276 +209,275 @@
                 </div>
                 <h2 class="text-xl font-bold text-white" id="profileName">مستخدم Sovexa</h2>
                 <p class="text-xs text-indigo-300 font-mono" id="profileEmail">user@sovexa.com</p>
-                <button onclick="logout()" class="px-4 py-2 bg-red-600/20 border border-red-500/30 text-red-300 text-xs font-semibold rounded-xl transition-all hover:bg-red-600 hover:text-white">
+                <button id="logoutBtn" class="px-4 py-2 bg-red-600/20 border border-red-500/30 text-red-300 text-xs font-semibold rounded-xl transition-all hover:bg-red-600 hover:text-white">
                     تسجيل الخروج
                 </button>
             </div>
         </div>
     </div>
 
-
-    <!-- ==================== FIREBASE SCRIPT ==================== -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import {
-            getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut,
-            GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult,
-            RecaptchaVerifier, signInWithPhoneNumber
-        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import {
+    getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult,
+    signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut,
+    RecaptchaVerifier, signInWithPhoneNumber
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import {
+    getFirestore, collection, doc, getDoc, setDoc, addDoc, onSnapshot, query, orderBy, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        const firebaseConfig = {
-          apiKey: "AIzaSyCJm_0O6NzS0UYnoYAv5MUIp-QR9xGN18Q",
-          authDomain: "sovexa-fbc93.firebaseapp.com",
-          projectId: "sovexa-fbc93",
-          storageBucket: "sovexa-fbc93.firebasestorage.app",
-          messagingSenderId: "147264654219",
-          appId: "1:147264654219:web:7487b91cc6c5fa041efd8e"
-        };
+const firebaseConfig = {
+    apiKey: "AIzaSyCJm_0O6NzS0UYnoYAv5MUIp-QR9xGN18Q",
+    authDomain: "sovexa-fbc93.firebaseapp.com",
+    projectId: "sovexa-fbc93",
+    storageBucket: "sovexa-fbc93.firebasestorage.app",
+    messagingSenderId: "147264654219",
+    appId: "1:147264654219:web:7487b91cc6c5fa041efd8e"
+};
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-        let currentUser = null;
-        let selectedImageFile = null;
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const nameOf = (u) => u.displayName || (u.email ? u.email.split("@")[0] : "") || u.phoneNumber || "مستخدم";
 
-        window.showToast = (msg) => {
-            const container = document.getElementById('toastContainer');
-            if (!container) return;
-            const toast = document.createElement('div');
-            toast.className = 'glass-modal px-4 py-2.5 rounded-2xl border border-indigo-500/50 shadow-2xl text-xs font-bold text-white flex items-center gap-2';
-            toast.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400"></i> ${msg}`;
-            container.appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
-        };
+let currentUser = null;
+let listening = false;
+let confirmationResult = null;
+let recaptcha = null;
 
-        window.handleImageSelection = (e) => {
-            const file = e.target.files[0];
-            if (file) selectedImageFile = file;
-        };
+window.showToast = (msg) => {
+    const container = $('toastContainer');
+    if (!container) return;
+    const toast = document.createElement('div');
+    toast.className = 'glass-modal px-4 py-2.5 rounded-2xl border border-indigo-500/50 shadow-2xl text-xs font-bold text-white flex items-center gap-2';
+    toast.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-400"></i> ' + esc(msg);
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+};
 
-        // ---------- Auth State Listener ----------
-        onAuthStateChanged(auth, (user) => {
-            currentUser = user;
-            const loginSection = document.getElementById('loginSection');
-            const mainHeader = document.getElementById('mainHeader');
-            const feedSection = document.getElementById('feedSection');
+function showLogin() {
+    $('loginSection').classList.remove('hidden');
+    $('mainHeader').classList.add('hidden');
+    ['feedSection', 'chatSection', 'profileSection'].forEach(s => $(s).classList.add('hidden'));
+}
 
-            if (user) {
-                if (loginSection) loginSection.classList.add('hidden');
-                if (mainHeader) mainHeader.classList.remove('hidden');
-                if (feedSection) feedSection.classList.remove('hidden');
+window.showSection = (sectionName) => {
+    ['feedSection', 'chatSection', 'profileSection'].forEach(sec => $(sec).classList.add('hidden'));
+    $(sectionName + 'Section').classList.remove('hidden');
+};
 
-                const displayName = (user.email || user.phoneNumber || "مستخدم").split('@')[0];
-                document.querySelectorAll('.userAvatarLetter').forEach(el => el.innerText = displayName.charAt(0).toUpperCase());
-                const profileName = document.getElementById('profileName');
-                if (profileName) profileName.innerText = displayName;
-                const profileEmail = document.getElementById('profileEmail');
-                if (profileEmail) profileEmail.innerText = user.email || user.phoneNumber || "";
+function showApp(user) {
+    $('loginSection').classList.add('hidden');
+    $('mainHeader').classList.remove('hidden');
+    window.showSection('feed');
 
-                listenToRealtimePosts();
-                listenToRealtimeChat();
-            } else {
-                if (loginSection) loginSection.classList.remove('hidden');
-                if (mainHeader) mainHeader.classList.add('hidden');
-                if (feedSection) feedSection.classList.add('hidden');
-            }
-        });
+    const name = nameOf(user);
+    document.querySelectorAll('.userAvatarContainer').forEach(box => {
+        box.innerHTML = user.photoURL
+            ? `<img src="${esc(user.photoURL)}" alt="" class="w-full h-full object-cover rounded-full">`
+            : `<span class="userAvatarLetter">${esc(name.charAt(0).toUpperCase())}</span>`;
+    });
+    $('profileName').textContent = name;
+    $('profileEmail').textContent = user.email || user.phoneNumber || "";
+}
 
-        // Handle result when returning from Google redirect (fallback)
-        getRedirectResult(auth).catch((err) => {
-            if (err && err.message) alert("خطأ Google: " + err.message);
-        });
+async function ensureUserProfile(user) {
+    const ref = doc(db, "users", user.uid);
+    const snap = await getDoc(ref);
+    const data = {
+        uid: user.uid,
+        name: nameOf(user),
+        email: user.email || "",
+        phone: user.phoneNumber || "",
+        photoURL: user.photoURL || "",
+        updatedAt: serverTimestamp()
+    };
+    if (!snap.exists()) data.createdAt = serverTimestamp();
+    await setDoc(ref, data, { merge: true });
+}
 
-        // ---------- Google Login ----------
-        const googleProvider = new GoogleAuthProvider();
-        document.getElementById('googleLoginBtn').addEventListener('click', async () => {
-            try {
-                showToast("جاري تسجيل الدخول بجوجل... 🔄");
-                await signInWithPopup(auth, googleProvider);
-                showToast("مرحباً بك في Sovexa! 🎉");
-            } catch (err) {
-                if (err.code === 'auth/popup-blocked' || err.code === 'auth/operation-not-supported-in-this-environment') {
-                    await signInWithRedirect(auth, googleProvider);
-                } else if (err.code !== 'auth/popup-closed-by-user') {
-                    alert("خطأ Google: " + err.message);
-                }
-            }
-        });
+onAuthStateChanged(auth, async (user) => {
+    currentUser = user;
+    if (!user) {
+        showLogin();
+        return;
+    }
+    showApp(user);
+    try {
+        await ensureUserProfile(user);
+    } catch (e) {
+        console.error(e);
+        showToast("تعذر حفظ الملف الشخصي، تحقق من قواعد Firestore");
+    }
+    if (!listening) {
+        listening = true;
+        listenPosts();
+        listenChat();
+    }
+});
 
-        // ---------- Phone Login ----------
-        const togglePhoneBtn = document.getElementById('togglePhoneBtn');
-        const phonePanel = document.getElementById('phonePanel');
-        const phoneStep = document.getElementById('phoneStep');
-        const codeStep = document.getElementById('codeStep');
-        let confirmationResult = null;
+getRedirectResult(auth).catch(err => showToast("خطأ Google: " + err.message));
 
-        const recaptcha = new RecaptchaVerifier(auth, 'recaptcha-container', { size: 'invisible' });
+const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({ prompt: "select_account" });
 
-        togglePhoneBtn.addEventListener('click', () => {
-            phonePanel.classList.toggle('hidden');
-        });
-
-        document.getElementById('sendCodeBtn').addEventListener('click', async () => {
-            const phone = document.getElementById('phoneInput').value.trim();
-            if (!/^\+\d{8,15}$/.test(phone)) {
-                showToast("أدخل الرقم بصيغة دولية مثل +966500000000");
-                return;
-            }
-            try {
-                showToast("جاري إرسال الرمز... 🔄");
-                confirmationResult = await signInWithPhoneNumber(auth, phone, recaptcha);
-                phoneStep.classList.add('hidden');
-                codeStep.classList.remove('hidden');
-                showToast("تم إرسال الرمز إلى هاتفك 📩");
-            } catch (err) {
-                recaptcha.clear();
-                alert("خطأ الهاتف: " + err.message);
-            }
-        });
-
-        document.getElementById('verifyCodeBtn').addEventListener('click', async () => {
-            const code = document.getElementById('codeInput').value.trim();
-            if (!confirmationResult) return;
-            try {
-                await confirmationResult.confirm(code);
-                showToast("مرحباً بك في Sovexa! 🎉");
-            } catch (err) {
-                alert("رمز غير صحيح: " + err.message);
-            }
-        });
-
-        document.getElementById('backToPhoneBtn').addEventListener('click', () => {
-            codeStep.classList.add('hidden');
-            phoneStep.classList.remove('hidden');
-            confirmationResult = null;
-        });
-
-        // ---------- Email Login (unchanged) ----------
-        const emailForm = document.getElementById('emailForm');
-        if (emailForm) {
-            emailForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const email = document.getElementById('emailInput').value.trim();
-                const password = document.getElementById('passwordInput').value.trim();
-
-                if (!email || !password) {
-                    showToast("يرجى إدخال البريد وكلمة المرور!");
-                    return;
-                }
-
-                try {
-                    showToast("جاري تسجيل الدخول... 🔄");
-                    await signInWithEmailAndPassword(auth, email, password);
-                    showToast("مرحباً بك مجدداً في Sovexa! 🎉");
-                } catch (loginError) {
-                    try {
-                        showToast("جاري إنشاء حساب جديد... 🚀");
-                        await createUserWithEmailAndPassword(auth, email, password);
-                        showToast("تم إنشاء حسابك وتسجيل الدخول بنجاح! ✨");
-                    } catch (createError) {
-                        alert("خطأ في المصادقة: " + createError.message);
-                    }
-                }
-            });
+$('googleLoginBtn').addEventListener('click', async () => {
+    try {
+        await signInWithPopup(auth, googleProvider);
+    } catch (err) {
+        if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') return;
+        if (err.code === 'auth/popup-blocked' || err.code === 'auth/operation-not-supported-in-this-environment') {
+            await signInWithRedirect(auth, googleProvider);
+            return;
         }
+        showToast("خطأ Google: " + err.message);
+    }
+});
 
-        window.logout = async () => {
-            await signOut(auth);
-            showToast("تم تسجيل الخروج.");
-        };
-
-        window.showSection = (sectionName) => {
-            ['feedSection', 'chatSection', 'profileSection'].forEach(sec => {
-                const el = document.getElementById(sec);
-                if (el) el.classList.add('hidden');
-            });
-            const target = document.getElementById(sectionName + 'Section');
-            if (target) target.classList.remove('hidden');
-        };
-
-        window.createNewPost = async () => {
-            const textInput = document.getElementById('postInput');
-            const postText = textInput.value.trim();
-            if (!postText) {
-                showToast("يرجى كتابة شيء لنشره!");
-                return;
-            }
+$('emailForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = $('emailInput').value.trim();
+    const password = $('passwordInput').value;
+    if (!email || !password) return showToast("يرجى إدخال البريد وكلمة المرور");
+    try {
+        await signInWithEmailAndPassword(auth, email, password);
+    } catch (err) {
+        if (err.code === 'auth/invalid-credential' || err.code === 'auth/user-not-found') {
             try {
-                await addDoc(collection(db, "posts"), {
-                    userId: currentUser.uid,
-                    userName: (currentUser.email || currentUser.phoneNumber || "مستخدم").split('@')[0],
-                    text: postText,
-                    createdAt: serverTimestamp(),
-                    likesCount: 0
-                });
-                textInput.value = '';
-                showToast("تم نشر منشورك بنجاح! 🎉");
-            } catch (err) {
-                alert("خطأ في النشر: " + err.message);
+                await createUserWithEmailAndPassword(auth, email, password);
+                showToast("تم إنشاء حسابك بنجاح ✨");
+            } catch (e2) {
+                showToast(e2.code === 'auth/email-already-in-use'
+                    ? "كلمة المرور غير صحيحة لهذا البريد"
+                    : "خطأ: " + e2.message);
             }
-        };
-
-        function listenToRealtimePosts() {
-            const postsQuery = query(collection(db, "posts"), orderBy("createdAt", "desc"));
-            onSnapshot(postsQuery, (snapshot) => {
-                const postsContainer = document.getElementById('postsContainer');
-                postsContainer.innerHTML = '';
-                if (snapshot.empty) {
-                    postsContainer.innerHTML = '<div class="glass-card p-6 rounded-2xl text-center text-xs text-gray-400">لا توجد منشورات بعد.</div>';
-                    return;
-                }
-                snapshot.forEach((docSnap) => {
-                    const post = docSnap.data();
-                    const card = document.createElement('article');
-                    card.className = 'glass-card p-4 rounded-2xl border border-slate-800 space-y-2';
-                    card.innerHTML = `
-                        <h4 class="font-bold text-xs text-white">${post.userName}</h4>
-                        <p class="text-xs text-gray-200">${post.text}</p>
-                    `;
-                    postsContainer.appendChild(card);
-                });
-            });
+        } else {
+            showToast("خطأ: " + err.message);
         }
+    }
+});
 
-        function listenToRealtimeChat() {
-            const chatQuery = query(collection(db, "global_chat"), orderBy("createdAt", "asc"));
-            onSnapshot(chatQuery, (snapshot) => {
-                const chatMessages = document.getElementById('chatMessages');
-                chatMessages.innerHTML = '';
-                if (snapshot.empty) {
-                    chatMessages.innerHTML = '<div class="text-center text-gray-400 text-xs py-4">لا توجد رسائل بعد.</div>';
-                    return;
-                }
-                snapshot.forEach((docSnap) => {
-                    const msg = docSnap.data();
-                    const isMe = currentUser && msg.userId === currentUser.uid;
-                    const div = document.createElement('div');
-                    div.className = `flex ${isMe ? 'justify-end' : 'justify-start'}`;
-                    div.innerHTML = `<div class="max-w-[80%] p-3 rounded-2xl text-xs ${isMe ? 'bg-indigo-600 text-white' : 'bg-slate-800 text-gray-200'}"><b>${msg.userName}:</b> ${msg.text}</div>`;
-                    chatMessages.appendChild(div);
-                });
-            });
+const getRecaptcha = () => {
+    if (!recaptcha) recaptcha = new RecaptchaVerifier(auth, 'recaptcha-container', { size: 'invisible' });
+    return recaptcha;
+};
+
+$('togglePhoneBtn').addEventListener('click', () => $('phonePanel').classList.toggle('hidden'));
+
+$('sendCodeBtn').addEventListener('click', async () => {
+    const phone = $('phoneInput').value.trim();
+    if (!/^\+\d{8,15}$/.test(phone)) return showToast("أدخل الرقم بصيغة دولية مثل +966500000000");
+    try {
+        confirmationResult = await signInWithPhoneNumber(auth, phone, getRecaptcha());
+        $('phoneStep').classList.add('hidden');
+        $('codeStep').classList.remove('hidden');
+        showToast("تم إرسال الرمز 📩");
+    } catch (err) {
+        if (recaptcha) { recaptcha.clear(); recaptcha = null; }
+        showToast("خطأ الهاتف: " + err.message);
+    }
+});
+
+$('verifyCodeBtn').addEventListener('click', async () => {
+    if (!confirmationResult) return;
+    try {
+        await confirmationResult.confirm($('codeInput').value.trim());
+    } catch (err) {
+        showToast("رمز غير صحيح");
+    }
+});
+
+$('backToPhoneBtn').addEventListener('click', () => {
+    $('codeStep').classList.add('hidden');
+    $('phoneStep').classList.remove('hidden');
+    confirmationResult = null;
+});
+
+$('logoutBtn').addEventListener('click', async () => {
+    await signOut(auth);
+    showToast("تم تسجيل الخروج");
+});
+
+window.createNewPost = async () => {
+    const input = $('postInput');
+    const text = input.value.trim();
+    if (!text) return showToast("يرجى كتابة شيء لنشره!");
+    if (!currentUser) return;
+    try {
+        await addDoc(collection(db, "posts"), {
+            userId: currentUser.uid,
+            userName: nameOf(currentUser),
+            text,
+            createdAt: serverTimestamp(),
+            likesCount: 0
+        });
+        input.value = '';
+        showToast("تم النشر 🎉");
+    } catch (err) {
+        showToast("خطأ في النشر: " + err.message);
+    }
+};
+
+function listenPosts() {
+    const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
+    onSnapshot(q, (snapshot) => {
+        const box = $('postsContainer');
+        box.innerHTML = '';
+        if (snapshot.empty) {
+            box.innerHTML = '<div class="glass-card p-6 rounded-2xl text-center text-xs text-gray-400">لا توجد منشورات بعد.</div>';
+            return;
         }
+        snapshot.forEach((d) => {
+            const p = d.data();
+            const card = document.createElement('article');
+            card.className = 'glass-card p-4 rounded-2xl border border-slate-800 space-y-2';
+            card.innerHTML = `<h4 class="font-bold text-xs text-white">${esc(p.userName)}</h4><p class="text-xs text-gray-200">${esc(p.text)}</p>`;
+            box.appendChild(card);
+        });
+    }, (err) => showToast("تعذر تحميل المنشورات: " + err.message));
+}
 
-        window.sendChatMessage = async (e) => {
-            e.preventDefault();
-            const input = document.getElementById('chatInput');
-            const text = input.value.trim();
-            if (!text) return;
-            try {
-                await addDoc(collection(db, "global_chat"), {
-                    userId: currentUser.uid,
-                    userName: (currentUser.email || currentUser.phoneNumber || "مستخدم").split('@')[0],
-                    text: text,
-                    createdAt: serverTimestamp()
-                });
-                input.value = '';
-            } catch (err) {
-                console.error(err);
-            }
-        };
+function listenChat() {
+    const q = query(collection(db, "global_chat"), orderBy("createdAt", "asc"));
+    onSnapshot(q, (snapshot) => {
+        const box = $('chatMessages');
+        box.innerHTML = '';
+        if (snapshot.empty) {
+            box.innerHTML = '<div class="text-center text-gray-400 text-xs py-4">لا توجد رسائل بعد.</div>';
+            return;
+        }
+        snapshot.forEach((d) => {
+            const m = d.data();
+            const isMe = currentUser && m.userId === currentUser.uid;
+            const div = document.createElement('div');
+            div.className = `flex ${isMe ? 'justify-end' : 'justify-start'}`;
+            div.innerHTML = `<div class="max-w-[80%] p-3 rounded-2xl text-xs ${isMe ? 'bg-indigo-600 text-white' : 'bg-slate-800 text-gray-200'}"><b>${esc(m.userName)}:</b> ${esc(m.text)}</div>`;
+            box.appendChild(div);
+        });
+    }, (err) => showToast("تعذر تحميل الدردشة: " + err.message));
+}
+
+$('chatForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const input = $('chatInput');
+    const text = input.value.trim();
+    if (!text || !currentUser) return;
+    try {
+        await addDoc(collection(db, "global_chat"), {
+            userId: currentUser.uid,
+            userName: nameOf(currentUser),
+            text,
+            createdAt: serverTimestamp()
+        });
+        input.value = '';
+    } catch (err) {
+        showToast("خطأ في الإرسال: " + err.message);
+    }
+});
     </script>
 </body>
-                        </html>
+    </html>
