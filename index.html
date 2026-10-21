@@ -9,7 +9,15 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700;900&display=swap" rel="stylesheet">
 <style>
-  body { background:#0b0f17; color:#e5e7eb; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; touch-action: manipulation; }
+  body { 
+    background:#0b0f17; 
+    color:#e5e7eb; 
+    font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; 
+    touch-action: manipulation;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
   .card { background:#111827; border:1px solid #1f2937; }
   .hidden { display:none !important; }
   .safe-top { padding-top: env(safe-area-inset-top, 0px); }
@@ -19,11 +27,20 @@
   .icon-btn { width:2.5rem; height:2.5rem; border-radius:9999px; background:#1f2937; display:flex; align-items:center; justify-content:center; }
   .bubble-me { background:linear-gradient(135deg,#4f46e5,#7c3aed); color:#fff; border-radius:1.1rem 1.1rem 0.3rem 1.1rem; }
   .bubble-other { background:#1f2937; color:#e5e7eb; border-radius:1.1rem 1.1rem 1.1rem 0.3rem; }
-  input, button { touch-action: manipulation; }
+  input, textarea, button { 
+    touch-action: manipulation; 
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+  input, textarea {
+    -webkit-user-select: text;
+    user-select: text;
+  }
 </style>
 </head>
 <body class="min-h-screen">
-<!-- BUILD 4 -->
+<!-- BUILD 5 -->
 
 <div id="toastContainer" class="fixed top-16 left-1/2 -translate-x-1/2 z-[60] flex flex-col items-center gap-2 pointer-events-none"></div>
 
@@ -36,7 +53,7 @@
       </div>
       <h2 class="text-xl font-bold text-white">مرحباً بك في Sovexa</h2>
       <p class="text-xs text-gray-400">سجل الدخول للمتابعة</p>
-      <p dir="ltr" class="text-[10px] text-gray-600 mt-1">BUILD 4</p>
+      <p dir="ltr" class="text-[10px] text-gray-600 mt-1">BUILD 5</p>
     </div>
 
     <button id="googleLoginBtn" type="button" class="w-full py-3 bg-gray-900 border border-gray-700 rounded-xl text-sm font-medium flex items-center justify-center gap-3 mb-3 cursor-pointer">
@@ -614,7 +631,7 @@ function viewAbout() {
     <div class="p-3 space-y-3 max-w-xl mx-auto">
       ${backHeader('عن منصة Sovexa 🌌')}
       <div class="card rounded-xl p-4 text-sm leading-7 text-gray-300">تعتبر منصة Sovexa وجهتك الرقمية المتكاملة والمبتكرة للتواصل الاجتماعي والدردشة.</div>
-      <p dir="ltr" class="text-center text-[11px] text-gray-500">BUILD 4</p>
+      <p dir="ltr" class="text-center text-[11px] text-gray-500">BUILD 5</p>
     </div>`;
 }
 
