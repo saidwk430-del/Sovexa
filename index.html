@@ -11,7 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&family=Outfit:wght@400;600;800;900&display=swap" rel="stylesheet">
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Inter', sans-serif; background-color: #0b0f17; color: #f3f4f6; }
@@ -80,7 +80,8 @@
                     <p class="text-xs text-gray-300">سجل الدخول للمتابعة إلى المنصة</p>
                 </div>
 
-                <button id="googleLoginBtn" class="w-full py-2.5 px-4 bg-slate-900/90 hover:bg-slate-800 border border-gray-700 text-white font-medium text-xs rounded-xl transition-all flex items-center justify-center gap-3 shadow-md mb-4">
+                <!-- Google Login -->
+                <button id="googleLoginBtn" class="w-full py-2.5 px-4 bg-slate-900/90 hover:bg-slate-800 border border-gray-700 text-white font-medium text-xs rounded-xl transition-all flex items-center justify-center gap-3 shadow-md mb-3">
                     <svg class="w-4 h-4" viewBox="0 0 24 24">
                         <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.7 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.2 9 5 12 5z"/>
                         <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.8z"/>
@@ -89,6 +90,36 @@
                     </svg>
                     <span>متابعة باستخدام Google</span>
                 </button>
+
+                <!-- Phone Login Toggle -->
+                <button id="togglePhoneBtn" class="w-full py-2.5 px-4 bg-slate-900/90 hover:bg-slate-800 border border-gray-700 text-white font-medium text-xs rounded-xl transition-all flex items-center justify-center gap-3 shadow-md mb-4">
+                    <i class="fa-solid fa-phone text-emerald-400"></i>
+                    <span>متابعة برقم الهاتف</span>
+                </button>
+
+                <!-- Phone Login Panel -->
+                <div id="phonePanel" class="hidden mb-4 space-y-3">
+                    <!-- Step 1: phone number -->
+                    <div id="phoneStep">
+                        <label class="block text-[11px] font-semibold text-gray-300 mb-1">رقم الهاتف (مع رمز الدولة)</label>
+                        <input type="tel" id="phoneInput" placeholder="+966500000000" dir="ltr" class="w-full bg-slate-900/90 border border-gray-700 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none">
+                        <button id="sendCodeBtn" class="w-full mt-3 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:opacity-90 text-white font-bold text-xs rounded-xl shadow-lg transition-all">
+                            إرسال رمز التحقق
+                        </button>
+                    </div>
+
+                    <!-- Step 2: verification code -->
+                    <div id="codeStep" class="hidden">
+                        <label class="block text-[11px] font-semibold text-gray-300 mb-1">أدخل الرمز المرسل إلى هاتفك</label>
+                        <input type="text" id="codeInput" inputmode="numeric" maxlength="6" placeholder="123456" dir="ltr" class="w-full bg-slate-900/90 border border-gray-700 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-xs text-white text-center tracking-widest focus:outline-none">
+                        <button id="verifyCodeBtn" class="w-full mt-3 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:opacity-90 text-white font-bold text-xs rounded-xl shadow-lg transition-all">
+                            تأكيد الرمز
+                        </button>
+                        <button id="backToPhoneBtn" class="w-full mt-2 text-[11px] text-gray-400 hover:text-white">
+                            تغيير الرقم
+                        </button>
+                    </div>
+                </div>
 
                 <div class="relative flex py-2 items-center mb-4">
                     <div class="flex-grow border-t border-gray-700/80"></div>
@@ -110,6 +141,9 @@
                     </button>
                 </form>
             </div>
+
+            <!-- Invisible reCAPTCHA container (required for phone login) -->
+            <div id="recaptcha-container"></div>
         </main>
 
         <footer class="w-full pb-6 text-center">
@@ -153,7 +187,7 @@
     <!-- ==================== PART 2: MAIN FEED VIEW ==================== -->
     <div id="feedSection" class="relative z-10 hidden min-h-screen pb-20">
         <div class="max-w-3xl mx-auto px-4 pt-4 space-y-4">
-            
+
             <!-- Create Post Box with Image Support -->
             <section class="glass-card p-4 rounded-2xl border border-slate-800">
                 <div class="flex items-center gap-3 pb-3 border-b border-slate-800/80">
@@ -224,7 +258,11 @@
     <!-- ==================== FIREBASE SCRIPT ==================== -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import {
+            getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut,
+            GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult,
+            RecaptchaVerifier, signInWithPhoneNumber
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -233,8 +271,7 @@
           projectId: "sovexa-fbc93",
           storageBucket: "sovexa-fbc93.firebasestorage.app",
           messagingSenderId: "147264654219",
-          appId: "1:147264654219:web:7487b91cc6c5fa041efd8e",
-          measurementId: "G-5PBTY2WXJ6"
+          appId: "1:147264654219:web:7487b91cc6c5fa041efd8e"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -259,7 +296,7 @@
             if (file) selectedImageFile = file;
         };
 
-        // Auth State Listener
+        // ---------- Auth State Listener ----------
         onAuthStateChanged(auth, (user) => {
             currentUser = user;
             const loginSection = document.getElementById('loginSection');
@@ -270,13 +307,13 @@
                 if (loginSection) loginSection.classList.add('hidden');
                 if (mainHeader) mainHeader.classList.remove('hidden');
                 if (feedSection) feedSection.classList.remove('hidden');
-                
-                const displayName = user.email.split('@')[0];
+
+                const displayName = (user.email || user.phoneNumber || "مستخدم").split('@')[0];
                 document.querySelectorAll('.userAvatarLetter').forEach(el => el.innerText = displayName.charAt(0).toUpperCase());
                 const profileName = document.getElementById('profileName');
                 if (profileName) profileName.innerText = displayName;
                 const profileEmail = document.getElementById('profileEmail');
-                if (profileEmail) profileEmail.innerText = user.email;
+                if (profileEmail) profileEmail.innerText = user.email || user.phoneNumber || "";
 
                 listenToRealtimePosts();
                 listenToRealtimeChat();
@@ -287,7 +324,76 @@
             }
         });
 
-        // Email Form Submission (No White Screen)
+        // Handle result when returning from Google redirect (fallback)
+        getRedirectResult(auth).catch((err) => {
+            if (err && err.message) alert("خطأ Google: " + err.message);
+        });
+
+        // ---------- Google Login ----------
+        const googleProvider = new GoogleAuthProvider();
+        document.getElementById('googleLoginBtn').addEventListener('click', async () => {
+            try {
+                showToast("جاري تسجيل الدخول بجوجل... 🔄");
+                await signInWithPopup(auth, googleProvider);
+                showToast("مرحباً بك في Sovexa! 🎉");
+            } catch (err) {
+                if (err.code === 'auth/popup-blocked' || err.code === 'auth/operation-not-supported-in-this-environment') {
+                    await signInWithRedirect(auth, googleProvider);
+                } else if (err.code !== 'auth/popup-closed-by-user') {
+                    alert("خطأ Google: " + err.message);
+                }
+            }
+        });
+
+        // ---------- Phone Login ----------
+        const togglePhoneBtn = document.getElementById('togglePhoneBtn');
+        const phonePanel = document.getElementById('phonePanel');
+        const phoneStep = document.getElementById('phoneStep');
+        const codeStep = document.getElementById('codeStep');
+        let confirmationResult = null;
+
+        const recaptcha = new RecaptchaVerifier(auth, 'recaptcha-container', { size: 'invisible' });
+
+        togglePhoneBtn.addEventListener('click', () => {
+            phonePanel.classList.toggle('hidden');
+        });
+
+        document.getElementById('sendCodeBtn').addEventListener('click', async () => {
+            const phone = document.getElementById('phoneInput').value.trim();
+            if (!/^\+\d{8,15}$/.test(phone)) {
+                showToast("أدخل الرقم بصيغة دولية مثل +966500000000");
+                return;
+            }
+            try {
+                showToast("جاري إرسال الرمز... 🔄");
+                confirmationResult = await signInWithPhoneNumber(auth, phone, recaptcha);
+                phoneStep.classList.add('hidden');
+                codeStep.classList.remove('hidden');
+                showToast("تم إرسال الرمز إلى هاتفك 📩");
+            } catch (err) {
+                recaptcha.clear();
+                alert("خطأ الهاتف: " + err.message);
+            }
+        });
+
+        document.getElementById('verifyCodeBtn').addEventListener('click', async () => {
+            const code = document.getElementById('codeInput').value.trim();
+            if (!confirmationResult) return;
+            try {
+                await confirmationResult.confirm(code);
+                showToast("مرحباً بك في Sovexa! 🎉");
+            } catch (err) {
+                alert("رمز غير صحيح: " + err.message);
+            }
+        });
+
+        document.getElementById('backToPhoneBtn').addEventListener('click', () => {
+            codeStep.classList.add('hidden');
+            phoneStep.classList.remove('hidden');
+            confirmationResult = null;
+        });
+
+        // ---------- Email Login (unchanged) ----------
         const emailForm = document.getElementById('emailForm');
         if (emailForm) {
             emailForm.addEventListener('submit', async (e) => {
@@ -340,7 +446,7 @@
             try {
                 await addDoc(collection(db, "posts"), {
                     userId: currentUser.uid,
-                    userName: currentUser.email.split('@')[0],
+                    userName: (currentUser.email || currentUser.phoneNumber || "مستخدم").split('@')[0],
                     text: postText,
                     createdAt: serverTimestamp(),
                     likesCount: 0
@@ -402,7 +508,7 @@
             try {
                 await addDoc(collection(db, "global_chat"), {
                     userId: currentUser.uid,
-                    userName: currentUser.email.split('@')[0],
+                    userName: (currentUser.email || currentUser.phoneNumber || "مستخدم").split('@')[0],
                     text: text,
                     createdAt: serverTimestamp()
                 });
@@ -413,4 +519,4 @@
         };
     </script>
 </body>
-</html>
+                        </html>
