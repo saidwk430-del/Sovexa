@@ -9,21 +9,21 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700;900&display=swap" rel="stylesheet">
 <style>
-  body { background:#0b0f17; color:#e5e7eb; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; }
+  body { background:#0b0f17; color:#e5e7eb; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; touch-action: manipulation; }
   .card { background:#111827; border:1px solid #1f2937; }
   .hidden { display:none !important; }
   .safe-top { padding-top: env(safe-area-inset-top, 0px); }
   .safe-bottom { padding-bottom: env(safe-area-inset-bottom, 0px); }
-  .btn-busy { opacity:.6; pointer-events:none; }
   .tab-btn { height:2.75rem; border-radius:0.9rem; background:#111827; border:1px solid #1f2937; color:#9ca3af; display:flex; align-items:center; justify-content:center; font-size:1.05rem; position:relative; }
   .tab-on { background:rgba(99,102,241,.22); color:#a5b4fc; border-color:rgba(129,140,248,.5); }
   .icon-btn { width:2.5rem; height:2.5rem; border-radius:9999px; background:#1f2937; display:flex; align-items:center; justify-content:center; }
   .bubble-me { background:linear-gradient(135deg,#4f46e5,#7c3aed); color:#fff; border-radius:1.1rem 1.1rem 0.3rem 1.1rem; }
   .bubble-other { background:#1f2937; color:#e5e7eb; border-radius:1.1rem 1.1rem 1.1rem 0.3rem; }
+  input, button { touch-action: manipulation; }
 </style>
 </head>
 <body class="min-h-screen">
-<!-- BUILD 2 -->
+<!-- BUILD 3 -->
 
 <div id="toastContainer" class="fixed top-16 left-1/2 -translate-x-1/2 z-[60] flex flex-col items-center gap-2 pointer-events-none"></div>
 
@@ -36,10 +36,10 @@
       </div>
       <h2 class="text-xl font-bold text-white" data-i18n="welcomeTitle">مرحباً بك في Sovexa</h2>
       <p class="text-xs text-gray-400" data-i18n="welcomeSub">سجل الدخول للمتابعة</p>
-      <p dir="ltr" class="text-[10px] text-gray-600 mt-1">BUILD 2</p>
+      <p dir="ltr" class="text-[10px] text-gray-600 mt-1">BUILD 3</p>
     </div>
 
-    <button id="googleLoginBtn" class="w-full py-2.5 bg-gray-900 border border-gray-700 rounded-xl text-sm font-medium flex items-center justify-center gap-3 mb-3">
+    <button id="googleLoginBtn" type="button" class="w-full py-3 bg-gray-900 border border-gray-700 rounded-xl text-sm font-medium flex items-center justify-center gap-3 mb-3 cursor-pointer">
       <svg class="w-4 h-4" viewBox="0 0 24 24">
         <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.7 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.2 9 5 12 5z"/>
         <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.8z"/>
@@ -49,28 +49,28 @@
       <span data-i18n="googleLogin">متابعة باستخدام Google</span>
     </button>
 
-    <button id="togglePhoneBtn" class="w-full py-2.5 bg-gray-900 border border-gray-700 rounded-xl text-sm font-medium flex items-center justify-center gap-3 mb-3">
+    <button id="togglePhoneBtn" type="button" class="w-full py-3 bg-gray-900 border border-gray-700 rounded-xl text-sm font-medium flex items-center justify-center gap-3 mb-3 cursor-pointer">
       <i class="fa-solid fa-phone text-emerald-400"></i> <span data-i18n="phoneLogin">متابعة برقم الهاتف</span>
     </button>
 
     <div id="phonePanel" class="hidden space-y-3 mb-3">
       <div id="phoneStep">
-        <input type="tel" id="phoneInput" placeholder="+966500000000" dir="ltr" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2.5 text-sm outline-none">
-        <button id="sendCodeBtn" type="button" class="w-full mt-2 py-2.5 bg-emerald-600 rounded-xl text-sm font-bold" data-i18n="sendCode">إرسال رمز التحقق</button>
+        <input type="tel" id="phoneInput" placeholder="+966500000000" dir="ltr" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-3 text-sm outline-none">
+        <button id="sendCodeBtn" type="button" class="w-full mt-2 py-3 bg-emerald-600 rounded-xl text-sm font-bold cursor-pointer" data-i18n="sendCode">إرسال رمز التحقق</button>
       </div>
       <div id="codeStep" class="hidden">
-        <input type="text" id="codeInput" inputmode="numeric" maxlength="6" placeholder="123456" dir="ltr" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2.5 text-sm text-center tracking-widest outline-none">
-        <button id="verifyCodeBtn" type="button" class="w-full mt-2 py-2.5 bg-emerald-600 rounded-xl text-sm font-bold" data-i18n="verifyCode">تأكيد الرمز</button>
-        <button id="backToPhoneBtn" type="button" class="w-full mt-2 text-xs text-gray-400" data-i18n="changePhone">تغيير الرقم</button>
+        <input type="text" id="codeInput" inputmode="numeric" maxlength="6" placeholder="123456" dir="ltr" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-3 text-sm text-center tracking-widest outline-none">
+        <button id="verifyCodeBtn" type="button" class="w-full mt-2 py-3 bg-emerald-600 rounded-xl text-sm font-bold cursor-pointer" data-i18n="verifyCode">تأكيد الرمز</button>
+        <button id="backToPhoneBtn" type="button" class="w-full mt-2 text-xs text-gray-400 cursor-pointer" data-i18n="changePhone">تغيير الرقم</button>
       </div>
     </div>
 
     <div class="flex items-center gap-3 my-4 text-xs text-gray-500"><div class="flex-1 border-t border-gray-700"></div><span data-i18n="orEmail">أو بالبريد</span><div class="flex-1 border-t border-gray-700"></div></div>
 
     <form id="emailForm" class="space-y-3">
-      <input type="email" id="emailInput" required placeholder="البريد الإلكتروني" data-i18n-placeholder="emailPlaceholder" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2.5 text-sm outline-none">
-      <input type="password" id="passwordInput" required placeholder="كلمة المرور" data-i18n-placeholder="passPlaceholder" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2.5 text-sm outline-none">
-      <button type="submit" class="w-full py-3 bg-gradient-to-r from-indigo-600 to-pink-600 rounded-xl text-sm font-bold" data-i18n="loginBtn">تسجيل الدخول / إنشاء حساب</button>
+      <input type="email" id="emailInput" required placeholder="البريد الإلكتروني" data-i18n-placeholder="emailPlaceholder" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-3 text-sm outline-none">
+      <input type="password" id="passwordInput" required placeholder="كلمة المرور" data-i18n-placeholder="passPlaceholder" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-3 text-sm outline-none">
+      <button type="submit" class="w-full py-3.5 bg-gradient-to-r from-indigo-600 to-pink-600 rounded-xl text-sm font-bold cursor-pointer" data-i18n="loginBtn">تسجيل الدخول / إنشاء حساب</button>
     </form>
     <div id="recaptcha-container"></div>
   </div>
@@ -93,7 +93,6 @@
       <button data-tab="profile" data-go="profile" data-id="" class="tab-btn"><i class="fa-solid fa-user"></i></button>
     </div>
   </header>
-
   <main id="view" class="flex-1 pb-8"></main>
 </div>
 
@@ -108,8 +107,6 @@ import {
   getFirestore, collection, doc, getDoc, setDoc, updateDoc, deleteDoc, addDoc, onSnapshot,
   query, orderBy, limit, serverTimestamp, arrayUnion, arrayRemove, increment
 } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
-
-const BUILD = "BUILD 2";
 
 const translations = {
   ar: {
@@ -164,7 +161,6 @@ function applyLanguage() {
   const t = translations[currentLang];
   document.documentElement.lang = currentLang;
   document.documentElement.dir = currentLang === "ar" ? "rtl" : "ltr";
-  
   document.querySelectorAll("[data-i18n]").forEach(el => {
     const key = el.dataset.i18n;
     if (t[key]) el.textContent = t[key];
@@ -218,7 +214,6 @@ window.showToast = (msg) => {
   $('toastContainer').appendChild(box);
   setTimeout(() => box.remove(), 2800);
 };
-const showToast = window.showToast;
 
 function avatarHTML(name, photo, cls = 'w-10 h-10 text-sm') {
   return photo
@@ -592,4 +587,415 @@ function viewProfile(id) {
   const followers = Object.values(allUsers).filter(x => (x.following || []).includes(target)).length;
   const following = (u.following || []).length;
   const postsCount = Object.values(postsCache).filter(p => p.userId === target).length;
-  const editTxt = currentLang === 'ar' ? 'تعديل الملف
+  const editTxt = currentLang === 'ar' ? 'تعديل الملف الشخصي' : 'Edit Profile';
+  const chatTxt = currentLang === 'ar' ? 'مراسلة' : 'Message';
+  const statsTxt = currentLang === 'ar' ? `${postsCount} منشور · ${followers} متابع · ${following} يتابع` : `${postsCount} posts · ${followers} followers · ${following} following`;
+  V().innerHTML = `
+    <div class="h-32 bg-gradient-to-r from-indigo-700 via-purple-700 to-pink-600 bg-cover bg-center" style="${u.coverURL ? `background-image:url('${esc(u.coverURL)}')` : ''}"></div>
+    <div class="px-4 -mt-12 text-center">
+      <div class="inline-block ring-4 ring-[#0b0f17] rounded-full">${avatarHTML(nameOf(u), u.photoURL, 'w-24 h-24 text-3xl')}</div>
+      <h2 class="text-xl font-black mt-2">${esc(nameOf(u))}${badgeHTML(isVerified(u))}</h2>
+      <p class="text-xs text-indigo-300">${esc(handleOf(u))}</p>
+      <p class="text-sm text-gray-400 mt-1">${esc(u.bio || '')}</p>
+      <p class="text-xs text-gray-500 mt-1">${statsTxt}</p>
+      <div class="flex gap-2 justify-center mt-3">
+        ${own
+          ? `<button data-go="edit" class="px-6 py-2 rounded-lg bg-gray-700 text-sm font-bold">${editTxt} رقمي</button>
+             <button data-go="menu" class="px-4 py-2 rounded-lg bg-gray-700 text-sm font-bold"><i class="fa-solid fa-bars"></i></button>`
+          : `${followBtn(target)}<button data-go="chat" data-id="${target}" class="px-4 py-2 rounded-lg bg-gray-700 text-xs font-bold">${chatTxt}</button>`}
+      </div>
+    </div>
+    <div id="uposts" class="p-3 space-y-3 mt-4 max-w-xl mx-auto"></div>`;
+  renderPosts('uposts', p => p.userId === target, currentLang === 'ar' ? 'لا توجد منشورات' : 'No posts');
+}
+
+function viewEdit() {
+  const u = me();
+  pendingPhoto = null;
+  pendingCover = null;
+  const title = currentLang === 'ar' ? 'تعديل الملف الشخصي' : 'Edit Profile';
+  const photoLbl = currentLang === 'ar' ? 'تغيير الصورة الشخصية' : 'Change Avatar';
+  const coverLbl = currentLang === 'ar' ? 'صورة الغلاف' : 'Cover Image';
+  const nameLbl = currentLang === 'ar' ? 'الاسم المعروض' : 'Display Name';
+  const userLbl = currentLang === 'ar' ? 'اسم المستخدم الفريد' : 'Unique Username';
+  const bioLbl = currentLang === 'ar' ? 'النبذة' : 'Bio';
+  const saveLbl = currentLang === 'ar' ? 'حفظ' : 'Save';
+  const cancelLbl = currentLang === 'ar' ? 'إلغاء' : 'Cancel';
+  V().innerHTML = `
+    <form data-form="edit" class="p-4 space-y-4 max-w-md mx-auto">
+      <h2 class="text-lg font-bold">${title}</h2>
+      <div class="flex flex-col items-center gap-2">
+        <div id="photoPrev">${avatarHTML(nameOf(u), u.photoURL, 'w-24 h-24 text-3xl')}</div>
+        <label class="text-indigo-400 text-sm cursor-pointer">${photoLbl}
+          <input type="file" id="photoIn" accept="image/*" class="hidden">
+        </label>
+      </div>
+      <label class="block text-xs text-gray-400">${coverLbl}
+        <input type="file" id="coverIn" accept="image/*" class="mt-1 w-full text-xs">
+      </label>
+      <label class="block text-xs text-gray-400">${nameLbl}
+        <input name="name" required value="${esc(nameOf(u))}" class="mt-1 w-full bg-gray-800 rounded-lg px-3 py-2 text-sm outline-none">
+      </label>
+      <label class="block text-xs text-gray-400">${userLbl}
+        <input name="username" required dir="ltr" value="${esc(u.username || '')}" class="mt-1 w-full bg-gray-800 rounded-lg px-3 py-2 text-sm outline-none">
+      </label>
+      <label class="block text-xs text-gray-400">${bioLbl}
+        <textarea name="bio" rows="3" class="mt-1 w-full bg-gray-800 rounded-lg px-3 py-2 text-sm outline-none">${esc(u.bio || '')}</textarea>
+      </label>
+      <button id="saveBtn" class="w-full py-2.5 rounded-lg bg-gradient-to-r from-indigo-600 to-pink-600 font-bold text-sm">${saveLbl}</button>
+      <button type="button" data-go="profile" data-id="${uid()}" class="w-full py-2 text-sm text-gray-400">${cancelLbl}</button>
+    </form>`;
+}
+
+const getMenuGroups = () => [
+  { title: currentLang === 'ar' ? "حسابي" : "My Account", items: [
+    ['fa-user', currentLang === 'ar' ? 'الملف الشخصي' : 'Profile', 'profile'],
+    ['fa-pen', currentLang === 'ar' ? 'تعديل الملف الشخصي' : 'Edit Profile', 'data-go="edit"'],
+    ['fa-gear', currentLang === 'ar' ? 'الإعدادات' : 'Settings', 'data-go="settings"'],
+  ]},
+  { title: currentLang === 'ar' ? "الاشتراك" : "Subscription", items: [
+    ['fa-crown', currentLang === 'ar' ? 'الاشتراك في التوثيق' : 'Verification Subscription', 'data-act="subscribe"'],
+  ]},
+  { title: currentLang === 'ar' ? "التواصل" : "Social", items: [
+    ['fa-user-group', currentLang === 'ar' ? 'الأصدقاء' : 'Friends', 'data-go="friends"'],
+    ['fa-comments', currentLang === 'ar' ? 'الدردشات' : 'Chats', 'data-go="chats"'],
+    ['fa-magnifying-glass', currentLang === 'ar' ? 'البحث' : 'Search', 'data-go="search"'],
+    ['fa-bell', currentLang === 'ar' ? 'الإشعارات' : 'Notifications', 'data-go="notifications"'],
+  ]},
+  { title: currentLang === 'ar' ? "المزيد" : "More", items: [
+    ['fa-clapperboard', currentLang === 'ar' ? 'الريلز' : 'Reels', 'data-go="reels"'],
+    ['fa-bookmark', currentLang === 'ar' ? 'المحفوظات' : 'Saved', 'data-go="saved"'],
+    ['fa-clock-rotate-left', currentLang === 'ar' ? 'الأرشيف' : 'Archive', 'data-go="archive"'],
+    ['fa-circle-question', currentLang === 'ar' ? 'المساعدة والدعم' : 'Help & Support', 'data-go="help"'],
+    ['fa-circle-info', currentLang === 'ar' ? 'عن Sovexa' : 'About Sovexa', 'data-go="about"'],
+  ]},
+  { title: currentLang === 'ar' ? "الحساب" : "Account Actions", items: [
+    ['fa-right-left', currentLang === 'ar' ? 'تبديل الحساب' : 'Switch Account', 'data-act="logout-menu"'],
+    ['fa-right-from-bracket', currentLang === 'ar' ? 'تسجيل الخروج' : 'Log Out', 'data-act="logout-menu"'],
+  ]},
+];
+
+function viewMenu() {
+  const u = me();
+  const groups = getMenuGroups().map((g) => {
+    const items = g.items.map(([icon, label, attrs], i) => {
+      const actionAttrs = attrs === 'profile' ? `data-go="profile" data-id="${uid()}"` : attrs;
+      const danger = label === 'تسجيل الخروج' || label === 'Log Out';
+      return `
+        <button ${actionAttrs} class="w-full flex items-center gap-3 px-4 py-3 text-right ${i ? 'border-t border-gray-800' : ''}">
+          <span class="w-8 h-8 rounded-lg flex items-center justify-center ${danger ? 'bg-red-600/20 text-red-400' : 'bg-gray-800 text-indigo-300'}"><i class="fa-solid ${icon} text-sm"></i></span>
+          <span class="text-sm flex-1 ${danger ? 'text-red-400' : ''}">${label}</span>
+          <i class="fa-solid fa-chevron-left text-[10px] text-gray-600"></i>
+        </button>`;
+    }).join('');
+    return `<div class="card rounded-xl overflow-hidden"><p class="px-4 pt-3 pb-1 text-[11px] text-gray-500">${g.title}</p>${items}</div>`;
+  }).join('');
+  V().innerHTML = `
+    <div class="p-3 space-y-3 max-w-xl mx-auto">
+      <button data-go="profile" data-id="${uid()}" class="card rounded-xl p-4 w-full flex items-center gap-3 text-right">
+        ${avatarHTML(nameOf(u), u.photoURL, 'w-14 h-14 text-lg')}
+        <div class="flex-1 min-w-0">
+          <b class="block truncate">${esc(nameOf(u))}${badgeHTML(isVerified(u))}</b>
+          <span class="text-xs text-indigo-300">${esc(handleOf(u) || (currentLang === 'ar' ? 'عرض الملف الشخصي' : 'View Profile'))}</span>
+        </div>
+        <i class="fa-solid fa-chevron-left text-xs text-gray-500"></i>
+      </button>
+      ${groups}
+    </div>`;
+}
+
+function viewHelp() {
+  const title = currentLang === 'ar' ? "مركز المساعدة والدعم 🛠️" : "Help & Support 🛠️";
+  const desc = currentLang === 'ar' ? "مرحباً بك في مركز المساعدة والدعم لمنصة Sovexa. نحن هنا لضمان حصولك على أفضل تجربة ممكنة في التواصل، الدردشة، ومشاهدة الفيديوهات." : "Welcome to Sovexa Help & Support center.";
+  V().innerHTML = `
+    <div class="p-3 space-y-3 max-w-xl mx-auto">
+      ${backHeader(title)}
+      <div class="card rounded-xl p-4 text-sm leading-7 text-gray-300">${desc}</div>
+    </div>`;
+}
+
+function viewAbout() {
+  const title = currentLang === 'ar' ? "عن منصة Sovexa 🌌" : "About Sovexa 🌌";
+  const desc = currentLang === 'ar' ? "تعتبر منصة Sovexa وجهتك الرقمية المتكاملة والمبتكرة للتواصل الاجتماعي والدردشة." : "Sovexa is your ultimate digital destination for social networking.";
+  V().innerHTML = `
+    <div class="p-3 space-y-3 max-w-xl mx-auto">
+      ${backHeader(title)}
+      <div class="card rounded-xl p-4 text-sm leading-7 text-gray-300">${desc}</div>
+      <p dir="ltr" class="text-center text-[11px] text-gray-500">${BUILD}</p>
+    </div>`;
+}
+
+function viewSaved() {
+  const title = currentLang === 'ar' ? "المحفوظات" : "Saved Posts";
+  V().innerHTML = `
+    <div class="p-3 space-y-3 max-w-xl mx-auto">
+      ${backHeader(title)}
+      <div id="savedList" class="space-y-3"></div>
+    </div>`;
+  renderSavedList();
+}
+
+function renderSavedList() {
+  const box = $('savedList');
+  if (!box) return;
+  const list = [...savedIds].map(id => postsCache[id] ? { id, ...postsCache[id] } : null).filter(Boolean);
+  box.innerHTML = list.length
+    ? list.map(postCard).join('')
+    : `<p class="text-center text-gray-500 py-10 text-sm">${currentLang === 'ar' ? 'لا توجد منشورات محفوظة بعد' : 'No saved posts'}</p>`;
+  restoreOpenComments();
+}
+
+function viewArchive() {
+  const title = currentLang === 'ar' ? "الأرشيف" : "Archive";
+  const mine = Object.entries(postsCache)
+    .map(([id, p]) => ({ id, ...p }))
+    .filter(p => p.userId === uid())
+    .sort((a, b) => (a.createdAt?.seconds ?? 0) - (b.createdAt?.seconds ?? 0));
+  V().innerHTML = `
+    <div class="p-3 space-y-3 max-w-xl mx-auto">
+      ${backHeader(title)}
+      ${mine.length ? mine.map(p => `
+        <div class="card rounded-xl p-3 space-y-2">
+          <p class="text-sm whitespace-pre-wrap">${esc(p.text || '(صورة فقط)')}</p>
+          <div class="flex items-center justify-between text-xs text-gray-500">
+            <span>${timeAgo(p.createdAt)} · ${(p.likes || []).length} ${currentLang === 'ar' ? 'إعجاب' : 'likes'}</span>
+            <button data-act="delpost" data-id="${p.id}" class="text-red-400"><i class="fa-solid fa-trash"></i> ${currentLang === 'ar' ? 'حذف' : 'Delete'}</button>
+          </div>
+        </div>`).join('') : `<p class="text-center text-gray-500 py-10 text-sm">${currentLang === 'ar' ? 'لم تنشر أي منشور بعد' : 'No posts yet'}</p>`}
+    </div>`;
+}
+
+function viewReels() {
+  V().innerHTML = `
+    <div class="p-6 text-center mt-16 space-y-3">
+      <i class="fa-solid fa-clapperboard text-5xl text-indigo-400"></i>
+      <h2 class="text-lg font-bold">${currentLang === 'ar' ? 'الريلز' : 'Reels'}</h2>
+      <p class="text-sm text-gray-400">${currentLang === 'ar' ? 'قريباً' : 'Coming soon'}</p>
+    </div>`;
+}
+
+function viewSettings() {
+  const t = translations[currentLang];
+  V().innerHTML = `
+    <div class="p-3 space-y-3 max-w-xl mx-auto">
+      <h2 class="text-lg font-bold">${t.settingsTitle}</h2>
+      <div class="card rounded-xl p-4 space-y-1 text-sm">
+        <p class="text-gray-400 text-xs">${t.registeredAccount}</p>
+        <p dir="ltr" class="text-right">${esc(currentUser?.email || currentUser?.phoneNumber || '')}</p>
+        <p class="text-indigo-300 text-xs">${esc(handleOf(me()))}</p>
+      </div>
+      <div class="card rounded-xl overflow-hidden text-sm">
+        <button data-go="edit" class="w-full px-4 py-3 text-right flex justify-between"><span>${t.editProfile}</span><i class="fa-solid fa-chevron-left text-xs text-gray-500"></i></button>
+        <button data-act="soon" class="w-full px-4 py-3 text-right flex justify-between border-t border-gray-800"><span>${t.privacy}</span><i class="fa-solid fa-chevron-left text-xs text-gray-500"></i></button>
+        <button data-act="soon" class="w-full px-4 py-3 text-right flex justify-between border-t border-gray-800"><span>${t.notifications}</span><i class="fa-solid fa-chevron-left text-xs text-gray-500"></i></button>
+        <button data-act="toggle-lang" class="w-full px-4 py-3 text-right flex justify-between border-t border-gray-800"><span>${t.language}</span><span class="text-indigo-400 font-bold text-xs" id="langLabel">${currentLang === 'ar' ? 'العربية' : 'English'}</span></button>
+      </div>
+      <button data-act="logout-menu" class="w-full rounded-xl p-3 bg-red-600/20 border border-red-500/30 text-red-300 text-sm font-bold">${t.logout}</button>
+    </div>`;
+}
+
+function renderUsersLive() {
+  if (!currentUser) return;
+  if (currentView === 'search') renderSearch($('q')?.value || '');
+  else if (['friends', 'chats', 'profile', 'menu', 'settings'].includes(currentView)) go(currentView, currentId);
+}
+
+function showLogoutSheet() {
+  document.getElementById('logoutSheet')?.remove();
+  const sheet = document.createElement('div');
+  sheet.id = 'logoutSheet';
+  sheet.className = 'fixed inset-0 z-[70] bg-black/60 flex items-end justify-center';
+  sheet.innerHTML = `
+    <div class="card w-full max-w-md rounded-t-3xl p-4 space-y-2 safe-bottom">
+      <div class="mx-auto w-12 h-1.5 rounded-full bg-gray-600 mb-2"></div>
+      <p dir="ltr" class="text-center text-sm text-gray-400 mb-2">${esc(currentUser?.email || currentUser?.phoneNumber || '')}</p>
+      <button data-act="logout-confirm" class="w-full py-3 rounded-xl bg-red-600/20 border border-red-500/30 text-red-300 font-bold text-sm">${currentLang === 'ar' ? 'تسجيل الخروج من هذا الحساب' : 'Log out from this account'}</button>
+      <button data-act="logout-switch" class="w-full py-3 rounded-xl bg-gray-800 text-sm font-bold">${currentLang === 'ar' ? 'تبديل الحساب' : 'Switch account'}</button>
+      <button data-act="logout-cancel" class="w-full py-3 rounded-xl bg-gray-900 text-sm text-gray-400">${currentLang === 'ar' ? 'إلغاء' : 'Cancel'}</button>
+    </div>`;
+  sheet.addEventListener('click', (e) => { if (e.target === sheet) sheet.remove(); });
+  document.body.appendChild(sheet);
+}
+
+function showSubscribeSheet() {
+  document.getElementById('subSheet')?.remove();
+  const sheet = document.createElement('div');
+  sheet.id = 'subSheet';
+  sheet.className = 'fixed inset-0 z-[70] bg-black/60 flex items-end justify-center';
+  const verified = isVerified(me());
+  sheet.innerHTML = `
+    <div class="card w-full max-w-md rounded-t-3xl p-5 space-y-3 safe-bottom">
+      <div class="mx-auto w-12 h-1.5 rounded-full bg-gray-600 mb-2"></div>
+      <div class="text-center">
+        <i class="fa-solid fa-circle-check text-indigo-400 text-4xl"></i>
+        <h3 class="text-lg font-bold mt-2">Sovexa Verification</h3>
+        <p class="text-sm text-gray-400 mt-1">${verified ? 'حسابك موثّق بالفعل ✔' : 'علامة زرقاء بجوار اسمك'}</p>
+      </div>
+      ${verified ? '' : `
+        <div class="card rounded-xl p-3 text-sm text-center"><b class="text-indigo-300">${SUB_PRICE}</b></div>
+        <button data-act="subscribe-confirm" class="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-pink-600 font-bold text-sm">طلب الاشتراك</button>`}
+      <button data-act="subscribe-cancel" class="w-full py-2 text-sm text-gray-400">إغلاق</button>
+    </div>`;
+  sheet.addEventListener('click', (e) => { if (e.target === sheet) sheet.remove(); });
+  document.body.appendChild(sheet);
+}
+
+function showLogin() {
+  $('loginSection').classList.remove('hidden');
+  $('appSection').classList.add('hidden');
+}
+function showApp() {
+  $('loginSection').classList.add('hidden');
+  $('appSection').classList.remove('hidden');
+}
+
+async function ensureUserProfile(user) {
+  const ref = doc(db, "users", user.uid);
+  const snap = await getDoc(ref);
+  if (!snap.exists()) {
+    await setDoc(ref, {
+      uid: user.uid, name: nameOf(user), username: "",
+      email: user.email || "", phone: user.phoneNumber || "",
+      photoURL: user.photoURL || "", coverURL: "", bio: "",
+      following: [], verified: false, createdAt: serverTimestamp()
+    });
+  } else {
+    await setDoc(ref, { email: user.email || "", phone: user.phoneNumber || "" }, { merge: true });
+  }
+}
+
+onAuthStateChanged(auth, async (user) => {
+  currentUser = user;
+  if (!user) {
+    clearListeners();
+    if (usersUnsub) { usersUnsub(); usersUnsub = null; }
+    if (postsUnsub) { postsUnsub(); postsUnsub = null; }
+    if (savedUnsub) { savedUnsub(); savedUnsub = null; }
+    postsCache = {};
+    savedIds = new Set();
+    showLogin();
+    return;
+  }
+  showApp();
+  try { await ensureUserProfile(user); } catch (e) { showToast("تعذر حفظ الملف"); }
+  if (!usersUnsub) {
+    usersUnsub = onSnapshot(collection(db, "users"), (s) => {
+      allUsers = {};
+      usersByUsername = {};
+      s.forEach(d => {
+        const data = { uid: d.id, ...d.data() };
+        allUsers[d.id] = data;
+        if (data.username) usersByUsername[data.username] = d.id;
+      });
+      renderUsersLive();
+    }, () => {});
+  }
+  if (!postsUnsub) {
+    postsUnsub = onSnapshot(query(collection(db, "posts"), orderBy("createdAt", "desc"), limit(100)), (s) => {
+      postsCache = {};
+      s.forEach(d => postsCache[d.id] = d.data());
+      refreshPosts();
+      if (currentView === 'saved') renderSavedList();
+      if (currentView === 'archive') viewArchive();
+    }, () => {});
+  }
+  if (!savedUnsub) {
+    savedUnsub = onSnapshot(collection(db, "users", user.uid, "saved"), (s) => {
+      savedIds = new Set(s.docs.map(d => d.id));
+      refreshPosts();
+      if (currentView === 'saved') renderSavedList();
+    }, () => {});
+  }
+  go('home');
+});
+
+getRedirectResult(auth).catch(() => {});
+const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({ prompt: "select_account" });
+
+// ربط تفاعلي مباشر للأزرار باللمس والنقر (Pointer / Click)
+window.addEventListener('DOMContentLoaded', () => {
+  const gBtn = $('googleLoginBtn');
+  if (gBtn) {
+    gBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      try { await signInWithPopup(auth, googleProvider); }
+      catch (err) {
+        if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') return;
+        if (err.code === 'auth/popup-blocked' || err.code === 'auth/operation-not-supported-in-this-environment') {
+          await signInWithRedirect(auth, googleProvider); return;
+        }
+        showToast("خطأ Google: " + err.code);
+      }
+    });
+  }
+
+  const pBtn = $('togglePhoneBtn');
+  if (pBtn) {
+    pBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      $('phonePanel').classList.toggle('hidden');
+    });
+  }
+});
+
+$('emailForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = $('emailInput').value.trim();
+  const password = $('passwordInput').value;
+  if (!email || !password) return showToast("أدخل البريد وكلمة المرور");
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+  } catch (err) {
+    if (err.code === 'auth/invalid-credential' || err.code === 'auth/user-not-found') {
+      try {
+        await createUserWithEmailAndPassword(auth, email, password);
+        showToast("تم إنشاء حسابك بنجاح");
+      } catch (e2) {
+        showToast("خطأ في بيانات التسجيل");
+      }
+    } else {
+      showToast("خطأ في تسجيل الدخول: " + err.code);
+    }
+  }
+});
+
+const getRecaptcha = () => {
+  if (!recaptcha) recaptcha = new RecaptchaVerifier(auth, 'recaptcha-container', { size: 'invisible' });
+  return recaptcha;
+};
+
+$('sendCodeBtn').addEventListener('click', async () => {
+  const phone = $('phoneInput').value.trim();
+  if (!/^\+\d{8,15}$/.test(phone)) return showToast("أدخل الرقم بصيغة دولية مثل +966500000000");
+  try {
+    confirmationResult = await signInWithPhoneNumber(auth, phone, getRecaptcha());
+    $('phoneStep').classList.add('hidden');
+    $('codeStep').classList.remove('hidden');
+    showToast("تم إرسال الرمز");
+  } catch (err) {
+    showToast("تعذر إرسال الرمز");
+  }
+});
+
+$('verifyCodeBtn').addEventListener('click', async () => {
+  const code = $('codeInput').value.trim();
+  if (!code) return showToast("أدخل الرمز");
+  try {
+    await confirmationResult.confirm(code);
+    showToast("تم تسجيل الدخول بنجاح");
+  } catch (err) {
+    showToast("الرمز غير صحيح");
+  }
+});
+
+$('backToPhoneBtn').addEventListener('click', () => {
+  $('codeStep').classList.add('hidden');
+  $('phoneStep').classList.remove('hidden');
+});
+
+// الأحداث العامة للتنقل والتفاعل
+document.addEventListener('click', async (e) => {
+  const btn = e.target.closest('[data-go], [data-act]');
+  if (!btn) return;
+  const g
