@@ -15,11 +15,12 @@
   .safe-top { padding-top: env(safe-area-inset-top, 0px); }
   .safe-bottom { padding-bottom: env(safe-area-inset-bottom, 0px); }
   .hidden { display:none !important; }
+  .btn-busy { opacity:.6; pointer-events:none; }
 </style>
 </head>
 <body class="min-h-screen">
 
-<div id="toastContainer" class="fixed top-16 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-2 pointer-events-none"></div>
+<div id="toastContainer" class="fixed top-16 left-1/2 -translate-x-1/2 z-[60] flex flex-col items-center gap-2 pointer-events-none"></div>
 
 <!-- ============ LOGIN ============ -->
 <div id="loginSection" class="min-h-screen flex flex-col items-center justify-center p-4">
@@ -125,11 +126,14 @@ const uid = () => currentUser?.uid;
 const me = () => allUsers[uid()] || { uid: uid(), name: "" };
 const V = () => $('view');
 const chatIdFor = (a, b) => [a, b].sort().join("_");
+const normUser = (s) => String(s || "").trim().toLowerCase().replace(/^@/, "").replace(/[^a-z0-9_.]/g, "");
+const handleOf = (u) => u.username ? "@" + u.username : "";
 
 let currentUser = null;
 let currentView = "home";
 let currentId = null;
 let allUsers = {};
+let usersByUsername = {};
 let usersUnsub = null;
 let unsubs = [];
 let commentUnsubs = {};
@@ -137,6 +141,7 @@ let openSet = new Set();
 let confirmationResult = null;
 let recaptcha = null;
 let pendingPhoto = null;
+let pendingCover = null;
 let pendingPostImg = null;
 
 window.showToast = (msg) => {
@@ -184,6 +189,13 @@ function compressImage(file, max, quality) {
     reader.onerror = reject;
     reader.readAsDataURL(file);
   });
+}
+
+function withTimeout(promise, ms = 15000) {
+  return Promise.race([
+    promise,
+    new Promise((_, rej) => setTimeout(() => rej(new Error("انتهت المهلة، تحقق من الاتصال أو من قواعد Firestore")), ms))
+  ]);
 }
 
 // ---------- router ----------
@@ -294,7 +306,7 @@ function viewReels() {
     <div class="p-6 text-center mt-16 space-y-3">
       <i class="fa-solid fa-clapperboard text-5xl text-indigo-400"></i>
       <h2 class="text-lg font-bold">الريلز</h2>
-      <p class="text-sm text-gray-400">رفع الفيديوهات يحتاج Firebase Storage، وهي المرحلة التالية بعد استقرار الميزات الحالية.</p>
+      <p class="text-sm text-gray-400">رفع الفيديوهات يحتاج Firebase Storage، وهي المرحلة التالية.</p>
     </div>`;
 }
 
@@ -322,7 +334,7 @@ function viewCreate() {
 function viewSearch() {
   V().innerHTML = `
     <div class="p-3 space-y-3 max-w-xl mx-auto">
-      <input id="q" type="search" placeholder="ابحث عن أشخاص..." class="w-full bg-gray-800 rounded-full px-4 py-2.5 text-sm outline-none">
+      <input id="q" type="search" placeholder="ابحث بالاسم أو @اسم_المستخدم..." class="w-full bg-gray-800 rounded-full px-4 py-2.5 text-sm outline-none">
       <div id="res" class="space-y-2"></div>
     </div>`;
   renderSearch('');
@@ -335,7 +347,7 @@ function userRow(u) {
         ${avatarHTML(nameOf(u), u.photoURL)}
         <div class="min-w-0">
           <b class="block text-sm truncate">${esc(nameOf(u))}</b>
-          <span class="text-xs text-gray-500 truncate block">${esc(u.bio || '')}</span>
+          <span class="text-xs text-indigo-300 truncate block">${esc(handleOf(u))}</span>
         </div>
       </button>
       ${followBtn(u.uid)}
@@ -343,9 +355,9 @@ function userRow(u) {
 }
 
 function renderSearch(term) {
-  const t = term.trim().toLowerCase();
+  const t = term.trim().toLowerCase().replace(/^@/, "");
   const list = Object.values(allUsers)
-    .filter(u => u.uid !== uid() && (nameOf(u) + ' ' + (u.email || '')).toLowerCase().includes(t))
+    .filter(u => u.uid !== uid() && ((nameOf(u) + ' ' + (u.username || '')).toLowerCase().includes(t)))
     .slice(0, 30);
   const res = $('res');
   if (!res) return;
@@ -377,7 +389,7 @@ function viewChats() {
       ${following.length ? following.map(u => `
         <button data-go="chat" data-id="${u.uid}" class="card rounded-xl p-3 w-full flex items-center gap-3 text-right">
           ${avatarHTML(nameOf(u), u.photoURL)}
-          <b class="text-sm">${esc(nameOf(u))}</b>
+          <div><b class="text-sm block">${esc(nameOf(u))}</b><span class="text-xs text-gray-500">${esc(handleOf(u))}</span></div>
         </button>`).join('') : '<p class="text-center text-gray-500 py-8">تابع أشخاصاً لتبدأ الدردشة معهم</p>'}
     </div>`;
 }
@@ -419,11 +431,12 @@ function viewProfile(id) {
   const followers = Object.values(allUsers).filter(x => (x.following || []).includes(target)).length;
   const following = (u.following || []).length;
   V().innerHTML = `
-    <div class="h-32 bg-gradient-to-r from-indigo-700 via-purple-700 to-pink-600"></div>
+    <div class="h-32 bg-gradient-to-r from-indigo-700 via-purple-700 to-pink-600 bg-cover bg-center" style="${u.coverURL ? `background-image:url('${esc(u.coverURL)}')` : ''}"></div>
     <div class="px-4 -mt-12 text-center">
       <div class="inline-block ring-4 ring-[#0b0f17] rounded-full">${avatarHTML(nameOf(u), u.photoURL, 'w-24 h-24 text-3xl')}</div>
       <h2 class="text-xl font-black mt-2">${esc(nameOf(u))}</h2>
-      <p class="text-sm text-gray-400">${esc(u.bio || '')}</p>
+      <p class="text-xs text-indigo-300">${esc(handleOf(u))}</p>
+      <p class="text-sm text-gray-400 mt-1">${esc(u.bio || '')}</p>
       <p class="text-xs text-gray-500 mt-1">${followers} متابع · ${following} يتابع</p>
       <div class="flex gap-2 justify-center mt-3">
         ${own
@@ -448,22 +461,29 @@ function viewProfile(id) {
 function viewEdit() {
   const u = me();
   pendingPhoto = null;
+  pendingCover = null;
   V().innerHTML = `
     <form data-form="edit" class="p-4 space-y-4 max-w-md mx-auto">
       <h2 class="text-lg font-bold">تعديل الملف الشخصي</h2>
       <div class="flex flex-col items-center gap-2">
         <div id="photoPrev">${avatarHTML(nameOf(u), u.photoURL, 'w-24 h-24 text-3xl')}</div>
-        <label class="text-indigo-400 text-sm cursor-pointer">تغيير الصورة
+        <label class="text-indigo-400 text-sm cursor-pointer">تغيير الصورة الشخصية
           <input type="file" id="photoIn" accept="image/*" class="hidden">
         </label>
       </div>
-      <label class="block text-xs text-gray-400">الاسم
+      <label class="block text-xs text-gray-400">صورة الغلاف
+        <input type="file" id="coverIn" accept="image/*" class="mt-1 w-full text-xs">
+      </label>
+      <label class="block text-xs text-gray-400">الاسم المعروض (يمكن تكراره)
         <input name="name" required value="${esc(nameOf(u))}" class="mt-1 w-full bg-gray-800 rounded-lg px-3 py-2 text-sm outline-none">
+      </label>
+      <label class="block text-xs text-gray-400">اسم المستخدم الفريد (بالإنجليزية والأرقام و _ و .)
+        <input name="username" required dir="ltr" value="${esc(u.username || '')}" class="mt-1 w-full bg-gray-800 rounded-lg px-3 py-2 text-sm outline-none">
       </label>
       <label class="block text-xs text-gray-400">النبذة
         <textarea name="bio" rows="3" class="mt-1 w-full bg-gray-800 rounded-lg px-3 py-2 text-sm outline-none">${esc(u.bio || '')}</textarea>
       </label>
-      <button class="w-full py-2.5 rounded-lg bg-gradient-to-r from-indigo-600 to-pink-600 font-bold text-sm">حفظ</button>
+      <button id="saveBtn" class="w-full py-2.5 rounded-lg bg-gradient-to-r from-indigo-600 to-pink-600 font-bold text-sm">حفظ</button>
       <button type="button" data-go="profile" data-id="${uid()}" class="w-full py-2 text-sm text-gray-400">إلغاء</button>
     </form>`;
 }
@@ -486,7 +506,7 @@ function viewMenu() {
       ${item('fa-magnifying-glass', 'البحث', `data-go="search"`)}
       ${item('fa-clapperboard', 'الريلز', `data-go="reels"`)}
       ${item('fa-gear', 'الإعدادات', `data-go="settings"`)}
-      ${item('fa-right-from-bracket', 'تسجيل الخروج', `data-act="logout"`)}
+      ${item('fa-right-from-bracket', 'تسجيل الخروج', `data-act="logout-menu"`)}
     </div>`;
 }
 
@@ -497,16 +517,36 @@ function viewSettings() {
       <div class="card rounded-xl p-4 space-y-1 text-sm">
         <p class="text-gray-400 text-xs">الحساب</p>
         <p>${esc(currentUser?.email || currentUser?.phoneNumber || '')}</p>
+        <p class="text-indigo-300 text-xs">${esc(handleOf(me()))}</p>
       </div>
       <button data-go="edit" class="card rounded-xl p-3 w-full text-right text-sm">تعديل الملف الشخصي</button>
-      <button data-act="logout" class="w-full rounded-xl p-3 bg-red-600/20 border border-red-500/30 text-red-300 text-sm font-bold">تسجيل الخروج</button>
+      <button data-act="logout-menu" class="w-full rounded-xl p-3 bg-red-600/20 border border-red-500/30 text-red-300 text-sm font-bold">تسجيل الخروج</button>
     </div>`;
 }
 
 function renderUsersLive() {
   if (!currentUser) return;
   if (currentView === 'search') renderSearch($('q')?.value || '');
-  else if (['friends', 'chats', 'profile', 'settings', 'menu', 'edit'].includes(currentView) && currentView !== 'edit') go(currentView, currentId);
+  else if (['friends', 'chats', 'profile', 'settings', 'menu'].includes(currentView)) go(currentView, currentId);
+}
+
+// ---------- logout sheet ----------
+function showLogoutSheet() {
+  const old = document.getElementById('logoutSheet');
+  if (old) old.remove();
+  const sheet = document.createElement('div');
+  sheet.id = 'logoutSheet';
+  sheet.className = 'fixed inset-0 z-[70] bg-black/60 flex items-end justify-center';
+  sheet.innerHTML = `
+    <div class="card w-full max-w-md rounded-t-3xl p-4 space-y-2 safe-bottom">
+      <div class="mx-auto w-12 h-1.5 rounded-full bg-gray-600 mb-2"></div>
+      <p class="text-center text-sm text-gray-400 mb-2">${esc(currentUser?.email || currentUser?.phoneNumber || '')}</p>
+      <button data-act="logout-confirm" class="w-full py-3 rounded-xl bg-red-600/20 border border-red-500/30 text-red-300 font-bold text-sm">تسجيل الخروج من هذا الحساب</button>
+      <button data-act="logout-switch" class="w-full py-3 rounded-xl bg-gray-800 text-sm font-bold">تبديل الحساب</button>
+      <button data-act="logout-cancel" class="w-full py-3 rounded-xl bg-gray-900 text-sm text-gray-400">إلغاء</button>
+    </div>`;
+  sheet.addEventListener('click', (e) => { if (e.target === sheet) sheet.remove(); });
+  document.body.appendChild(sheet);
 }
 
 // ---------- auth ----------
@@ -526,9 +566,11 @@ async function ensureUserProfile(user) {
     await setDoc(ref, {
       uid: user.uid,
       name: nameOf(user),
+      username: "",
       email: user.email || "",
       phone: user.phoneNumber || "",
       photoURL: user.photoURL || "",
+      coverURL: "",
       bio: "",
       following: [],
       createdAt: serverTimestamp()
@@ -551,7 +593,12 @@ onAuthStateChanged(auth, async (user) => {
   if (!usersUnsub) {
     usersUnsub = onSnapshot(collection(db, "users"), (s) => {
       allUsers = {};
-      s.forEach(d => allUsers[d.id] = { uid: d.id, ...d.data() });
+      usersByUsername = {};
+      s.forEach(d => {
+        const data = { uid: d.id, ...d.data() };
+        allUsers[d.id] = data;
+        if (data.username) usersByUsername[data.username] = d.id;
+      });
       renderUsersLive();
     }, (err) => showToast("تعذر تحميل المستخدمين: " + err.message));
   }
@@ -625,7 +672,7 @@ $('backToPhoneBtn').addEventListener('click', () => {
   confirmationResult = null;
 });
 
-// ---------- global events (delegation) ----------
+// ---------- global events ----------
 document.addEventListener('click', async (e) => {
   const g = e.target.closest('[data-go]');
   if (g) { go(g.dataset.go, g.dataset.id); return; }
@@ -643,8 +690,17 @@ document.addEventListener('click', async (e) => {
     } else if (act === 'follow') {
       const isF = (me().following || []).includes(id);
       await updateDoc(doc(db, "users", uid()), { following: isF ? arrayRemove(id) : arrayUnion(id) });
-    } else if (act === 'logout') {
+    } else if (act === 'logout-menu') {
+      showLogoutSheet();
+    } else if (act === 'logout-confirm') {
+      document.getElementById('logoutSheet')?.remove();
       await signOut(auth);
+    } else if (act === 'logout-switch') {
+      document.getElementById('logoutSheet')?.remove();
+      await signOut(auth);
+      showToast("سجّل الدخول بالحساب الآخر");
+    } else if (act === 'logout-cancel') {
+      document.getElementById('logoutSheet')?.remove();
     }
   } catch (err) {
     showToast("خطأ: " + err.message);
@@ -660,8 +716,11 @@ document.addEventListener('change', async (e) => {
   if (!f) return;
   try {
     if (e.target.id === 'photoIn') {
-      pendingPhoto = await compressImage(f, 400, 0.8);
+      pendingPhoto = await compressImage(f, 256, 0.7);
       $('photoPrev').innerHTML = `<img src="${pendingPhoto}" class="w-24 h-24 rounded-full object-cover">`;
+    } else if (e.target.id === 'coverIn') {
+      pendingCover = await compressImage(f, 600, 0.6);
+      showToast("تم اختيار الغلاف");
     } else if (e.target.id === 'postImg') {
       pendingPostImg = await compressImage(f, 800, 0.7);
       $('postPrev').innerHTML = `<img src="${pendingPostImg}" class="w-full rounded-xl">`;
@@ -675,6 +734,7 @@ document.addEventListener('submit', async (e) => {
   if (!type) return;
   e.preventDefault();
   const fd = new FormData(f);
+  const btn = f.querySelector('button[type="submit"], button:not([type])');
   try {
     if (type === 'comment') {
       const t = (fd.get('t') || '').toString().trim();
@@ -700,20 +760,28 @@ document.addEventListener('submit', async (e) => {
       showToast("تم النشر");
       go('home');
     } else if (type === 'edit') {
-      const data = {
-        name: (fd.get('name') || '').toString().trim() || nameOf(me()),
-        bio: (fd.get('bio') || '').toString().trim()
-      };
+      if (btn) { btn.disabled = true; btn.textContent = "جاري الحفظ..."; btn.classList.add('btn-busy'); }
+      const name = (fd.get('name') || '').toString().trim();
+      const username = normUser(fd.get('username'));
+      const bio = (fd.get('bio') || '').toString().trim();
+      if (!name) throw new Error("الاسم مطلوب");
+      if (username.length < 3) throw new Error("اسم المستخدم يجب أن يكون 3 أحرف على الأقل");
+      const takenBy = usersByUsername[username];
+      if (takenBy && takenBy !== uid()) throw new Error("اسم المستخدم مستخدم من شخص آخر، اختر اسماً مختلفاً");
+      const data = { name, username, bio };
       if (pendingPhoto) data.photoURL = pendingPhoto;
-      await setDoc(doc(db, "users", uid()), data, { merge: true });
+      if (pendingCover) data.coverURL = pendingCover;
+      await withTimeout(setDoc(doc(db, "users", uid()), data, { merge: true }));
       pendingPhoto = null;
+      pendingCover = null;
       showToast("تم حفظ التعديلات");
       go('profile', uid());
     }
   } catch (err) {
     showToast("خطأ: " + err.message);
+    if (type === 'edit' && btn) { btn.disabled = false; btn.textContent = "حفظ"; btn.classList.remove('btn-busy'); }
   }
 });
 </script>
 </body>
-</html>
+  </html>
