@@ -23,6 +23,7 @@
 </style>
 </head>
 <body class="min-h-screen">
+<!-- BUILD 1 -->
 
 <div id="toastContainer" class="fixed top-16 left-1/2 -translate-x-1/2 z-[60] flex flex-col items-center gap-2 pointer-events-none"></div>
 
@@ -35,6 +36,7 @@
       </div>
       <h2 class="text-xl font-bold text-white">مرحباً بك في Sovexa</h2>
       <p class="text-xs text-gray-400">سجل الدخول للمتابعة</p>
+      <p dir="ltr" class="text-[10px] text-gray-600 mt-1">BUILD 1</p>
     </div>
 
     <button id="googleLoginBtn" class="w-full py-2.5 bg-gray-900 border border-gray-700 rounded-xl text-sm font-medium flex items-center justify-center gap-3 mb-3">
@@ -106,6 +108,8 @@ import {
   getFirestore, collection, doc, getDoc, setDoc, updateDoc, deleteDoc, addDoc, onSnapshot,
   query, orderBy, limit, serverTimestamp, arrayUnion, arrayRemove, increment
 } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+
+const BUILD = "BUILD 1";
 
 const app = initializeApp({
   apiKey: "AIzaSyCJm_0O6NzS0UYnoYAv5MUIp-QR9xGN18Q",
@@ -686,6 +690,7 @@ function viewAbout() {
       <div class="card rounded-xl p-4 text-center text-sm text-indigo-200">
         شكراً لانضمامك إلى عائلة Sovexa.. رحلتك معنا للترفيه والتواصل تبدأ من هنا!
       </div>
+      <p dir="ltr" class="text-center text-[11px] text-gray-500">${BUILD}</p>
     </div>`;
 }
 
@@ -1047,4 +1052,46 @@ document.addEventListener('submit', async (e) => {
     } else if (type === 'create') {
       const text = (fd.get('text') || '').toString().trim();
       if (!text && !pendingPostImg) return showToast("اكتب شيئاً أو أضف صورة");
-      await 
+      btn?.classList.add('btn-busy');
+      await withTimeout(addDoc(collection(db, "posts"), {
+        userId: uid(),
+        userName: nameOf(me()),
+        userPhoto: me().photoURL || '',
+        verified: isVerified(me()),
+        text,
+        image: pendingPostImg || '',
+        likes: [],
+        commentsCount: 0,
+        createdAt: serverTimestamp()
+      }));
+      pendingPostImg = null;
+      showToast("تم النشر ✅");
+      go('home');
+    } else if (type === 'edit') {
+      const name = (fd.get('name') || '').toString().trim();
+      const username = normUser(fd.get('username'));
+      const bio = (fd.get('bio') || '').toString().trim();
+      if (!name) return showToast("أدخل الاسم");
+      if (!username) return showToast("اسم المستخدم مطلوب (إنجليزي وأرقام و _ و .)");
+      if (username.length < 3) return showToast("اسم المستخدم قصير جداً (3 أحرف على الأقل)");
+      const owner = usersByUsername[username];
+      if (owner && owner !== uid()) return showToast("اسم المستخدم مستخدم بالفعل");
+      btn?.classList.add('btn-busy');
+      const data = { name, username, bio };
+      if (pendingPhoto) data.photoURL = pendingPhoto;
+      if (pendingCover) data.coverURL = pendingCover;
+      await withTimeout(setDoc(doc(db, "users", uid()), data, { merge: true }));
+      pendingPhoto = null;
+      pendingCover = null;
+      showToast("تم حفظ الملف الشخصي ✅");
+      go('profile', uid());
+    }
+  } catch (err) {
+    showToast("خطأ: " + err.message);
+  } finally {
+    btn?.classList.remove('btn-busy');
+  }
+});
+</script>
+</body>
+</html>
