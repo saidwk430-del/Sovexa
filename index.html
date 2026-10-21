@@ -137,11 +137,12 @@ const handleOf = (u) => u.username ? "@" + u.username : "";
 
 let currentUser = null, currentView = "home", currentId = null;
 let allUsers = {}, usersByUsername = {}, postsCache = {};
-let usersUnsub = null, postsUnsub = null;
+let usersUnsub = null, postsUnsub = null, savedUnsub = null;
 let unsubs = [], commentUnsubs = {}, openSet = new Set();
 let confirmationResult = null, recaptcha = null;
 let pendingPhoto = null, pendingCover = null, pendingPostImg = null;
 let profileTarget = null;
+let savedIds = new Set();
 
 window.showToast = (msg) => {
   const box = document.createElement('div');
@@ -197,6 +198,14 @@ function withTimeout(promise, ms = 15000) {
   ]);
 }
 
+function backHeader(title) {
+  return `
+    <div class="flex items-center gap-3">
+      <button data-go="menu" class="w-9 h-9 rounded-full bg-gray-800 flex items-center justify-center"><i class="fa-solid fa-arrow-right"></i></button>
+      <h2 class="font-bold text-lg">${title}</h2>
+    </div>`;
+}
+
 // ---------- router ----------
 function clearListeners() {
   unsubs.forEach(f => f());
@@ -218,7 +227,8 @@ function go(view, id) {
   const views = {
     home: viewHome, notifications: viewNotifications, chats: viewChats, chat: viewChat,
     profile: viewProfile, edit: viewEdit, search: viewSearch, friends: viewFriends,
-    create: viewCreate, reels: viewReels, menu: viewMenu, settings: viewSettings
+    create: viewCreate, reels: viewReels, menu: viewMenu, settings: viewSettings,
+    help: viewHelp, about: viewAbout, saved: viewSaved, archive: viewArchive
   };
   (views[view] || viewHome)(id);
   window.scrollTo(0, 0);
@@ -228,6 +238,7 @@ function go(view, id) {
 function actionsHTML(p) {
   const likes = p.likes || [];
   const liked = likes.includes(uid());
+  const saved = savedIds.has(p.id);
   return `
   <div class="flex justify-around items-center border-t border-gray-800 text-sm text-gray-400 py-1">
     <button data-act="like" data-id="${p.id}" class="flex-1 py-2 flex items-center justify-center gap-1.5 ${liked ? 'text-pink-400 font-bold' : ''}">
@@ -235,6 +246,9 @@ function actionsHTML(p) {
     </button>
     <button data-act="comments" data-id="${p.id}" class="flex-1 py-2 flex items-center justify-center gap-1.5">
       <i class="fa-regular fa-comment"></i><span>تعليق</span><span class="text-xs">${p.commentsCount || 0}</span>
+    </button>
+    <button data-act="save" data-id="${p.id}" class="flex-1 py-2 flex items-center justify-center gap-1.5 ${saved ? 'text-amber-400' : ''}">
+      <i class="fa-${saved ? 'solid' : 'regular'} fa-bookmark"></i><span>حفظ</span>
     </button>
     <button data-act="share" data-id="${p.id}" class="flex-1 py-2 flex items-center justify-center gap-1.5">
       <i class="fa-solid fa-share"></i><span>مشاركة</span>
@@ -291,6 +305,21 @@ async function toggleLike(id) {
     p.likes = old;
     refreshPosts();
     showToast("تعذر تسجيل الإعجاب: " + err.message);
+  }
+}
+
+async function toggleSave(id) {
+  const ref = doc(db, "users", uid(), "saved", id);
+  if (savedIds.has(id)) {
+    savedIds.delete(id);
+    refreshPosts();
+    await deleteDoc(ref);
+    showToast("أُزيل من المحفوظات");
+  } else {
+    savedIds.add(id);
+    refreshPosts();
+    await setDoc(ref, { postId: id, savedAt: serverTimestamp() });
+    showToast("تم الحفظ 🔖");
   }
 }
 
@@ -572,10 +601,10 @@ const MENU_GROUPS = [
   ]},
   { title: "المزيد", items: [
     ['fa-clapperboard', 'الريلز', 'data-go="reels"'],
-    ['fa-bookmark', 'المحفوظات', 'data-act="soon"'],
-    ['fa-clock-rotate-left', 'الأرشيف', 'data-act="soon"'],
-    ['fa-circle-question', 'المساعدة والدعم', 'data-act="soon"'],
-    ['fa-circle-info', 'عن Sovexa', 'data-act="about"'],
+    ['fa-bookmark', 'المحفوظات', 'data-go="saved"'],
+    ['fa-clock-rotate-left', 'الأرشيف', 'data-go="archive"'],
+    ['fa-circle-question', 'المساعدة والدعم', 'data-go="help"'],
+    ['fa-circle-info', 'عن Sovexa', 'data-go="about"'],
   ]},
   { title: "الحساب", items: [
     ['fa-right-left', 'تبديل الحساب', 'data-act="logout-menu"'],
@@ -612,6 +641,102 @@ function viewMenu() {
     </div>`;
 }
 
+function viewHelp() {
+  const faqs = [
+    ["كيف يمكنني تعديل الملف الشخصي؟", "يمكنك الانتقال إلى إعدادات الحساب وتحديث صورتك واسمك بكل سهولة."],
+    ["تواجه مشكلة في إرسال أو استقبال الرسائل؟", "تأكد من اتصالك بالإنترنت، أو قم بتحديث التطبيق لأحدث نسخة."],
+    ["كيف أبلغ عن محتوى غير لائق؟", "نحن نُهتم بأمان مجتمعنا؛ يمكنك النقر على خيار \"إبلاغ\" بجانب أي منشور أو محتوى مخالف."],
+  ];
+  V().innerHTML = `
+    <div class="p-3 space-y-3 max-w-xl mx-auto">
+      ${backHeader("مركز المساعدة والدعم 🛠️")}
+      <div class="card rounded-xl p-4 text-sm leading-7 text-gray-300">
+        مرحباً بك في مركز المساعدة والدعم لمنصة Sovexa. نحن هنا لضمان حصولك على أفضل تجربة ممكنة في التواصل، الدردشة، ومشاهدة الفيديوهات.
+      </div>
+      <h3 class="font-bold text-sm text-gray-400 pt-2">الأسئلة الشائعة</h3>
+      ${faqs.map(([q, a]) => `
+        <details class="card rounded-xl p-3">
+          <summary class="text-sm font-bold cursor-pointer">${q}</summary>
+          <p class="text-xs text-gray-400 mt-2 leading-6">${a}</p>
+        </details>`).join('')}
+      <div class="card rounded-xl p-4 text-sm leading-7 text-gray-300">
+        إذا لم تجد إجابة لسؤالك، فريق الدعم لدينا جاهز لمساعدتك على مدار الساعة. تواصل معنا عبر البريد الإلكتروني أو من خلال قنوات التواصل الخاصة بنا.
+        <p dir="ltr" class="text-indigo-300 text-xs mt-2">support@sovexa.app</p>
+      </div>
+    </div>`;
+}
+
+function viewAbout() {
+  V().innerHTML = `
+    <div class="p-3 space-y-3 max-w-xl mx-auto">
+      ${backHeader("عن منصة Sovexa 🌌")}
+      <div class="card rounded-xl p-4 text-sm leading-7 text-gray-300">
+        تعتبر منصة Sovexa وجهتك الرقمية المتكاملة والمبتكرة للتواصل الاجتماعي، الدردشة الحية، واستكشاف أحدث الفيديوهات والمحتوى الترفيهي.
+      </div>
+      <div class="card rounded-xl p-4 space-y-2 text-sm leading-7 text-gray-300">
+        <b class="text-white">رؤيتنا:</b>
+        <p>نهدف إلى بناء مجتمع رقمي تفاعلي يجمع الأصدقاء والعائلات في بيئة آمنة، سريعة، وذات تصميم عصري يجمع بين الإبداع وسهولة الاستخدام.</p>
+      </div>
+      <div class="card rounded-xl p-4 space-y-3 text-sm leading-7 text-gray-300">
+        <b class="text-white">لماذا Sovexa؟</b>
+        <p><b class="text-indigo-300">تواصل بلا حدود:</b> دردش مع أصدقائك وشاركهم لحظاتك اليومية لحظة بلحظة.</p>
+        <p><b class="text-indigo-300">مشاهدة ممتعة:</b> استمتع بمقاطع الفيديو والريلز المتنوعة التي تناسب اهتماماتك.</p>
+        <p><b class="text-indigo-300">تصميم فريد:</b> واجهة مستخدم أنيقة وسلسة تمنحك تجربة مريحة ومميزة.</p>
+      </div>
+      <div class="card rounded-xl p-4 text-center text-sm text-indigo-200">
+        شكراً لانضمامك إلى عائلة Sovexa.. رحلتك معنا للترفيه والتواصل تبدأ من هنا!
+      </div>
+    </div>`;
+}
+
+function viewSaved() {
+  V().innerHTML = `
+    <div class="p-3 space-y-3 max-w-xl mx-auto">
+      ${backHeader("المحفوظات")}
+      <div id="savedList" class="space-y-3"></div>
+    </div>`;
+  renderSavedList();
+}
+
+function renderSavedList() {
+  const box = $('savedList');
+  if (!box) return;
+  const list = [...savedIds].map(id => postsCache[id] ? { id, ...postsCache[id] } : null).filter(Boolean);
+  box.innerHTML = list.length
+    ? list.map(postCard).join('')
+    : '<p class="text-center text-gray-500 py-10 text-sm">لا توجد منشورات محفوظة بعد</p>';
+  restoreOpenComments();
+}
+
+function viewArchive() {
+  const mine = Object.entries(postsCache)
+    .map(([id, p]) => ({ id, ...p }))
+    .filter(p => p.userId === uid())
+    .sort((a, b) => (a.createdAt?.seconds ?? 0) - (b.createdAt?.seconds ?? 0));
+  V().innerHTML = `
+    <div class="p-3 space-y-3 max-w-xl mx-auto">
+      ${backHeader("الأرشيف")}
+      <p class="text-xs text-gray-500">منشوراتك جميعها، من الأقدم إلى الأحدث.</p>
+      ${mine.length ? mine.map(p => `
+        <div class="card rounded-xl p-3 space-y-2">
+          <p class="text-sm whitespace-pre-wrap">${esc(p.text || '(صورة فقط)')}</p>
+          <div class="flex items-center justify-between text-xs text-gray-500">
+            <span>${timeAgo(p.createdAt)} · ${(p.likes || []).length} إعجاب</span>
+            <button data-act="delpost" data-id="${p.id}" class="text-red-400"><i class="fa-solid fa-trash"></i> حذف</button>
+          </div>
+        </div>`).join('') : '<p class="text-center text-gray-500 py-10 text-sm">لم تنشر أي منشور بعد</p>'}
+    </div>`;
+}
+
+function viewReels() {
+  V().innerHTML = `
+    <div class="p-6 text-center mt-16 space-y-3">
+      <i class="fa-solid fa-clapperboard text-5xl text-indigo-400"></i>
+      <h2 class="text-lg font-bold">الريلز</h2>
+      <p class="text-sm text-gray-400">رفع الفيديوهات يحتاج Firebase Storage، وهي المرحلة التالية.</p>
+    </div>`;
+}
+
 function viewSettings() {
   V().innerHTML = `
     <div class="p-3 space-y-3 max-w-xl mx-auto">
@@ -628,15 +753,6 @@ function viewSettings() {
         <button data-act="soon" class="w-full px-4 py-3 text-right flex justify-between border-t border-gray-800"><span>اللغة</span><span class="text-gray-500 text-xs">العربية</span></button>
       </div>
       <button data-act="logout-menu" class="w-full rounded-xl p-3 bg-red-600/20 border border-red-500/30 text-red-300 text-sm font-bold">تسجيل الخروج</button>
-    </div>`;
-}
-
-function viewReels() {
-  V().innerHTML = `
-    <div class="p-6 text-center mt-16 space-y-3">
-      <i class="fa-solid fa-clapperboard text-5xl text-indigo-400"></i>
-      <h2 class="text-lg font-bold">الريلز</h2>
-      <p class="text-sm text-gray-400">رفع الفيديوهات يحتاج Firebase Storage، وهي المرحلة التالية.</p>
     </div>`;
 }
 
@@ -720,7 +836,9 @@ onAuthStateChanged(auth, async (user) => {
     clearListeners();
     if (usersUnsub) { usersUnsub(); usersUnsub = null; }
     if (postsUnsub) { postsUnsub(); postsUnsub = null; }
+    if (savedUnsub) { savedUnsub(); savedUnsub = null; }
     postsCache = {};
+    savedIds = new Set();
     showLogin();
     return;
   }
@@ -743,7 +861,16 @@ onAuthStateChanged(auth, async (user) => {
       postsCache = {};
       s.forEach(d => postsCache[d.id] = d.data());
       refreshPosts();
+      if (currentView === 'saved') renderSavedList();
+      if (currentView === 'archive') viewArchive();
     }, (err) => showToast("تعذر تحميل المنشورات: " + err.message));
+  }
+  if (!savedUnsub) {
+    savedUnsub = onSnapshot(collection(db, "users", user.uid, "saved"), (s) => {
+      savedIds = new Set(s.docs.map(d => d.id));
+      refreshPosts();
+      if (currentView === 'saved') renderSavedList();
+    }, () => {});
   }
   go('home');
 });
@@ -827,6 +954,8 @@ document.addEventListener('click', async (e) => {
       await toggleLike(id);
     } else if (act === 'comments') {
       openComments(id);
+    } else if (act === 'save') {
+      await toggleSave(id);
     } else if (act === 'share') {
       const p = postsCache[id] || {};
       if (navigator.share) {
@@ -852,8 +981,6 @@ document.addEventListener('click', async (e) => {
       document.getElementById('subSheet')?.remove();
     } else if (act === 'soon') {
       showToast("هذه الميزة قريباً");
-    } else if (act === 'about') {
-      showToast("Sovexa: منصة تواصل اجتماعي ودردشة");
     } else if (act === 'logout-menu') {
       showLogoutSheet();
     } else if (act === 'logout-confirm') {
@@ -920,37 +1047,4 @@ document.addEventListener('submit', async (e) => {
     } else if (type === 'create') {
       const text = (fd.get('text') || '').toString().trim();
       if (!text && !pendingPostImg) return showToast("اكتب شيئاً أو أضف صورة");
-      await addDoc(collection(db, "posts"), {
-        userId: uid(), userName: nameOf(me()), userPhoto: me().photoURL || '',
-        verified: isVerified(me()),
-        text, image: pendingPostImg || '', likes: [], commentsCount: 0, createdAt: serverTimestamp()
-      });
-      pendingPostImg = null;
-      showToast("تم النشر");
-      go('home');
-    } else if (type === 'edit') {
-      if (btn) { btn.disabled = true; btn.textContent = "جاري الحفظ..."; btn.classList.add('btn-busy'); }
-      const name = (fd.get('name') || '').toString().trim();
-      const username = normUser(fd.get('username'));
-      const bio = (fd.get('bio') || '').toString().trim();
-      if (!name) throw new Error("الاسم مطلوب");
-      if (username.length < 3) throw new Error("اسم المستخدم يجب أن يكون 3 أحرف على الأقل");
-      const takenBy = usersByUsername[username];
-      if (takenBy && takenBy !== uid()) throw new Error("اسم المستخدم مستخدم من شخص آخر، اختر اسماً مختلفاً");
-      const data = { name, username, bio };
-      if (pendingPhoto) data.photoURL = pendingPhoto;
-      if (pendingCover) data.coverURL = pendingCover;
-      await withTimeout(setDoc(doc(db, "users", uid()), data, { merge: true }));
-      pendingPhoto = null;
-      pendingCover = null;
-      showToast("تم حفظ التعديلات");
-      go('profile', uid());
-    }
-  } catch (err) {
-    showToast("خطأ: " + err.message);
-    if (type === 'edit' && btn) { btn.disabled = false; btn.textContent = "حفظ"; btn.classList.remove('btn-busy'); }
-  }
-});
-</script>
-</body>
-  </html>
+      await 
