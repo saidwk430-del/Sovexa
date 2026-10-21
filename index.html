@@ -11,11 +11,16 @@
 <style>
   body { background:#0b0f17; color:#e5e7eb; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; }
   .card { background:#111827; border:1px solid #1f2937; }
-  .icon-btn { width:2.5rem; height:2.5rem; border-radius:9999px; background:#1f2937; display:flex; align-items:center; justify-content:center; }
+  .hidden { display:none !important; }
   .safe-top { padding-top: env(safe-area-inset-top, 0px); }
   .safe-bottom { padding-bottom: env(safe-area-inset-bottom, 0px); }
-  .hidden { display:none !important; }
   .btn-busy { opacity:.6; pointer-events:none; }
+  .tab-btn { height:2.75rem; border-radius:0.9rem; background:#111827; border:1px solid #1f2937; color:#9ca3af; display:flex; align-items:center; justify-content:center; font-size:1.05rem; position:relative; }
+  .tab-on { background:rgba(99,102,241,.22); color:#a5b4fc; border-color:rgba(129,140,248,.5); }
+  .tab-dot { position:absolute; top:4px; left:calc(50% + 10px); background:#ec4899; color:#fff; font-size:10px; border-radius:9999px; padding:0 5px; }
+  .icon-btn { width:2.5rem; height:2.5rem; border-radius:9999px; background:#1f2937; display:flex; align-items:center; justify-content:center; }
+  .bubble-me { background:linear-gradient(135deg,#4f46e5,#7c3aed); color:#fff; border-radius:1.1rem 1.1rem 0.3rem 1.1rem; }
+  .bubble-other { background:#1f2937; color:#e5e7eb; border-radius:1.1rem 1.1rem 1.1rem 0.3rem; }
 </style>
 </head>
 <body class="min-h-screen">
@@ -77,35 +82,31 @@
       <span class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-pink-400" style="font-family:Outfit">Sovexa</span>
       <div class="flex gap-2">
         <button data-go="search" class="icon-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
-        <button data-go="chats" class="icon-btn"><i class="fa-brands fa-facebook-messenger"></i></button>
+        <button data-go="menu" class="icon-btn"><i class="fa-solid fa-bars"></i></button>
       </div>
+    </div>
+    <div class="grid grid-cols-4 gap-2 px-3 pb-2">
+      <button data-tab="home" data-go="home" class="tab-btn"><i class="fa-solid fa-house"></i></button>
+      <button data-tab="notifications" data-go="notifications" class="tab-btn"><i class="fa-solid fa-bell"></i></button>
+      <button data-tab="chats" data-go="chats" class="tab-btn"><i class="fa-solid fa-comments"></i></button>
+      <button data-tab="profile" data-go="profile" data-id="" class="tab-btn"><i class="fa-solid fa-user"></i></button>
     </div>
   </header>
 
-  <main id="view" class="flex-1 pb-20"></main>
-
-  <nav class="fixed bottom-0 inset-x-0 z-40 bg-[#111827] border-t border-gray-800 safe-bottom">
-    <div class="grid grid-cols-5 h-14 text-gray-400 text-lg">
-      <button data-go="home" class="flex items-center justify-center"><i class="fa-solid fa-house"></i></button>
-      <button data-go="reels" class="flex items-center justify-center"><i class="fa-solid fa-clapperboard"></i></button>
-      <button data-go="create" class="flex items-center justify-center text-indigo-400"><i class="fa-solid fa-square-plus"></i></button>
-      <button data-go="friends" class="flex items-center justify-center"><i class="fa-solid fa-user-group"></i></button>
-      <button data-go="menu" class="flex items-center justify-center"><i class="fa-solid fa-bars"></i></button>
-    </div>
-  </nav>
+  <main id="view" class="flex-1 pb-8"></main>
 </div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
 import {
   getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult,
   signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut,
   RecaptchaVerifier, signInWithPhoneNumber
-} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+} from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
 import {
   getFirestore, collection, doc, getDoc, setDoc, updateDoc, deleteDoc, addDoc, onSnapshot,
-  query, where, orderBy, limit, serverTimestamp, arrayUnion, arrayRemove
-} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  query, where, orderBy, limit, serverTimestamp, arrayUnion, arrayRemove, increment
+} from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
 const app = initializeApp({
   apiKey: "AIzaSyCJm_0O6NzS0UYnoYAv5MUIp-QR9xGN18Q",
@@ -129,20 +130,12 @@ const chatIdFor = (a, b) => [a, b].sort().join("_");
 const normUser = (s) => String(s || "").trim().toLowerCase().replace(/^@/, "").replace(/[^a-z0-9_.]/g, "");
 const handleOf = (u) => u.username ? "@" + u.username : "";
 
-let currentUser = null;
-let currentView = "home";
-let currentId = null;
-let allUsers = {};
-let usersByUsername = {};
-let usersUnsub = null;
-let unsubs = [];
-let commentUnsubs = {};
-let openSet = new Set();
-let confirmationResult = null;
-let recaptcha = null;
-let pendingPhoto = null;
-let pendingCover = null;
-let pendingPostImg = null;
+let currentUser = null, currentView = "home", currentId = null;
+let allUsers = {}, usersByUsername = {}, postsCache = {};
+let usersUnsub = null, postsUnsub = null;
+let unsubs = [], commentUnsubs = {}, openSet = new Set();
+let confirmationResult = null, recaptcha = null;
+let pendingPhoto = null, pendingCover = null, pendingPostImg = null;
 
 window.showToast = (msg) => {
   const box = document.createElement('div');
@@ -207,24 +200,48 @@ function clearListeners() {
   openSet.clear();
 }
 
+function setActiveTab(view) {
+  document.querySelectorAll('[data-tab]').forEach(b => {
+    const on = b.dataset.tab === view;
+    b.classList.toggle('tab-on', on);
+  });
+}
+
 function go(view, id) {
   clearListeners();
   currentView = view;
   currentId = id || null;
-  document.querySelectorAll('nav [data-go]').forEach(b => b.classList.toggle('text-indigo-400', b.dataset.go === view));
+  setActiveTab(view);
   const views = {
-    home: viewHome, reels: viewReels, create: viewCreate, friends: viewFriends,
-    menu: viewMenu, search: viewSearch, chats: viewChats, profile: viewProfile,
-    chat: viewChat, edit: viewEdit, settings: viewSettings
+    home: viewHome, notifications: viewNotifications, chats: viewChats, chat: viewChat,
+    profile: viewProfile, edit: viewEdit, search: viewSearch, friends: viewFriends,
+    create: viewCreate, reels: viewReels, menu: viewMenu, settings: viewSettings
   };
   (views[view] || viewHome)(id);
   window.scrollTo(0, 0);
 }
 
-// ---------- posts & comments ----------
-function postCard(id, p) {
-  const liked = (p.likes || []).includes(uid());
-  const count = (p.likes || []).length;
+// ---------- posts ----------
+let profileTarget = null;
+
+function actionsHTML(p) {
+  const likes = p.likes || [];
+  const liked = likes.includes(uid());
+  return `
+  <div class="flex justify-around items-center border-t border-gray-800 text-sm text-gray-400 py-1">
+    <button data-act="like" data-id="${p.id}" class="flex-1 py-2 flex items-center justify-center gap-1.5 ${liked ? 'text-pink-400 font-bold' : ''}">
+      <i class="fa-${liked ? 'solid' : 'regular'} fa-heart"></i><span>إعجاب</span><span class="text-xs">${likes.length}</span>
+    </button>
+    <button data-act="comments" data-id="${p.id}" class="flex-1 py-2 flex items-center justify-center gap-1.5">
+      <i class="fa-regular fa-comment"></i><span>تعليق</span><span class="text-xs">${p.commentsCount || 0}</span>
+    </button>
+    <button data-act="share" data-id="${p.id}" class="flex-1 py-2 flex items-center justify-center gap-1.5">
+      <i class="fa-solid fa-share"></i><span>مشاركة</span>
+    </button>
+  </div>`;
+}
+
+function postCard(p) {
   return `
   <article class="card rounded-xl overflow-hidden">
     <div class="flex items-center gap-3 p-3">
@@ -233,22 +250,52 @@ function postCard(id, p) {
         <b class="block text-sm text-white truncate">${esc(p.userName)}</b>
         <span class="text-xs text-gray-500">${timeAgo(p.createdAt)}</span>
       </div>
-      ${p.userId === uid() ? `<button data-act="delpost" data-id="${id}" class="text-gray-500 px-2"><i class="fa-solid fa-trash"></i></button>` : ''}
+      ${p.userId === uid() ? `<button data-act="delpost" data-id="${p.id}" class="text-gray-500 px-2"><i class="fa-solid fa-trash"></i></button>` : ''}
     </div>
     ${p.text ? `<p class="px-3 pb-3 text-sm whitespace-pre-wrap">${esc(p.text)}</p>` : ''}
     ${p.image ? `<img src="${esc(p.image)}" class="w-full max-h-[480px] object-cover">` : ''}
-    <div class="flex justify-around border-t border-gray-800 text-sm text-gray-400">
-      <button data-act="like" data-id="${id}" data-liked="${liked ? 1 : 0}" class="flex-1 py-2 ${liked ? 'text-indigo-400' : ''}"><i class="fa-solid fa-thumbs-up"></i> ${count} إعجاب</button>
-      <button data-act="comments" data-id="${id}" class="flex-1 py-2"><i class="fa-regular fa-comment"></i> تعليق</button>
-    </div>
-    <div id="cbox-${id}" class="hidden p-3 border-t border-gray-800 space-y-2"></div>
+    ${actionsHTML(p)}
+    <div id="cbox-${p.id}" class="hidden p-3 border-t border-gray-800 space-y-2"></div>
   </article>`;
+}
+
+function renderPosts(containerId, filter, emptyMsg) {
+  const box = $(containerId);
+  if (!box) return;
+  const list = Object.entries(postsCache)
+    .map(([id, p]) => ({ id, ...p }))
+    .filter(filter || (() => true))
+    .sort((a, b) => (b.createdAt?.seconds ?? Date.now() / 1000) - (a.createdAt?.seconds ?? Date.now() / 1000));
+  box.innerHTML = list.length
+    ? list.map(postCard).join('')
+    : `<p class="text-center text-gray-500 py-10">${emptyMsg || 'لا توجد منشورات بعد'}</p>`;
+  restoreOpenComments();
+}
+
+function refreshPosts() {
+  renderPosts('feed', null);
+  if (profileTarget) renderPosts('uposts', p => p.userId === profileTarget, 'لا توجد منشورات');
+}
+
+async function toggleLike(id) {
+  const p = postsCache[id];
+  if (!p) return;
+  const old = [...(p.likes || [])];
+  const liked = old.includes(uid());
+  p.likes = liked ? old.filter(x => x !== uid()) : [...old, uid()];
+  refreshPosts();
+  try {
+    await updateDoc(doc(db, "posts", id), { likes: liked ? arrayRemove(uid()) : arrayUnion(uid()) });
+  } catch (err) {
+    p.likes = old;
+    refreshPosts();
+    showToast("تعذر تسجيل الإعجاب: " + err.message);
+  }
 }
 
 function watchComments(id) {
   commentUnsubs[id] && commentUnsubs[id]();
-  const box0 = $('cbox-' + id);
-  if (box0) box0.classList.remove('hidden');
+  $('cbox-' + id)?.classList.remove('hidden');
   const q = query(collection(db, "posts", id, "comments"), orderBy("createdAt", "asc"), limit(50));
   commentUnsubs[id] = onSnapshot(q, (snap) => {
     const box = $('cbox-' + id);
@@ -291,22 +338,24 @@ function viewHome() {
       </section>
       <div id="feed" class="space-y-3"></div>
     </div>`;
-  unsubs.push(onSnapshot(query(collection(db, "posts"), orderBy("createdAt", "desc"), limit(50)), (snap) => {
-    const feed = $('feed');
-    if (!feed) return;
-    feed.innerHTML = snap.empty
-      ? '<p class="text-center text-gray-500 py-10">لا توجد منشورات بعد</p>'
-      : snap.docs.map(d => postCard(d.id, d.data())).join('');
-    restoreOpenComments();
-  }));
+  refreshPosts();
 }
 
-function viewReels() {
+function viewNotifications() {
+  const list = Object.entries(postsCache)
+    .map(([id, p]) => ({ id, ...p }))
+    .filter(p => p.userId !== uid())
+    .sort((a, b) => (b.createdAt?.seconds ?? 0) - (a.createdAt?.seconds ?? 0))
+    .slice(0, 30);
   V().innerHTML = `
-    <div class="p-6 text-center mt-16 space-y-3">
-      <i class="fa-solid fa-clapperboard text-5xl text-indigo-400"></i>
-      <h2 class="text-lg font-bold">الريلز</h2>
-      <p class="text-sm text-gray-400">رفع الفيديوهات يحتاج Firebase Storage، وهي المرحلة التالية.</p>
+    <div class="p-3 space-y-2 max-w-xl mx-auto">
+      <h2 class="font-bold text-lg mb-2">الإشعارات</h2>
+      ${list.length ? list.map(p => `
+        <div class="card rounded-xl p-3 flex items-center gap-3">
+          ${avatarHTML(p.userName, p.userPhoto, 'w-9 h-9 text-xs')}
+          <div class="text-sm"><b>${esc(p.userName)}</b> نشر منشوراً جديداً
+            <div class="text-xs text-gray-500">${timeAgo(p.createdAt)}</div></div>
+        </div>`).join('') : '<p class="text-center text-gray-500 py-10">لا توجد إشعارات بعد</p>'}
     </div>`;
 }
 
@@ -386,39 +435,63 @@ function viewChats() {
   V().innerHTML = `
     <div class="p-3 space-y-2 max-w-xl mx-auto">
       <h2 class="font-bold text-lg mb-2">الدردشات</h2>
+      <button data-go="chat" data-id="global" class="card rounded-xl p-3 w-full flex items-center gap-3 text-right">
+        <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-purple-600 to-pink-500 flex items-center justify-center font-bold">S</div>
+        <div><b class="text-sm block">الدردشة العامة Sovexa</b><span class="text-xs text-emerald-400">مفتوحة للجميع</span></div>
+      </button>
       ${following.length ? following.map(u => `
         <button data-go="chat" data-id="${u.uid}" class="card rounded-xl p-3 w-full flex items-center gap-3 text-right">
           ${avatarHTML(nameOf(u), u.photoURL)}
           <div><b class="text-sm block">${esc(nameOf(u))}</b><span class="text-xs text-gray-500">${esc(handleOf(u))}</span></div>
-        </button>`).join('') : '<p class="text-center text-gray-500 py-8">تابع أشخاصاً لتبدأ الدردشة معهم</p>'}
+        </button>`).join('') : '<p class="text-center text-gray-500 py-8 text-sm">تابع أشخاصاً لتبدأ الدردشة معهم</p>'}
     </div>`;
 }
 
 function viewChat(otherId) {
+  const isGlobal = otherId === 'global';
   const o = allUsers[otherId] || { uid: otherId, name: "مستخدم" };
-  const cid = chatIdFor(uid(), otherId);
-  setDoc(doc(db, "chats", cid), { members: [uid(), otherId] }, { merge: true }).catch(() => {});
+  const title = isGlobal ? "الدردشة العامة Sovexa" : nameOf(o);
+  const cid = isGlobal ? "global" : chatIdFor(uid(), otherId);
+  if (!isGlobal) setDoc(doc(db, "chats", cid), { members: [uid(), otherId] }, { merge: true }).catch(() => {});
   V().innerHTML = `
-    <div class="flex flex-col h-[calc(100vh-7.5rem)]">
-      <div class="flex items-center gap-3 p-3 border-b border-gray-800">
-        <button data-go="chats" class="px-2"><i class="fa-solid fa-arrow-right"></i></button>
-        ${avatarHTML(nameOf(o), o.photoURL, 'w-9 h-9 text-xs')}
-        <b class="text-sm">${esc(nameOf(o))}</b>
+    <div class="flex flex-col h-[calc(100vh-10.5rem)] max-w-2xl mx-auto">
+      <div class="flex items-center gap-3 px-3 py-2 border-b border-gray-800 bg-[#111827]">
+        <button data-go="chats" class="w-9 h-9 rounded-full bg-gray-800 flex items-center justify-center"><i class="fa-solid fa-arrow-right"></i></button>
+        ${isGlobal
+          ? `<div class="w-9 h-9 rounded-full bg-gradient-to-tr from-purple-600 to-pink-500 flex items-center justify-center font-bold text-sm">S</div>`
+          : avatarHTML(nameOf(o), o.photoURL, 'w-9 h-9 text-xs')}
+        <div class="min-w-0">
+          <b class="block text-sm truncate">${esc(title)}</b>
+          <span class="text-[11px] text-emerald-400">${isGlobal ? 'مجتمع Sovexa' : esc(handleOf(o))}</span>
+        </div>
       </div>
-      <div id="msgs" class="flex-1 overflow-y-auto p-3 space-y-2"></div>
-      <form data-form="msg" data-id="${otherId}" class="p-3 flex gap-2 border-t border-gray-800">
-        <input name="t" autocomplete="off" placeholder="اكتب رسالة..." class="flex-1 bg-gray-800 rounded-full px-4 py-2 text-sm outline-none">
-        <button class="px-4 rounded-full bg-indigo-600 text-sm font-bold">إرسال</button>
+      <div id="msgs" class="flex-1 overflow-y-auto px-3 py-3 space-y-2 bg-[#0b0f17]"></div>
+      <form data-form="msg" data-id="${cid}" class="p-2 flex items-center gap-2 border-t border-gray-800 bg-[#111827]">
+        <input name="t" autocomplete="off" placeholder="اكتب رسالة..." class="flex-1 bg-gray-800 rounded-full px-4 py-2.5 text-sm outline-none">
+        <button class="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-600 to-pink-600 flex items-center justify-center shrink-0"><i class="fa-solid fa-paper-plane text-sm"></i></button>
       </form>
     </div>`;
   unsubs.push(onSnapshot(query(collection(db, "chats", cid, "messages"), orderBy("createdAt", "asc"), limit(200)), (snap) => {
     const el = $('msgs');
     if (!el) return;
+    if (snap.empty) {
+      el.innerHTML = '<p class="text-center text-gray-500 text-xs py-10">ابدأ المحادثة الآن</p>';
+      return;
+    }
     el.innerHTML = snap.docs.map(d => {
       const m = d.data();
       const mine = m.senderId === uid();
-      return `<div class="flex ${mine ? 'justify-end' : 'justify-start'}">
-        <div class="max-w-[75%] px-3 py-2 rounded-2xl text-sm ${mine ? 'bg-indigo-600 text-white' : 'bg-gray-800'}">${esc(m.text)}</div></div>`;
+      const sender = allUsers[m.senderId];
+      const senderLine = (!mine && isGlobal)
+        ? `<div class="text-[11px] text-indigo-300 mb-0.5 px-1">${esc(sender ? nameOf(sender) : (m.senderName || ''))}</div>` : '';
+      return `
+        <div class="flex items-end gap-2 ${mine ? 'justify-end' : 'justify-start'}">
+          ${!mine ? avatarHTML(sender ? nameOf(sender) : (m.senderName || '?'), sender?.photoURL, 'w-7 h-7 text-[10px]') : ''}
+          <div class="max-w-[75%]">
+            ${senderLine}
+            <div class="${mine ? 'bubble-me' : 'bubble-other'} px-3 py-2 text-sm whitespace-pre-wrap break-words">${esc(m.text)}</div>
+          </div>
+        </div>`;
     }).join('');
     el.scrollTop = el.scrollHeight;
   }));
@@ -426,10 +499,12 @@ function viewChat(otherId) {
 
 function viewProfile(id) {
   const target = id || uid();
+  profileTarget = target;
   const u = allUsers[target] || { uid: target, name: "مستخدم" };
   const own = target === uid();
   const followers = Object.values(allUsers).filter(x => (x.following || []).includes(target)).length;
   const following = (u.following || []).length;
+  const postsCount = Object.values(postsCache).filter(p => p.userId === target).length;
   V().innerHTML = `
     <div class="h-32 bg-gradient-to-r from-indigo-700 via-purple-700 to-pink-600 bg-cover bg-center" style="${u.coverURL ? `background-image:url('${esc(u.coverURL)}')` : ''}"></div>
     <div class="px-4 -mt-12 text-center">
@@ -437,25 +512,16 @@ function viewProfile(id) {
       <h2 class="text-xl font-black mt-2">${esc(nameOf(u))}</h2>
       <p class="text-xs text-indigo-300">${esc(handleOf(u))}</p>
       <p class="text-sm text-gray-400 mt-1">${esc(u.bio || '')}</p>
-      <p class="text-xs text-gray-500 mt-1">${followers} متابع · ${following} يتابع</p>
+      <p class="text-xs text-gray-500 mt-1">${postsCount} منشور · ${followers} متابع · ${following} يتابع</p>
       <div class="flex gap-2 justify-center mt-3">
         ${own
           ? `<button data-go="edit" class="px-6 py-2 rounded-lg bg-gray-700 text-sm font-bold">تعديل الملف الشخصي</button>
-             <button data-go="settings" class="px-4 py-2 rounded-lg bg-gray-700 text-sm font-bold"><i class="fa-solid fa-gear"></i></button>`
+             <button data-go="menu" class="px-4 py-2 rounded-lg bg-gray-700 text-sm font-bold"><i class="fa-solid fa-bars"></i></button>`
           : `${followBtn(target)}<button data-go="chat" data-id="${target}" class="px-4 py-2 rounded-lg bg-gray-700 text-xs font-bold">مراسلة</button>`}
       </div>
     </div>
     <div id="uposts" class="p-3 space-y-3 mt-4 max-w-xl mx-auto"></div>`;
-  unsubs.push(onSnapshot(query(collection(db, "posts"), where("userId", "==", target)), (snap) => {
-    const el = $('uposts');
-    if (!el) return;
-    const t = (d) => d.data().createdAt?.seconds ?? Date.now() / 1000;
-    const docs = [...snap.docs].sort((a, b) => t(b) - t(a));
-    el.innerHTML = docs.length
-      ? docs.map(d => postCard(d.id, d.data())).join('')
-      : '<p class="text-center text-gray-500 py-8">لا توجد منشورات</p>';
-    restoreOpenComments();
-  }));
+  renderPosts('uposts', p => p.userId === target, 'لا توجد منشورات');
 }
 
 function viewEdit() {
@@ -477,7 +543,7 @@ function viewEdit() {
       <label class="block text-xs text-gray-400">الاسم المعروض (يمكن تكراره)
         <input name="name" required value="${esc(nameOf(u))}" class="mt-1 w-full bg-gray-800 rounded-lg px-3 py-2 text-sm outline-none">
       </label>
-      <label class="block text-xs text-gray-400">اسم المستخدم الفريد (بالإنجليزية والأرقام و _ و .)
+      <label class="block text-xs text-gray-400">اسم المستخدم الفريد (إنجليزي وأرقام و _ و .)
         <input name="username" required dir="ltr" value="${esc(u.username || '')}" class="mt-1 w-full bg-gray-800 rounded-lg px-3 py-2 text-sm outline-none">
       </label>
       <label class="block text-xs text-gray-400">النبذة
@@ -488,25 +554,57 @@ function viewEdit() {
     </form>`;
 }
 
+const MENU_GROUPS = [
+  { title: "حسابي", items: [
+    ['fa-user', 'الملف الشخصي', 'data-go="profile" data-id="' + '"'],
+    ['fa-pen', 'تعديل الملف الشخصي', 'data-go="edit"'],
+    ['fa-gear', 'الإعدادات', 'data-go="settings"'],
+  ]},
+  { title: "التواصل", items: [
+    ['fa-user-group', 'الأصدقاء', 'data-go="friends"'],
+    ['fa-comments', 'الدردشات', 'data-go="chats"'],
+    ['fa-magnifying-glass', 'البحث', 'data-go="search"'],
+    ['fa-bell', 'الإشعارات', 'data-go="notifications"'],
+  ]},
+  { title: "المزيد", items: [
+    ['fa-clapperboard', 'الريلز', 'data-go="reels"'],
+    ['fa-bookmark', 'المحفوظات', 'data-act="soon"'],
+    ['fa-clock-rotate-left', 'الأرشيف', 'data-act="soon"'],
+    ['fa-circle-question', 'المساعدة والدعم', 'data-act="soon"'],
+    ['fa-circle-info', 'عن Sovexa', 'data-act="about"'],
+  ]},
+  { title: "الحساب", items: [
+    ['fa-right-left', 'تبديل الحساب', 'data-act="logout-menu"'],
+    ['fa-right-from-bracket', 'تسجيل الخروج', 'data-act="logout-menu"'],
+  ]},
+];
+
 function viewMenu() {
   const u = me();
-  const item = (icon, label, attrs) => `
-    <button ${attrs} class="card rounded-xl p-3 w-full flex items-center gap-3 text-right">
-      <i class="fa-solid ${icon} w-5 text-indigo-400"></i><span class="text-sm">${label}</span>
-    </button>`;
+  const groups = MENU_GROUPS.map((g, gi) => {
+    const items = g.items.map(([icon, label, attrs], i) => {
+      const fixed = (label === 'الملف الشخصي') ? `data-go="profile" data-id="${uid()}"` : attrs;
+      const danger = label === 'تسجيل الخروج';
+      return `
+        <button ${fixed} class="w-full flex items-center gap-3 px-4 py-3 text-right ${i ? 'border-t border-gray-800' : ''}">
+          <span class="w-8 h-8 rounded-lg flex items-center justify-center ${danger ? 'bg-red-600/20 text-red-400' : 'bg-gray-800 text-indigo-300'}"><i class="fa-solid ${icon} text-sm"></i></span>
+          <span class="text-sm flex-1 ${danger ? 'text-red-400' : ''}">${label}</span>
+          <i class="fa-solid fa-chevron-left text-[10px] text-gray-600"></i>
+        </button>`;
+    }).join('');
+    return `<div class="card rounded-xl overflow-hidden"><p class="px-4 pt-3 pb-1 text-[11px] text-gray-500">${g.title}</p>${items}</div>`;
+  }).join('');
   V().innerHTML = `
-    <div class="p-3 space-y-2 max-w-xl mx-auto">
-      <button data-go="profile" data-id="${uid()}" class="card rounded-xl p-3 w-full flex items-center gap-3 text-right mb-3">
-        ${avatarHTML(nameOf(u), u.photoURL, 'w-12 h-12')}
-        <div><b class="block">${esc(nameOf(u))}</b><span class="text-xs text-gray-500">عرض ملفك الشخصي</span></div>
+    <div class="p-3 space-y-3 max-w-xl mx-auto">
+      <button data-go="profile" data-id="${uid()}" class="card rounded-xl p-4 w-full flex items-center gap-3 text-right">
+        ${avatarHTML(nameOf(u), u.photoURL, 'w-14 h-14 text-lg')}
+        <div class="flex-1 min-w-0">
+          <b class="block truncate">${esc(nameOf(u))}</b>
+          <span class="text-xs text-indigo-300">${esc(handleOf(u) || 'عرض الملف الشخصي')}</span>
+        </div>
+        <i class="fa-solid fa-chevron-left text-xs text-gray-500"></i>
       </button>
-      ${item('fa-user', 'الملف الشخصي', `data-go="profile" data-id="${uid()}"`)}
-      ${item('fa-user-group', 'الأصدقاء', `data-go="friends"`)}
-      ${item('fa-comments', 'الدردشات', `data-go="chats"`)}
-      ${item('fa-magnifying-glass', 'البحث', `data-go="search"`)}
-      ${item('fa-clapperboard', 'الريلز', `data-go="reels"`)}
-      ${item('fa-gear', 'الإعدادات', `data-go="settings"`)}
-      ${item('fa-right-from-bracket', 'تسجيل الخروج', `data-act="logout-menu"`)}
+      ${groups}
     </div>`;
 }
 
@@ -515,32 +613,45 @@ function viewSettings() {
     <div class="p-3 space-y-3 max-w-xl mx-auto">
       <h2 class="text-lg font-bold">الإعدادات</h2>
       <div class="card rounded-xl p-4 space-y-1 text-sm">
-        <p class="text-gray-400 text-xs">الحساب</p>
-        <p>${esc(currentUser?.email || currentUser?.phoneNumber || '')}</p>
+        <p class="text-gray-400 text-xs">الحساب المسجّل</p>
+        <p dir="ltr" class="text-right">${esc(currentUser?.email || currentUser?.phoneNumber || '')}</p>
         <p class="text-indigo-300 text-xs">${esc(handleOf(me()))}</p>
       </div>
-      <button data-go="edit" class="card rounded-xl p-3 w-full text-right text-sm">تعديل الملف الشخصي</button>
+      <div class="card rounded-xl overflow-hidden text-sm">
+        <button data-go="edit" class="w-full px-4 py-3 text-right flex justify-between"><span>تعديل الملف الشخصي</span><i class="fa-solid fa-chevron-left text-xs text-gray-500"></i></button>
+        <button data-act="soon" class="w-full px-4 py-3 text-right flex justify-between border-t border-gray-800"><span>الخصوصية</span><i class="fa-solid fa-chevron-left text-xs text-gray-500"></i></button>
+        <button data-act="soon" class="w-full px-4 py-3 text-right flex justify-between border-t border-gray-800"><span>الإشعارات</span><i class="fa-solid fa-chevron-left text-xs text-gray-500"></i></button>
+        <button data-act="soon" class="w-full px-4 py-3 text-right flex justify-between border-t border-gray-800"><span>اللغة</span><span class="text-gray-500 text-xs">العربية</span></button>
+      </div>
       <button data-act="logout-menu" class="w-full rounded-xl p-3 bg-red-600/20 border border-red-500/30 text-red-300 text-sm font-bold">تسجيل الخروج</button>
+    </div>`;
+}
+
+function viewReels() {
+  V().innerHTML = `
+    <div class="p-6 text-center mt-16 space-y-3">
+      <i class="fa-solid fa-clapperboard text-5xl text-indigo-400"></i>
+      <h2 class="text-lg font-bold">الريلز</h2>
+      <p class="text-sm text-gray-400">رفع الفيديوهات يحتاج Firebase Storage، وهي المرحلة التالية.</p>
     </div>`;
 }
 
 function renderUsersLive() {
   if (!currentUser) return;
   if (currentView === 'search') renderSearch($('q')?.value || '');
-  else if (['friends', 'chats', 'profile', 'settings', 'menu'].includes(currentView)) go(currentView, currentId);
+  else if (['friends', 'chats', 'profile', 'menu', 'settings'].includes(currentView)) go(currentView, currentId);
 }
 
 // ---------- logout sheet ----------
 function showLogoutSheet() {
-  const old = document.getElementById('logoutSheet');
-  if (old) old.remove();
+  document.getElementById('logoutSheet')?.remove();
   const sheet = document.createElement('div');
   sheet.id = 'logoutSheet';
   sheet.className = 'fixed inset-0 z-[70] bg-black/60 flex items-end justify-center';
   sheet.innerHTML = `
     <div class="card w-full max-w-md rounded-t-3xl p-4 space-y-2 safe-bottom">
       <div class="mx-auto w-12 h-1.5 rounded-full bg-gray-600 mb-2"></div>
-      <p class="text-center text-sm text-gray-400 mb-2">${esc(currentUser?.email || currentUser?.phoneNumber || '')}</p>
+      <p dir="ltr" class="text-center text-sm text-gray-400 mb-2">${esc(currentUser?.email || currentUser?.phoneNumber || '')}</p>
       <button data-act="logout-confirm" class="w-full py-3 rounded-xl bg-red-600/20 border border-red-500/30 text-red-300 font-bold text-sm">تسجيل الخروج من هذا الحساب</button>
       <button data-act="logout-switch" class="w-full py-3 rounded-xl bg-gray-800 text-sm font-bold">تبديل الحساب</button>
       <button data-act="logout-cancel" class="w-full py-3 rounded-xl bg-gray-900 text-sm text-gray-400">إلغاء</button>
@@ -564,16 +675,10 @@ async function ensureUserProfile(user) {
   const snap = await getDoc(ref);
   if (!snap.exists()) {
     await setDoc(ref, {
-      uid: user.uid,
-      name: nameOf(user),
-      username: "",
-      email: user.email || "",
-      phone: user.phoneNumber || "",
-      photoURL: user.photoURL || "",
-      coverURL: "",
-      bio: "",
-      following: [],
-      createdAt: serverTimestamp()
+      uid: user.uid, name: nameOf(user), username: "",
+      email: user.email || "", phone: user.phoneNumber || "",
+      photoURL: user.photoURL || "", coverURL: "", bio: "",
+      following: [], createdAt: serverTimestamp()
     });
   } else {
     await setDoc(ref, { email: user.email || "", phone: user.phoneNumber || "" }, { merge: true });
@@ -585,6 +690,8 @@ onAuthStateChanged(auth, async (user) => {
   if (!user) {
     clearListeners();
     if (usersUnsub) { usersUnsub(); usersUnsub = null; }
+    if (postsUnsub) { postsUnsub(); postsUnsub = null; }
+    postsCache = {};
     showLogin();
     return;
   }
@@ -601,6 +708,13 @@ onAuthStateChanged(auth, async (user) => {
       });
       renderUsersLive();
     }, (err) => showToast("تعذر تحميل المستخدمين: " + err.message));
+  }
+  if (!postsUnsub) {
+    postsUnsub = onSnapshot(query(collection(db, "posts"), orderBy("createdAt", "desc"), limit(100)), (s) => {
+      postsCache = {};
+      s.forEach(d => postsCache[d.id] = d.data());
+      refreshPosts();
+    }, (err) => showToast("تعذر تحميل المنشورات: " + err.message));
   }
   go('home');
 });
@@ -681,15 +795,26 @@ document.addEventListener('click', async (e) => {
   const { act, id } = a.dataset;
   try {
     if (act === 'like') {
-      const liked = a.dataset.liked === '1';
-      await updateDoc(doc(db, "posts", id), { likes: liked ? arrayRemove(uid()) : arrayUnion(uid()) });
+      await toggleLike(id);
     } else if (act === 'comments') {
       openComments(id);
+    } else if (act === 'share') {
+      const p = postsCache[id] || {};
+      if (navigator.share) {
+        navigator.share({ title: 'Sovexa', text: p.text || 'منشور من Sovexa', url: location.href }).catch(() => {});
+      } else {
+        navigator.clipboard?.writeText(location.href);
+        showToast("تم نسخ رابط التطبيق");
+      }
     } else if (act === 'delpost') {
       if (confirm('حذف هذا المنشور؟')) await deleteDoc(doc(db, "posts", id));
     } else if (act === 'follow') {
       const isF = (me().following || []).includes(id);
       await updateDoc(doc(db, "users", uid()), { following: isF ? arrayRemove(id) : arrayUnion(id) });
+    } else if (act === 'soon') {
+      showToast("هذه الميزة قريباً");
+    } else if (act === 'about') {
+      showToast("Sovexa: منصة تواصل اجتماعي ودردشة");
     } else if (act === 'logout-menu') {
       showLogoutSheet();
     } else if (act === 'logout-confirm') {
@@ -739,22 +864,25 @@ document.addEventListener('submit', async (e) => {
     if (type === 'comment') {
       const t = (fd.get('t') || '').toString().trim();
       if (!t) return;
-      await addDoc(collection(db, "posts", f.dataset.id, "comments"), {
+      const postId = f.dataset.id;
+      await addDoc(collection(db, "posts", postId, "comments"), {
         userId: uid(), userName: nameOf(me()), userPhoto: me().photoURL || '', text: t, createdAt: serverTimestamp()
       });
+      await updateDoc(doc(db, "posts", postId), { commentsCount: increment(1) });
       f.reset();
     } else if (type === 'msg') {
       const t = (fd.get('t') || '').toString().trim();
       if (!t) return;
-      const cid = chatIdFor(uid(), f.dataset.id);
-      await addDoc(collection(db, "chats", cid, "messages"), { text: t, senderId: uid(), createdAt: serverTimestamp() });
+      await addDoc(collection(db, "chats", f.dataset.id, "messages"), {
+        text: t, senderId: uid(), senderName: nameOf(me()), createdAt: serverTimestamp()
+      });
       f.reset();
     } else if (type === 'create') {
       const text = (fd.get('text') || '').toString().trim();
       if (!text && !pendingPostImg) return showToast("اكتب شيئاً أو أضف صورة");
       await addDoc(collection(db, "posts"), {
         userId: uid(), userName: nameOf(me()), userPhoto: me().photoURL || '',
-        text, image: pendingPostImg || '', likes: [], createdAt: serverTimestamp()
+        text, image: pendingPostImg || '', likes: [], commentsCount: 0, createdAt: serverTimestamp()
       });
       pendingPostImg = null;
       showToast("تم النشر");
@@ -784,4 +912,4 @@ document.addEventListener('submit', async (e) => {
 });
 </script>
 </body>
-  </html>
+</html>
