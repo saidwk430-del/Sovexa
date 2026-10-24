@@ -9,89 +9,72 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700;900&display=swap" rel="stylesheet">
 <style>
-  body { 
-    background:#0b0f17; 
-    color:#e5e7eb; 
-    font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; 
-    touch-action: manipulation;
-  }
-  input, textarea, button, label {
-    -webkit-user-select: text;
-    user-select: text;
-    touch-action: manipulation;
-  }
+  body { background:#0b0f17; color:#e5e7eb; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; }
   .card { background:#111827; border:1px solid #1f2937; }
   .hidden { display:none !important; }
   .safe-top { padding-top: env(safe-area-inset-top, 0px); }
   .safe-bottom { padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .btn-busy { opacity:.6; pointer-events:none; }
   .tab-btn { height:2.75rem; border-radius:0.9rem; background:#111827; border:1px solid #1f2937; color:#9ca3af; display:flex; align-items:center; justify-content:center; font-size:1.05rem; position:relative; }
   .tab-on { background:rgba(99,102,241,.22); color:#a5b4fc; border-color:rgba(129,140,248,.5); }
   .icon-btn { width:2.5rem; height:2.5rem; border-radius:9999px; background:#1f2937; display:flex; align-items:center; justify-content:center; }
   .bubble-me { background:linear-gradient(135deg,#4f46e5,#7c3aed); color:#fff; border-radius:1.1rem 1.1rem 0.3rem 1.1rem; }
   .bubble-other { background:#1f2937; color:#e5e7eb; border-radius:1.1rem 1.1rem 1.1rem 0.3rem; }
-  .no-scrollbar::-webkit-scrollbar { display: none; }
-  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 </style>
 </head>
 <body class="min-h-screen">
-<!-- BUILD 6.5 -->
 
 <div id="toastContainer" class="fixed top-16 left-1/2 -translate-x-1/2 z-[60] flex flex-col items-center gap-2 pointer-events-none"></div>
 
-<!-- ============ تسجيل الدخول ============ -->
+<!-- ============ LOGIN ============ -->
 <div id="loginSection" class="min-h-screen flex flex-col items-center justify-center p-4">
-  <div class="w-full max-w-md card rounded-3xl p-6 shadow-2xl relative z-10">
+  <div class="w-full max-w-md card rounded-3xl p-6 shadow-2xl">
     <div class="text-center mb-5">
       <div class="mx-auto w-20 h-20 rounded-3xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center mb-3">
         <span class="font-black text-4xl text-white" style="font-family:Outfit">S</span>
       </div>
       <h2 class="text-xl font-bold text-white">مرحباً بك في Sovexa</h2>
       <p class="text-xs text-gray-400">سجل الدخول للمتابعة</p>
-      <p dir="ltr" class="text-[10px] text-gray-600 mt-1">BUILD 6.5</p>
     </div>
 
-    <!-- زر Google -->
-    <button id="googleLoginBtn" type="button" class="w-full py-3 bg-gray-900 border border-gray-700 rounded-xl text-sm font-medium flex items-center justify-center gap-3 mb-3 cursor-pointer text-white">
+    <button id="googleLoginBtn" class="w-full py-2.5 bg-gray-900 border border-gray-700 rounded-xl text-sm font-medium flex items-center justify-center gap-3 mb-3">
       <svg class="w-4 h-4" viewBox="0 0 24 24">
         <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.7 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.2 9 5 12 5z"/>
         <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.8z"/>
         <path fill="#FBBC05" d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.3s.2-1.6.4-2.3L1.9 7.3C.7 9.7 0 10.8 0 12.3s.7 2.6 1.9 5l3.7-2.5z"/>
         <path fill="#34A853" d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.2-6.4-5.2L1.9 16C3.7 19.7 7.5 23 12 23z"/>
       </svg>
-      <span>متابعة باستخدام Google</span>
+      متابعة باستخدام Google
     </button>
 
-    <!-- زر إظهار لوحة الهاتف -->
-    <button id="togglePhoneBtn" type="button" class="w-full py-3 bg-gray-900 border border-gray-700 rounded-xl text-sm font-medium flex items-center justify-center gap-3 mb-3 cursor-pointer text-white">
-      <i class="fa-solid fa-phone text-emerald-400"></i> <span>متابعة برقم الهاتف</span>
+    <button id="togglePhoneBtn" class="w-full py-2.5 bg-gray-900 border border-gray-700 rounded-xl text-sm font-medium flex items-center justify-center gap-3 mb-3">
+      <i class="fa-solid fa-phone text-emerald-400"></i> متابعة برقم الهاتف
     </button>
 
-    <!-- لوحة الهاتف -->
-    <div id="phonePanel" class="hidden space-y-3 mb-3 p-3 bg-gray-900/50 rounded-xl border border-gray-800">
+    <div id="phonePanel" class="hidden space-y-3 mb-3">
       <div id="phoneStep">
-        <input type="tel" id="phoneInput" placeholder="+213500000000" dir="ltr" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-3 text-sm outline-none text-white">
-        <button id="sendCodeBtn" type="button" class="w-full mt-2 py-3 bg-emerald-600 hover:bg-emerald-500 rounded-xl text-sm font-bold cursor-pointer text-white">إرسال رمز التحقق</button>
+        <input type="tel" id="phoneInput" placeholder="+966500000000" dir="ltr" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2.5 text-sm outline-none">
+        <button id="sendCodeBtn" type="button" class="w-full mt-2 py-2.5 bg-emerald-600 rounded-xl text-sm font-bold">إرسال رمز التحقق</button>
       </div>
-      <div id="codeStep" class="hidden space-y-2">
-        <input type="text" id="codeInput" inputmode="numeric" maxlength="6" placeholder="123456" dir="ltr" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-3 text-sm text-center tracking-widest outline-none text-white">
-        <button id="verifyCodeBtn" type="button" class="w-full py-3 bg-emerald-600 hover:bg-emerald-500 rounded-xl text-sm font-bold cursor-pointer text-white">تأكيد الرمز</button>
-        <button id="backToPhoneBtn" type="button" class="w-full py-1 text-xs text-gray-400 cursor-pointer text-center">تغيير الرقم</button>
+      <div id="codeStep" class="hidden">
+        <input type="text" id="codeInput" inputmode="numeric" maxlength="6" placeholder="123456" dir="ltr" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2.5 text-sm text-center tracking-widest outline-none">
+        <button id="verifyCodeBtn" type="button" class="w-full mt-2 py-2.5 bg-emerald-600 rounded-xl text-sm font-bold">تأكيد الرمز</button>
+        <button id="backToPhoneBtn" type="button" class="w-full mt-2 text-xs text-gray-400">تغيير الرقم</button>
       </div>
     </div>
 
-    <div class="flex items-center gap-3 my-4 text-xs text-gray-500"><div class="flex-1 border-t border-gray-700"></div><span>أو بالبريد الإلكتروني</span><div class="flex-1 border-t border-gray-700"></div></div>
+    <div class="flex items-center gap-3 my-4 text-xs text-gray-500"><div class="flex-1 border-t border-gray-700"></div>أو بالبريد<div class="flex-1 border-t border-gray-700"></div></div>
 
-    <!-- نموذج البريد الإلكتروني -->
     <form id="emailForm" class="space-y-3">
-      <input type="email" id="emailInput" required placeholder="البريد الإلكتروني" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-3 text-sm outline-none text-white">
-      <input type="password" id="passwordInput" required placeholder="كلمة المرور (6 أحرف فأكثر)" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-3 text-sm outline-none text-white">
-      <button type="submit" class="w-full py-3.5 bg-gradient-to-r from-indigo-600 to-pink-600 rounded-xl text-sm font-bold cursor-pointer text-white shadow-lg">تسجيل الدخول / إنشاء حساب</button>
+      <input type="email" id="emailInput" required placeholder="البريد الإلكتروني" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2.5 text-sm outline-none">
+      <input type="password" id="passwordInput" required placeholder="كلمة المرور" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2.5 text-sm outline-none">
+      <button type="submit" class="w-full py-3 bg-gradient-to-r from-indigo-600 to-pink-600 rounded-xl text-sm font-bold">تسجيل الدخول / إنشاء حساب</button>
     </form>
-    <div id="recaptcha-container" class="mt-2"></div>
+    <div id="recaptcha-container"></div>
   </div>
 </div>
 
-<!-- ============ التطبيق الرئيسي ============ -->
+<!-- ============ APP ============ -->
 <div id="appSection" class="hidden min-h-screen flex flex-col">
   <header class="sticky top-0 z-40 bg-[#111827] border-b border-gray-800 safe-top">
     <div class="flex items-center justify-between px-4 h-14">
@@ -108,6 +91,7 @@
       <button data-tab="profile" data-go="profile" data-id="" class="tab-btn"><i class="fa-solid fa-user"></i></button>
     </div>
   </header>
+
   <main id="view" class="flex-1 pb-8"></main>
 </div>
 
@@ -116,11 +100,11 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/fireba
 import {
   getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult,
   signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut,
-  RecaptchaVerifier, signInWithPhoneNumber
+  RecaptchaVerifier, signInWithPhoneNumber, setPersistence, browserLocalPersistence
 } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
 import {
   getFirestore, collection, doc, getDoc, setDoc, updateDoc, deleteDoc, addDoc, onSnapshot,
-  query, orderBy, limit, serverTimestamp, arrayUnion, arrayRemove, increment
+  query, orderBy, limit, serverTimestamp, arrayUnion, arrayRemove, increment, runTransaction
 } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
 const app = initializeApp({
@@ -132,13 +116,16 @@ const app = initializeApp({
   appId: "1:147264654219:web:7487b91cc6c5fa041efd8e"
 });
 const auth = getAuth(app);
+setPersistence(auth, browserLocalPersistence).catch(err => console.error("persistence:", err));
 const db = getFirestore(app);
 
+// ---------- verification settings ----------
 const ADMIN_EMAIL = "shanks377s8@gmail.com";
 const SUB_PRICE = "9.99$ شهرياً";
 const isVerified = (u) => !!u && (u.email === ADMIN_EMAIL || u.verified === true);
 const badgeHTML = (on) => on ? ' <i class="fa-solid fa-circle-check text-indigo-400 text-xs"></i>' : '';
 
+// ---------- helpers ----------
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const nameOf = (u) => u.name || u.displayName || (u.email ? u.email.split("@")[0] : "") || u.phoneNumber || "مستخدم";
@@ -146,11 +133,12 @@ const uid = () => currentUser?.uid;
 const me = () => allUsers[uid()] || { uid: uid(), name: "", email: currentUser?.email || "" };
 const V = () => $('view');
 const chatIdFor = (a, b) => [a, b].sort().join("_");
+const normUser = (s) => String(s || "").trim().toLowerCase().replace(/^@/, "").replace(/[^a-z0-9_.]/g, "");
 const handleOf = (u) => u.username ? "@" + u.username : "";
 
 let currentUser = null, currentView = "home", currentId = null;
-let allUsers = {}, usersByUsername = {}, postsCache = {}, storiesCache = [];
-let usersUnsub = null, postsUnsub = null, savedUnsub = null, storiesUnsub = null;
+let allUsers = {}, usersByUsername = {}, postsCache = {};
+let usersUnsub = null, postsUnsub = null, savedUnsub = null;
 let unsubs = [], commentUnsubs = {}, openSet = new Set();
 let confirmationResult = null, recaptcha = null;
 let pendingPhoto = null, pendingCover = null, pendingPostImg = null;
@@ -159,11 +147,12 @@ let savedIds = new Set();
 
 window.showToast = (msg) => {
   const box = document.createElement('div');
-  box.className = 'card px-4 py-2 rounded-xl text-xs font-bold text-white shadow-xl bg-gray-900 border border-gray-700';
+  box.className = 'card px-4 py-2 rounded-xl text-xs font-bold text-white shadow-xl';
   box.textContent = msg;
   $('toastContainer').appendChild(box);
-  setTimeout(() => box.remove(), 3000);
+  setTimeout(() => box.remove(), 2800);
 };
+const showToast = window.showToast;
 
 function avatarHTML(name, photo, cls = 'w-10 h-10 text-sm') {
   return photo
@@ -182,6 +171,34 @@ function followBtn(id) {
   return `<button data-act="follow" data-id="${id}" class="px-3 py-1.5 rounded-lg text-xs font-bold ${f ? 'bg-gray-700 text-gray-200' : 'bg-indigo-600 text-white'}">${f ? 'إلغاء المتابعة' : 'متابعة'}</button>`;
 }
 
+function compressImage(file, max, quality) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const s = Math.min(1, max / Math.max(img.width, img.height));
+        const c = document.createElement('canvas');
+        c.width = Math.round(img.width * s);
+        c.height = Math.round(img.height * s);
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        resolve(c.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = reject;
+      img.src = reader.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+function withTimeout(promise, ms = 15000) {
+  return Promise.race([
+    promise,
+    new Promise((_, rej) => setTimeout(() => rej(new Error("انتهت المهلة، تحقق من الاتصال أو من قواعد Firestore")), ms))
+  ]);
+}
+
 function backHeader(title) {
   return `
     <div class="flex items-center gap-3">
@@ -190,6 +207,29 @@ function backHeader(title) {
     </div>`;
 }
 
+// ---------- username uniqueness ----------
+async function isUsernameFree(name) {
+  if (!name || name.length < 3) return false;
+  if (name === "sovexa" && currentUser?.email !== ADMIN_EMAIL) return false;
+  const s = await getDoc(doc(db, "usernames", name));
+  return !s.exists() || s.data().uid === uid();
+}
+
+async function claimUsername(newName, oldName) {
+  await runTransaction(db, async (tx) => {
+    const nRef = doc(db, "usernames", newName);
+    const nSnap = await tx.get(nRef);
+    if (nSnap.exists() && nSnap.data().uid !== uid()) throw new Error("اسم المستخدم مستخدم من شخص آخر");
+    if (!nSnap.exists()) tx.set(nRef, { uid: uid() });
+    if (oldName && oldName !== newName) {
+      const oRef = doc(db, "usernames", oldName);
+      const oSnap = await tx.get(oRef);
+      if (oSnap.exists() && oSnap.data().uid === uid()) tx.delete(oRef);
+    }
+  });
+}
+
+// ---------- router ----------
 function clearListeners() {
   unsubs.forEach(f => f());
   unsubs = [];
@@ -217,6 +257,7 @@ function go(view, id) {
   window.scrollTo(0, 0);
 }
 
+// ---------- posts ----------
 function actionsHTML(p) {
   const likes = p.likes || [];
   const liked = likes.includes(uid());
@@ -286,7 +327,7 @@ async function toggleLike(id) {
   } catch (err) {
     p.likes = old;
     refreshPosts();
-    showToast("تعذر تسجيل الإعجاب");
+    showToast("تعذر تسجيل الإعجاب: " + err.message);
   }
 }
 
@@ -296,12 +337,12 @@ async function toggleSave(id) {
     savedIds.delete(id);
     refreshPosts();
     await deleteDoc(ref);
-    showToast('أُزيل من المحفوظات');
+    showToast("أُزيل من المحفوظات");
   } else {
     savedIds.add(id);
     refreshPosts();
     await setDoc(ref, { postId: id, savedAt: serverTimestamp() });
-    showToast('تم الحفظ 🔖');
+    showToast("تم الحفظ 🔖");
   }
 }
 
@@ -318,7 +359,7 @@ function watchComments(id) {
         <div class="bg-gray-800 rounded-xl px-3 py-2 text-xs"><b>${esc(c.userName)}${badgeHTML(c.verified)}</b><p>${esc(c.text)}</p></div></div>`;
     }).join('') + `
       <form data-form="comment" data-id="${id}" class="flex gap-2 pt-1">
-        <input name="t" autocomplete="off" placeholder="اكتب تعليقاً..." class="flex-1 bg-gray-800 rounded-full px-3 py-2 text-xs outline-none text-white">
+        <input name="t" autocomplete="off" placeholder="اكتب تعليقاً..." class="flex-1 bg-gray-800 rounded-full px-3 py-2 text-xs outline-none">
         <button class="text-indigo-400 text-xs font-bold px-2">إرسال</button>
       </form>`;
   });
@@ -340,47 +381,16 @@ function restoreOpenComments() {
   openSet.forEach(id => { if ($('cbox-' + id)) watchComments(id); });
 }
 
-function renderStoriesBar() {
-  const bar = $('storiesBar');
-  if (!bar) return;
-  const u = me();
-  let html = `
-    <div class="flex flex-col items-center shrink-0 cursor-pointer" data-act="add-story">
-      <div class="w-16 h-16 rounded-full p-0.5 bg-gradient-to-tr from-indigo-500 to-pink-500 relative">
-        <div class="w-full h-full rounded-full bg-[#111827] flex items-center justify-center overflow-hidden">
-          ${u.photoURL ? `<img src="${esc(u.photoURL)}" class="w-full h-full object-cover">` : `<span class="font-bold">${nameOf(u).charAt(0)}</span>`}
-        </div>
-        <div class="absolute bottom-0 right-0 w-5 h-5 bg-indigo-600 rounded-full flex items-center justify-center text-white text-xs ring-2 ring-[#0b0f17]">+</div>
-      </div>
-      <span class="text-[11px] mt-1 text-gray-300 truncate w-16 text-center">قصتك</span>
-    </div>`;
-
-  storiesCache.forEach(s => {
-    html += `
-      <div class="flex flex-col items-center shrink-0 cursor-pointer" data-act="view-story" data-id="${s.id}">
-        <div class="w-16 h-16 rounded-full p-0.5 bg-gradient-to-tr from-purple-500 via-pink-500 to-amber-400">
-          <div class="w-full h-full rounded-full bg-[#111827] flex items-center justify-center overflow-hidden">
-            ${s.userPhoto ? `<img src="${esc(s.userPhoto)}" class="w-full h-full object-cover">` : `<span class="font-bold">${esc(s.userName.charAt(0))}</span>`}
-          </div>
-        </div>
-        <span class="text-[11px] mt-1 text-gray-300 truncate w-16 text-center">${esc(s.userName)}</span>
-      </div>`;
-  });
-  bar.innerHTML = html;
-}
-
+// ---------- views ----------
 function viewHome() {
   V().innerHTML = `
     <div class="p-3 space-y-3 max-w-xl mx-auto">
-      <div class="card rounded-2xl p-3 overflow-x-auto no-scrollbar flex gap-3 items-center" id="storiesBar"></div>
-
       <section class="card rounded-xl p-3 flex items-center gap-3">
         ${avatarHTML(nameOf(me()), me().photoURL)}
-        <button data-go="create" class="flex-1 text-right bg-gray-800 rounded-full px-4 py-2 text-sm text-gray-400">بماذا تفكر يا ${nameOf(me())}؟</button>
+        <button data-go="create" class="flex-1 text-right bg-gray-800 rounded-full px-4 py-2 text-sm text-gray-400">بماذا تفكر يا ${esc(nameOf(me()))}؟</button>
       </section>
       <div id="feed" class="space-y-3"></div>
     </div>`;
-  renderStoriesBar();
   refreshPosts();
 }
 
@@ -398,7 +408,7 @@ function viewNotifications() {
           ${avatarHTML(p.userName, p.userPhoto, 'w-9 h-9 text-xs')}
           <div class="text-sm"><b>${esc(p.userName)}</b> نشر منشوراً جديداً
             <div class="text-xs text-gray-500">${timeAgo(p.createdAt)}</div></div>
-        </div>`).join('') : `<p class="text-center text-gray-500 py-10">لا توجد إشعارات بعد</p>`}
+        </div>`).join('') : '<p class="text-center text-gray-500 py-10">لا توجد إشعارات بعد</p>'}
     </div>`;
 }
 
@@ -408,13 +418,13 @@ function viewCreate() {
     <form data-form="create" class="p-4 space-y-3 max-w-xl mx-auto">
       <div class="flex items-center justify-between">
         <h2 class="font-bold">إنشاء منشور</h2>
-        <button class="px-4 py-1.5 rounded-lg bg-gradient-to-r from-indigo-600 to-pink-600 text-sm font-bold text-white">نشر</button>
+        <button class="px-4 py-1.5 rounded-lg bg-gradient-to-r from-indigo-600 to-pink-600 text-sm font-bold">نشر</button>
       </div>
       <div class="flex items-center gap-3">
         ${avatarHTML(nameOf(me()), me().photoURL)}
         <b class="text-sm">${esc(nameOf(me()))}${badgeHTML(isVerified(me()))}</b>
       </div>
-      <textarea name="text" rows="5" placeholder="بماذا تفكر؟" class="w-full bg-transparent text-base outline-none resize-none text-white"></textarea>
+      <textarea name="text" rows="5" placeholder="بماذا تفكر؟" class="w-full bg-transparent text-base outline-none resize-none"></textarea>
       <div id="postPrev"></div>
       <label class="card rounded-xl p-3 flex items-center gap-2 text-emerald-400 text-sm cursor-pointer">
         <i class="fa-solid fa-image"></i> إضافة صورة
@@ -426,7 +436,7 @@ function viewCreate() {
 function viewSearch() {
   V().innerHTML = `
     <div class="p-3 space-y-3 max-w-xl mx-auto">
-      <input id="q" type="search" placeholder="ابحث بالاسم أو @اسم_المستخدم..." class="w-full bg-gray-800 rounded-full px-4 py-2.5 text-sm outline-none text-white">
+      <input id="q" type="search" placeholder="ابحث بالاسم أو @اسم_المستخدم..." class="w-full bg-gray-800 rounded-full px-4 py-2.5 text-sm outline-none">
       <div id="res" class="space-y-2"></div>
     </div>`;
   renderSearch('');
@@ -453,7 +463,7 @@ function renderSearch(term) {
     .slice(0, 30);
   const res = $('res');
   if (!res) return;
-  res.innerHTML = list.length ? list.map(userRow).join('') : `<p class="text-center text-gray-500 py-8">لا توجد نتائج</p>`;
+  res.innerHTML = list.length ? list.map(userRow).join('') : '<p class="text-center text-gray-500 py-8">لا توجد نتائج</p>';
 }
 
 function viewFriends() {
@@ -464,11 +474,11 @@ function viewFriends() {
       <h2 class="font-bold text-lg">الأصدقاء</h2>
       <section class="space-y-2">
         <h3 class="text-sm text-gray-400">أصدقاؤك (${following.length})</h3>
-        ${following.length ? following.map(userRow).join('') : `<p class="text-xs text-gray-500">لم تتابع أحداً بعد</p>`}
+        ${following.length ? following.map(userRow).join('') : '<p class="text-xs text-gray-500">لم تتابع أحداً بعد</p>'}
       </section>
       <section class="space-y-2">
         <h3 class="text-sm text-gray-400">اقتراحات لك</h3>
-        ${suggestions.length ? suggestions.map(userRow).join('') : `<p class="text-xs text-gray-500">لا توجد اقتراحات</p>`}
+        ${suggestions.length ? suggestions.map(userRow).join('') : '<p class="text-xs text-gray-500">لا توجد اقتراحات</p>'}
       </section>
     </div>`;
 }
@@ -486,7 +496,7 @@ function viewChats() {
         <button data-go="chat" data-id="${u.uid}" class="card rounded-xl p-3 w-full flex items-center gap-3 text-right">
           ${avatarHTML(nameOf(u), u.photoURL)}
           <div><b class="text-sm block">${esc(nameOf(u))}${badgeHTML(isVerified(u))}</b><span class="text-xs text-gray-500">${esc(handleOf(u))}</span></div>
-        </button>`).join('') : `<p class="text-center text-gray-500 py-8 text-sm">تابع أشخاصاً لتبدأ الدردشة معهم</p>`}
+        </button>`).join('') : '<p class="text-center text-gray-500 py-8 text-sm">تابع أشخاصاً لتبدأ الدردشة معهم</p>'}
     </div>`;
 }
 
@@ -500,7 +510,9 @@ function viewChat(otherId) {
     <div class="flex flex-col h-[calc(100vh-10.5rem)] max-w-2xl mx-auto">
       <div class="flex items-center gap-3 px-3 py-2 border-b border-gray-800 bg-[#111827]">
         <button data-go="chats" class="w-9 h-9 rounded-full bg-gray-800 flex items-center justify-center"><i class="fa-solid fa-arrow-right"></i></button>
-        ${isGlobal ? `<div class="w-9 h-9 rounded-full bg-gradient-to-tr from-purple-600 to-pink-500 flex items-center justify-center font-bold text-sm">S</div>` : avatarHTML(nameOf(o), o.photoURL, 'w-9 h-9 text-xs')}
+        ${isGlobal
+          ? `<div class="w-9 h-9 rounded-full bg-gradient-to-tr from-purple-600 to-pink-500 flex items-center justify-center font-bold text-sm">S</div>`
+          : avatarHTML(nameOf(o), o.photoURL, 'w-9 h-9 text-xs')}
         <div class="min-w-0">
           <b class="block text-sm truncate">${esc(title)}</b>
           <span class="text-[11px] text-emerald-400">${isGlobal ? 'مجتمع Sovexa' : esc(handleOf(o))}</span>
@@ -508,22 +520,23 @@ function viewChat(otherId) {
       </div>
       <div id="msgs" class="flex-1 overflow-y-auto px-3 py-3 space-y-2 bg-[#0b0f17]"></div>
       <form data-form="msg" data-id="${cid}" class="p-2 flex items-center gap-2 border-t border-gray-800 bg-[#111827]">
-        <input name="t" autocomplete="off" placeholder="اكتب رسالة..." class="flex-1 bg-gray-800 rounded-full px-4 py-2.5 text-sm outline-none text-white">
-        <button class="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-600 to-pink-600 flex items-center justify-center shrink-0 text-white"><i class="fa-solid fa-paper-plane text-sm"></i></button>
+        <input name="t" autocomplete="off" placeholder="اكتب رسالة..." class="flex-1 bg-gray-800 rounded-full px-4 py-2.5 text-sm outline-none">
+        <button class="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-600 to-pink-600 flex items-center justify-center shrink-0"><i class="fa-solid fa-paper-plane text-sm"></i></button>
       </form>
     </div>`;
   unsubs.push(onSnapshot(query(collection(db, "chats", cid, "messages"), orderBy("createdAt", "asc"), limit(200)), (snap) => {
     const el = $('msgs');
     if (!el) return;
     if (snap.empty) {
-      el.innerHTML = `<p class="text-center text-gray-500 text-xs py-10">ابدأ المحادثة الآن</p>`;
+      el.innerHTML = '<p class="text-center text-gray-500 text-xs py-10">ابدأ المحادثة الآن</p>';
       return;
     }
     el.innerHTML = snap.docs.map(d => {
       const m = d.data();
       const mine = m.senderId === uid();
       const sender = allUsers[m.senderId];
-      const senderLine = (!mine && isGlobal) ? `<div class="text-[11px] text-indigo-300 mb-0.5 px-1">${esc(sender ? nameOf(sender) : (m.senderName || ''))}${badgeHTML(isVerified(sender))}</div>` : '';
+      const senderLine = (!mine && isGlobal)
+        ? `<div class="text-[11px] text-indigo-300 mb-0.5 px-1">${esc(sender ? nameOf(sender) : (m.senderName || ''))}${badgeHTML(isVerified(sender))}</div>` : '';
       return `
         <div class="flex items-end gap-2 ${mine ? 'justify-end' : 'justify-start'}">
           ${!mine ? avatarHTML(sender ? nameOf(sender) : (m.senderName || '?'), sender?.photoURL, 'w-7 h-7 text-[10px]') : ''}
@@ -534,6 +547,9 @@ function viewChat(otherId) {
         </div>`;
     }).join('');
     el.scrollTop = el.scrollHeight;
+  }, (err) => {
+    const el = $('msgs');
+    if (el) el.innerHTML = `<p class="text-center text-red-400 text-xs py-10">تعذر تحميل الرسائل: ${esc(err.message)}</p>`;
   }));
 }
 
@@ -554,7 +570,10 @@ function viewProfile(id) {
       <p class="text-sm text-gray-400 mt-1">${esc(u.bio || '')}</p>
       <p class="text-xs text-gray-500 mt-1">${postsCount} منشور · ${followers} متابع · ${following} يتابع</p>
       <div class="flex gap-2 justify-center mt-3">
-        ${own ? `<button data-go="edit" class="px-6 py-2 rounded-lg bg-gray-700 text-sm font-bold text-white">تعديل الملف الشخصي</button><button data-go="menu" class="px-4 py-2 rounded-lg bg-gray-700 text-sm font-bold text-white"><i class="fa-solid fa-bars"></i></button>` : `${followBtn(target)}<button data-go="chat" data-id="${target}" class="px-4 py-2 rounded-lg bg-gray-700 text-xs font-bold text-white">مراسلة</button>`}
+        ${own
+          ? `<button data-go="edit" class="px-6 py-2 rounded-lg bg-gray-700 text-sm font-bold">تعديل الملف الشخصي</button>
+             <button data-go="menu" class="px-4 py-2 rounded-lg bg-gray-700 text-sm font-bold"><i class="fa-solid fa-bars"></i></button>`
+          : `${followBtn(target)}<button data-go="chat" data-id="${target}" class="px-4 py-2 rounded-lg bg-gray-700 text-xs font-bold">مراسلة</button>`}
       </div>
     </div>
     <div id="uposts" class="p-3 space-y-3 mt-4 max-w-xl mx-auto"></div>`;
@@ -575,23 +594,24 @@ function viewEdit() {
         </label>
       </div>
       <label class="block text-xs text-gray-400">صورة الغلاف
-        <input type="file" id="coverIn" accept="image/*" class="mt-1 w-full text-xs text-white">
+        <input type="file" id="coverIn" accept="image/*" class="mt-1 w-full text-xs">
       </label>
-      <label class="block text-xs text-gray-400">الاسم المعروض
-        <input name="name" required value="${esc(nameOf(u))}" class="mt-1 w-full bg-gray-800 rounded-lg px-3 py-2 text-sm outline-none text-white">
+      <label class="block text-xs text-gray-400">الاسم المعروض (يمكن تكراره)
+        <input name="name" required value="${esc(nameOf(u))}" class="mt-1 w-full bg-gray-800 rounded-lg px-3 py-2 text-sm outline-none">
       </label>
-      <label class="block text-xs text-gray-400">اسم المستخدم الفريد
-        <input name="username" required dir="ltr" value="${esc(u.username || '')}" class="mt-1 w-full bg-gray-800 rounded-lg px-3 py-2 text-sm outline-none text-white">
+      <label class="block text-xs text-gray-400">اسم المستخدم الفريد (إنجليزي وأرقام و _ و .)
+        <input name="username" required dir="ltr" value="${esc(u.username || '')}" class="mt-1 w-full bg-gray-800 rounded-lg px-3 py-2 text-sm outline-none">
       </label>
+      <div id="unameState" class="text-xs -mt-2"></div>
       <label class="block text-xs text-gray-400">النبذة
-        <textarea name="bio" rows="3" class="mt-1 w-full bg-gray-800 rounded-lg px-3 py-2 text-sm outline-none text-white">${esc(u.bio || '')}</textarea>
+        <textarea name="bio" rows="3" class="mt-1 w-full bg-gray-800 rounded-lg px-3 py-2 text-sm outline-none">${esc(u.bio || '')}</textarea>
       </label>
-      <button id="saveBtn" class="w-full py-2.5 rounded-lg bg-gradient-to-r from-indigo-600 to-pink-600 font-bold text-sm text-white">حفظ</button>
+      <button id="saveBtn" class="w-full py-2.5 rounded-lg bg-gradient-to-r from-indigo-600 to-pink-600 font-bold text-sm">حفظ</button>
       <button type="button" data-go="profile" data-id="${uid()}" class="w-full py-2 text-sm text-gray-400">إلغاء</button>
     </form>`;
 }
 
-const getMenuGroups = () => [
+const MENU_GROUPS = [
   { title: "حسابي", items: [
     ['fa-user', 'الملف الشخصي', 'profile'],
     ['fa-pen', 'تعديل الملف الشخصي', 'data-go="edit"'],
@@ -621,7 +641,7 @@ const getMenuGroups = () => [
 
 function viewMenu() {
   const u = me();
-  const groups = getMenuGroups().map((g) => {
+  const groups = MENU_GROUPS.map((g) => {
     const items = g.items.map(([icon, label, attrs], i) => {
       const actionAttrs = attrs === 'profile' ? `data-go="profile" data-id="${uid()}"` : attrs;
       const danger = label === 'تسجيل الخروج';
@@ -649,26 +669,57 @@ function viewMenu() {
 }
 
 function viewHelp() {
+  const faqs = [
+    ["كيف يمكنني تعديل الملف الشخصي؟", "يمكنك الانتقال إلى إعدادات الحساب وتحديث صورتك واسمك بكل سهولة."],
+    ["تواجه مشكلة في إرسال أو استقبال الرسائل؟", "تأكد من اتصالك بالإنترنت، أو قم بتحديث التطبيق لأحدث نسخة."],
+    ["كيف أبلغ عن محتوى غير لائق؟", "نحن نُهتم بأمان مجتمعنا؛ يمكنك النقر على خيار \"إبلاغ\" بجانب أي منشور أو محتوى مخالف."],
+  ];
   V().innerHTML = `
     <div class="p-3 space-y-3 max-w-xl mx-auto">
-      ${backHeader('مركز المساعدة والدعم 🛠️')}
-      <div class="card rounded-xl p-4 text-sm leading-7 text-gray-300">مرحباً بك في مركز المساعدة والدعم لمنصة Sovexa. نحن هنا لضمان حصولك على أفضل تجربة ممكنة في التواصل، الدردشة، ومشاهدة الفيديوهات.</div>
+      ${backHeader("مركز المساعدة والدعم 🛠️")}
+      <div class="card rounded-xl p-4 text-sm leading-7 text-gray-300">
+        مرحباً بك في مركز المساعدة والدعم لمنصة Sovexa. نحن هنا لضمان حصولك على أفضل تجربة ممكنة في التواصل، الدردشة، ومشاهدة الفيديوهات.
+      </div>
+      <h3 class="font-bold text-sm text-gray-400 pt-2">الأسئلة الشائعة</h3>
+      ${faqs.map(([q, a]) => `
+        <details class="card rounded-xl p-3">
+          <summary class="text-sm font-bold cursor-pointer">${q}</summary>
+          <p class="text-xs text-gray-400 mt-2 leading-6">${a}</p>
+        </details>`).join('')}
+      <div class="card rounded-xl p-4 text-sm leading-7 text-gray-300">
+        إذا لم تجد إجابة لسؤالك، فريق الدعم لدينا جاهز لمساعدتك على مدار الساعة. تواصل معنا عبر البريد الإلكتروني أو من خلال قنوات التواصل الخاصة بنا.
+        <p dir="ltr" class="text-indigo-300 text-xs mt-2">support@sovexa.app</p>
+      </div>
     </div>`;
 }
 
 function viewAbout() {
   V().innerHTML = `
     <div class="p-3 space-y-3 max-w-xl mx-auto">
-      ${backHeader('عن منصة Sovexa 🌌')}
-      <div class="card rounded-xl p-4 text-sm leading-7 text-gray-300">تعتبر منصة Sovexa وجهتك الرقمية المتكاملة والمبتكرة للتواصل الاجتماعي والدردشة.</div>
-      <p dir="ltr" class="text-center text-[11px] text-gray-500">BUILD 6.5</p>
+      ${backHeader("عن منصة Sovexa 🌌")}
+      <div class="card rounded-xl p-4 text-sm leading-7 text-gray-300">
+        تعتبر منصة Sovexa وجهتك الرقمية المتكاملة والمبتكرة للتواصل الاجتماعي، الدردشة الحية، واستكشاف أحدث الفيديوهات والمحتوى الترفيهي.
+      </div>
+      <div class="card rounded-xl p-4 space-y-2 text-sm leading-7 text-gray-300">
+        <b class="text-white">رؤيتنا:</b>
+        <p>نهدف إلى بناء مجتمع رقمي تفاعلي يجمع الأصدقاء والعائلات في بيئة آمنة، سريعة، وذات تصميم عصري يجمع بين الإبداع وسهولة الاستخدام.</p>
+      </div>
+      <div class="card rounded-xl p-4 space-y-3 text-sm leading-7 text-gray-300">
+        <b class="text-white">لماذا Sovexa؟</b>
+        <p><b class="text-indigo-300">تواصل بلا حدود:</b> دردش مع أصدقائك وشاركهم لحظاتك اليومية لحظة بلحظة.</p>
+        <p><b class="text-indigo-300">مشاهدة ممتعة:</b> استمتع بمقاطع الفيديو والريلز المتنوعة التي تناسب اهتماماتك.</p>
+        <p><b class="text-indigo-300">تصميم فريد:</b> واجهة مستخدم أنيقة وسلسة تمنحك تجربة مريحة ومميزة.</p>
+      </div>
+      <div class="card rounded-xl p-4 text-center text-sm text-indigo-200">
+        شكراً لانضمامك إلى عائلة Sovexa.. رحلتك معنا للترفيه والتواصل تبدأ من هنا!
+      </div>
     </div>`;
 }
 
 function viewSaved() {
   V().innerHTML = `
     <div class="p-3 space-y-3 max-w-xl mx-auto">
-      ${backHeader('المحفوظات')}
+      ${backHeader("المحفوظات")}
       <div id="savedList" class="space-y-3"></div>
     </div>`;
   renderSavedList();
@@ -678,23 +729,29 @@ function renderSavedList() {
   const box = $('savedList');
   if (!box) return;
   const list = [...savedIds].map(id => postsCache[id] ? { id, ...postsCache[id] } : null).filter(Boolean);
-  box.innerHTML = list.length ? list.map(postCard).join('') : `<p class="text-center text-gray-500 py-10 text-sm">لا توجد منشورات محفوظة بعد</p>`;
+  box.innerHTML = list.length
+    ? list.map(postCard).join('')
+    : '<p class="text-center text-gray-500 py-10 text-sm">لا توجد منشورات محفوظة بعد</p>';
   restoreOpenComments();
 }
 
 function viewArchive() {
-  const mine = Object.entries(postsCache).map(([id, p]) => ({ id, ...p })).filter(p => p.userId === uid());
+  const mine = Object.entries(postsCache)
+    .map(([id, p]) => ({ id, ...p }))
+    .filter(p => p.userId === uid())
+    .sort((a, b) => (a.createdAt?.seconds ?? 0) - (b.createdAt?.seconds ?? 0));
   V().innerHTML = `
     <div class="p-3 space-y-3 max-w-xl mx-auto">
-      ${backHeader('الأرشيف')}
+      ${backHeader("الأرشيف")}
+      <p class="text-xs text-gray-500">منشوراتك جميعها، من الأقدم إلى الأحدث.</p>
       ${mine.length ? mine.map(p => `
         <div class="card rounded-xl p-3 space-y-2">
           <p class="text-sm whitespace-pre-wrap">${esc(p.text || '(صورة فقط)')}</p>
           <div class="flex items-center justify-between text-xs text-gray-500">
-            <span>${timeAgo(p.createdAt)} ·${(p.likes || []).length} إعجاب</span>
+            <span>${timeAgo(p.createdAt)} · ${(p.likes || []).length} إعجاب</span>
             <button data-act="delpost" data-id="${p.id}" class="text-red-400"><i class="fa-solid fa-trash"></i> حذف</button>
           </div>
-        </div>`).join('') : `<p class="text-center text-gray-500 py-10 text-sm">لم تنشر أي منشور بعد</p>`}
+        </div>`).join('') : '<p class="text-center text-gray-500 py-10 text-sm">لم تنشر أي منشور بعد</p>'}
     </div>`;
 }
 
@@ -703,7 +760,7 @@ function viewReels() {
     <div class="p-6 text-center mt-16 space-y-3">
       <i class="fa-solid fa-clapperboard text-5xl text-indigo-400"></i>
       <h2 class="text-lg font-bold">الريلز</h2>
-      <p class="text-sm text-gray-400">قريباً</p>
+      <p class="text-sm text-gray-400">رفع الفيديوهات يحتاج Firebase Storage، وهي المرحلة التالية.</p>
     </div>`;
 }
 
@@ -720,6 +777,7 @@ function viewSettings() {
         <button data-go="edit" class="w-full px-4 py-3 text-right flex justify-between"><span>تعديل الملف الشخصي</span><i class="fa-solid fa-chevron-left text-xs text-gray-500"></i></button>
         <button data-act="soon" class="w-full px-4 py-3 text-right flex justify-between border-t border-gray-800"><span>الخصوصية</span><i class="fa-solid fa-chevron-left text-xs text-gray-500"></i></button>
         <button data-act="soon" class="w-full px-4 py-3 text-right flex justify-between border-t border-gray-800"><span>الإشعارات</span><i class="fa-solid fa-chevron-left text-xs text-gray-500"></i></button>
+        <button data-act="soon" class="w-full px-4 py-3 text-right flex justify-between border-t border-gray-800"><span>اللغة</span><span class="text-gray-500 text-xs">العربية</span></button>
       </div>
       <button data-act="logout-menu" class="w-full rounded-xl p-3 bg-red-600/20 border border-red-500/30 text-red-300 text-sm font-bold">تسجيل الخروج</button>
     </div>`;
@@ -729,9 +787,9 @@ function renderUsersLive() {
   if (!currentUser) return;
   if (currentView === 'search') renderSearch($('q')?.value || '');
   else if (['friends', 'chats', 'profile', 'menu', 'settings'].includes(currentView)) go(currentView, currentId);
-  else if (currentView === 'home') renderStoriesBar();
 }
 
+// ---------- logout sheet ----------
 function showLogoutSheet() {
   document.getElementById('logoutSheet')?.remove();
   const sheet = document.createElement('div');
@@ -742,12 +800,14 @@ function showLogoutSheet() {
       <div class="mx-auto w-12 h-1.5 rounded-full bg-gray-600 mb-2"></div>
       <p dir="ltr" class="text-center text-sm text-gray-400 mb-2">${esc(currentUser?.email || currentUser?.phoneNumber || '')}</p>
       <button data-act="logout-confirm" class="w-full py-3 rounded-xl bg-red-600/20 border border-red-500/30 text-red-300 font-bold text-sm">تسجيل الخروج من هذا الحساب</button>
+      <button data-act="logout-switch" class="w-full py-3 rounded-xl bg-gray-800 text-sm font-bold">تبديل الحساب</button>
       <button data-act="logout-cancel" class="w-full py-3 rounded-xl bg-gray-900 text-sm text-gray-400">إلغاء</button>
     </div>`;
   sheet.addEventListener('click', (e) => { if (e.target === sheet) sheet.remove(); });
   document.body.appendChild(sheet);
 }
 
+// ---------- subscription sheet ----------
 function showSubscribeSheet() {
   document.getElementById('subSheet')?.remove();
   const sheet = document.createElement('div');
@@ -759,16 +819,20 @@ function showSubscribeSheet() {
       <div class="mx-auto w-12 h-1.5 rounded-full bg-gray-600 mb-2"></div>
       <div class="text-center">
         <i class="fa-solid fa-circle-check text-indigo-400 text-4xl"></i>
-        <h3 class="text-lg font-bold mt-2">Sovexa Verification</h3>
-        <p class="text-sm text-gray-400 mt-1">${verified ? 'حسابك موثّق بالفعل ✔' : 'علامة زرقاء بجوار اسمك'}</p>
+        <h3 class="text-lg font-bold mt-2">التوثيق Sovexa</h3>
+        <p class="text-sm text-gray-400 mt-1">${verified ? 'حسابك موثّق بالفعل ✔' : 'علامة زرقاء بجوار اسمك تدل على حساب موثّق'}</p>
       </div>
-      ${verified ? '' : `<div class="card rounded-xl p-3 text-sm text-center"><b class="text-indigo-300">${SUB_PRICE}</b></div><button data-act="subscribe-confirm" class="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-pink-600 font-bold text-sm text-white">طلب الاشتراك</button>`}
+      ${verified ? '' : `
+        <div class="card rounded-xl p-3 text-sm text-center"><b class="text-indigo-300">${SUB_PRICE}</b></div>
+        <button data-act="subscribe-confirm" class="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-pink-600 font-bold text-sm">طلب الاشتراك</button>
+        <p class="text-[11px] text-gray-500 text-center">سيتم تفعيل التوثيق بعد تأكيد الدفع</p>`}
       <button data-act="subscribe-cancel" class="w-full py-2 text-sm text-gray-400">إغلاق</button>
     </div>`;
   sheet.addEventListener('click', (e) => { if (e.target === sheet) sheet.remove(); });
   document.body.appendChild(sheet);
 }
 
+// ---------- auth ----------
 function showLogin() {
   $('loginSection').classList.remove('hidden');
   $('appSection').classList.add('hidden');
@@ -800,15 +864,13 @@ onAuthStateChanged(auth, async (user) => {
     if (usersUnsub) { usersUnsub(); usersUnsub = null; }
     if (postsUnsub) { postsUnsub(); postsUnsub = null; }
     if (savedUnsub) { savedUnsub(); savedUnsub = null; }
-    if (storiesUnsub) { storiesUnsub(); storiesUnsub = null; }
     postsCache = {};
-    storiesCache = [];
     savedIds = new Set();
     showLogin();
     return;
   }
   showApp();
-  try { await ensureUserProfile(user); } catch (e) { showToast("تعذر حفظ الملف"); }
+  try { await ensureUserProfile(user); } catch (e) { showToast("تعذر حفظ الملف: " + e.message); }
   if (!usersUnsub) {
     usersUnsub = onSnapshot(collection(db, "users"), (s) => {
       allUsers = {};
@@ -819,7 +881,7 @@ onAuthStateChanged(auth, async (user) => {
         if (data.username) usersByUsername[data.username] = d.id;
       });
       renderUsersLive();
-    }, () => {});
+    }, (err) => showToast("تعذر تحميل المستخدمين: " + err.message));
   }
   if (!postsUnsub) {
     postsUnsub = onSnapshot(query(collection(db, "posts"), orderBy("createdAt", "desc"), limit(100)), (s) => {
@@ -828,13 +890,7 @@ onAuthStateChanged(auth, async (user) => {
       refreshPosts();
       if (currentView === 'saved') renderSavedList();
       if (currentView === 'archive') viewArchive();
-    }, () => {});
-  }
-  if (!storiesUnsub) {
-    storiesUnsub = onSnapshot(query(collection(db, "stories"), orderBy("createdAt", "desc"), limit(50)), (s) => {
-      storiesCache = s.docs.map(d => ({ id: d.id, ...d.data() }));
-      if (currentView === 'home') renderStoriesBar();
-    }, () => {});
+    }, (err) => showToast("تعذر تحميل المنشورات: " + err.message));
   }
   if (!savedUnsub) {
     savedUnsub = onSnapshot(collection(db, "users", user.uid, "saved"), (s) => {
@@ -846,284 +902,225 @@ onAuthStateChanged(auth, async (user) => {
   go('home');
 });
 
-getRedirectResult(auth).catch(() => {});
+getRedirectResult(auth).catch(err => showToast("خطأ Google: " + err.message));
 const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({ prompt: "select_account" });
 
-// ربط مباشر ومبسط جداً للأحداث والنماذج
-document.addEventListener('DOMContentLoaded', () => {
-  const gBtn = $('googleLoginBtn');
-  if (gBtn) {
-    gBtn.onclick = async () => {
-      try { await signInWithPopup(auth, googleProvider); }
-      catch (err) {
-        if (['auth/popup-closed-by-user', 'auth/cancelled-popup-request'].includes(err.code)) return;
-        try { await signInWithRedirect(auth, googleProvider); } catch(e) { showToast("خطأ Google: " + err.code); }
-      }
-    };
-  }
-
-  const pBtn = $('togglePhoneBtn');
-  if (pBtn) {
-    pBtn.onclick = () => {
-      $('phonePanel').classList.toggle('hidden');
-    };
-  }
-
-  // تسليم نموذج البريد الإلكتروني مباشرة
-  const emailForm = $('emailForm');
-  if (emailForm) {
-    emailForm.onsubmit = async (e) => {
-      e.preventDefault();
-      const email = $('emailInput').value.trim();
-      const password = $('passwordInput').value;
-      if (!email || !password) {
-        showToast("أدخل البريد وكلمة المرور");
-        return;
-      }
-      try {
-        await signInWithEmailAndPassword(auth, email, password);
-        showToast("تم تسجيل الدخول بنجاح");
-      } catch (err) {
-        if (['auth/invalid-credential', 'auth/user-not-found', 'auth/invalid-email'].includes(err.code)) {
-          try {
-            await createUserWithEmailAndPassword(auth, email, password);
-            showToast("تم إنشاء الحساب وتسجيل الدخول بنجاح");
-          } catch (e2) {
-            showToast("كلمة المرور يجب أن تكون 6 أحرف على الأقل");
-          }
-        } else {
-          showToast("خطأ: " + err.code);
-        }
-      }
-    };
-  }
-
-  // زر إرسال رمز الهاتف
-  const sendCodeBtn = $('sendCodeBtn');
-  if (sendCodeBtn) {
-    sendCodeBtn.onclick = async () => {
-      const phone = $('phoneInput').value.trim();
-      if (!phone.startsWith('+')) {
-        showToast("أدخل الرقم بالصيغة الدولية (مثال: +213...)");
-        return;
-      }
-      try {
-        if (!recaptcha) {
-          recaptcha = new RecaptchaVerifier(auth, 'recaptcha-container', { size: 'invisible' });
-        }
-        confirmationResult = await signInWithPhoneNumber(auth, phone, recaptcha);
-        $('phoneStep').classList.add('hidden');
-        $('codeStep').classList.remove('hidden');
-        showToast("تم إرسال رمز التحقق بنجاح");
-      } catch (err) {
-        showToast("تعذر إرسال الرمز، تأكد من صحة الرقم");
-      }
-    };
-  }
-
-  // زر تأكيد الرمز
-  const verifyCodeBtn = $('verifyCodeBtn');
-  if (verifyCodeBtn) {
-    verifyCodeBtn.onclick = async () => {
-      const code = $('codeInput').value.trim();
-      if (!code) {
-        showToast("أدخل رمز التحقق");
-        return;
-      }
-      try {
-        await confirmationResult.confirm(code);
-        showToast("تم تسجيل الدخول بنجاح");
-      } catch (err) {
-        showToast("رمز التحقق غير صحيح");
-      }
-    };
-  }
-
-  const backToPhoneBtn = $('backToPhoneBtn');
-  if (backToPhoneBtn) {
-    backToPhoneBtn.onclick = () => {
-      $('codeStep').classList.add('hidden');
-      $('phoneStep').classList.remove('hidden');
-    };
+$('googleLoginBtn').addEventListener('click', async () => {
+  try { await signInWithPopup(auth, googleProvider); }
+  catch (err) {
+    if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') return;
+    if (err.code === 'auth/popup-blocked' || err.code === 'auth/operation-not-supported-in-this-environment') {
+      await signInWithRedirect(auth, googleProvider); return;
+    }
+    showToast("خطأ Google: " + err.message);
   }
 });
 
-document.addEventListener('click', async (e) => {
-  const btn = e.target.closest('[data-go], [data-act]');
-  if (!btn) return;
-  const goTarget = btn.dataset.go;
-  const actTarget = btn.dataset.act;
-  const id = btn.dataset.id;
-
-  if (goTarget) {
-    go(goTarget, id);
-  } else if (actTarget === 'like') {
-    toggleLike(id);
-  } else if (actTarget === 'comments') {
-    openComments(id);
-  } else if (actTarget === 'save') {
-    toggleSave(id);
-  } else if (actTarget === 'share') {
-    if (navigator.share) {
-      navigator.share({ title: 'Sovexa', url: window.location.href }).catch(() => {});
-    } else {
-      navigator.clipboard.writeText(window.location.href);
-      showToast('تم نسخ الرابط');
-    }
-  } else if (actTarget === 'delpost') {
-    if (confirm('هل تريد حذف هذا المنشور؟')) {
-      try {
-        await deleteDoc(doc(db, "posts", id));
-        showToast('تم الحذف');
-      } catch (e) {
-        showToast('تعذر الحذف');
-      }
-    }
-  } else if (actTarget === 'follow') {
-    const targetId = id;
-    const isFollowing = (me().following || []).includes(targetId);
-    const newFollowing = isFollowing ? (me().following || []).filter(x => x !== targetId) : [...(me().following || []), targetId];
-    try {
-      await updateDoc(doc(db, "users", uid()), { following: newFollowing });
-      showToast(isFollowing ? 'تم إلغاء المتابعة' : 'تمت المتابعة');
-      renderUsersLive();
-    } catch (e) {
-      showToast('تعذر تحديث المتابعة');
-    }
-  } else if (actTarget === 'add-story') {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.onchange = async (ev) => {
-      const file = ev.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = async (e2) => {
-        try {
-          await addDoc(collection(db, "stories"), {
-            userId: uid(), userName: nameOf(me()), userPhoto: me().photoURL || "",
-            mediaUrl: e2.target.result, createdAt: serverTimestamp()
-          });
-          showToast('تم نشر القصة بنجاح 📸');
-        } catch (err) {
-          showToast('تعذر نشر القصة');
-        }
-      };
-      reader.readAsDataURL(file);
-    };
-    input.click();
-  } else if (actTarget === 'view-story') {
-    const s = storiesCache.find(x => x.id === id);
-    if (!s) return;
-    const modal = document.createElement('div');
-    modal.className = 'fixed inset-0 z-[80] bg-black/90 flex flex-col items-center justify-center p-4';
-    modal.innerHTML = `
-      <div class="relative w-full max-w-sm card rounded-2xl overflow-hidden flex flex-col items-center p-4">
-        <div class="w-full flex items-center justify-between mb-3">
-          <div class="flex items-center gap-2">
-            ${avatarHTML(s.userName, s.userPhoto, 'w-8 h-8 text-xs')}
-            <b class="text-sm">${esc(s.userName)}</b>
-          </div>
-          <button id="closeStory" class="text-gray-400 text-lg px-2"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-        <img src="${esc(s.mediaUrl)}" class="w-full max-h-[70vh] object-cover rounded-xl">
-      </div>`;
-    modal.querySelector('#closeStory').onclick = () => modal.remove();
-    modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
-    document.body.appendChild(modal);
-  } else if (actTarget === 'soon') {
-    showToast('هذه الميزة ستتوفر قريباً!');
-  } else if (actTarget === 'logout-menu') {
-    showLogoutSheet();
-  } else if (actTarget === 'logout-confirm') {
-    signOut(auth);
-    document.getElementById('logoutSheet')?.remove();
-  } else if (actTarget === 'logout-cancel') {
-    document.getElementById('logoutSheet')?.remove();
-  } else if (actTarget === 'subscribe') {
-    showSubscribeSheet();
-  } else if (actTarget === 'subscribe-confirm') {
-    showToast('تم استلام طلبك للتوثيق');
-    document.getElementById('subSheet')?.remove();
-  } else if (actTarget === 'subscribe-cancel') {
-    document.getElementById('subSheet')?.remove();
-  }
-});
-
-document.addEventListener('submit', async (e) => {
+$('emailForm').addEventListener('submit', async (e) => {
   e.preventDefault();
-  const form = e.target;
-  const ftype = form.dataset.form;
-  const id = form.dataset.id;
+  const email = $('emailInput').value.trim();
+  const password = $('passwordInput').value;
+  if (!email || !password) return showToast("أدخل البريد وكلمة المرور");
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+  } catch (err) {
+    if (err.code === 'auth/invalid-credential' || err.code === 'auth/user-not-found') {
+      try {
+        await createUserWithEmailAndPassword(auth, email, password);
+        showToast("تم إنشاء حسابك");
+      } catch (e2) {
+        showToast(e2.code === 'auth/email-already-in-use' ? "كلمة المرور غير صحيحة لهذا البريد" : "خطأ: " + e2.message);
+      }
+    } else {
+      showToast("خطأ: " + err.message);
+    }
+  }
+});
 
-  if (ftype === 'comment') {
-    const text = form.elements['t'].value.trim();
-    if (!text) return;
-    form.elements['t'].value = '';
-    try {
-      await addDoc(collection(db, "posts", id, "comments"), {
-        userId: uid(), userName: nameOf(me()), userPhoto: me().photoURL || "",
-        verified: isVerified(me()), text, createdAt: serverTimestamp()
+const getRecaptcha = () => {
+  if (!recaptcha) recaptcha = new RecaptchaVerifier(auth, 'recaptcha-container', { size: 'invisible' });
+  return recaptcha;
+};
+$('togglePhoneBtn').addEventListener('click', () => $('phonePanel').classList.toggle('hidden'));
+$('sendCodeBtn').addEventListener('click', async () => {
+  const phone = $('phoneInput').value.trim();
+  if (!/^\+\d{8,15}$/.test(phone)) return showToast("أدخل الرقم بصيغة دولية مثل +966500000000");
+  try {
+    confirmationResult = await signInWithPhoneNumber(auth, phone, getRecaptcha());
+    $('phoneStep').classList.add('hidden');
+    $('codeStep').classList.remove('hidden');
+    showToast("تم إرسال الرمز");
+  } catch (err) {
+    if (recaptcha) { try { recaptcha.clear(); } catch (_) {} }
+    recaptcha = null;
+    $('recaptcha-container').innerHTML = '';
+    showToast("خطأ الهاتف: " + err.message);
+  }
+});
+$('verifyCodeBtn').addEventListener('click', async () => {
+  if (!confirmationResult) return;
+  try { await confirmationResult.confirm($('codeInput').value.trim()); }
+  catch (err) { showToast("رمز غير صحيح"); }
+});
+$('backToPhoneBtn').addEventListener('click', () => {
+  $('codeStep').classList.add('hidden');
+  $('phoneStep').classList.remove('hidden');
+  confirmationResult = null;
+});
+
+// ---------- global events ----------
+let unameTimer = null;
+document.addEventListener('click', async (e) => {
+  const g = e.target.closest('[data-go]');
+  if (g) { go(g.dataset.go, g.dataset.id); return; }
+  const a = e.target.closest('[data-act]');
+  if (!a) return;
+  const { act, id } = a.dataset;
+  try {
+    if (act === 'like') {
+      await toggleLike(id);
+    } else if (act === 'comments') {
+      openComments(id);
+    } else if (act === 'save') {
+      await toggleSave(id);
+    } else if (act === 'share') {
+      const p = postsCache[id] || {};
+      if (navigator.share) {
+        navigator.share({ title: 'Sovexa', text: p.text || 'منشور من Sovexa', url: location.href }).catch(() => {});
+      } else {
+        navigator.clipboard?.writeText(location.href);
+        showToast("تم نسخ رابط التطبيق");
+      }
+    } else if (act === 'delpost') {
+      if (confirm('حذف هذا المنشور؟')) await deleteDoc(doc(db, "posts", id));
+    } else if (act === 'follow') {
+      const isF = (me().following || []).includes(id);
+      await updateDoc(doc(db, "users", uid()), { following: isF ? arrayRemove(id) : arrayUnion(id) });
+    } else if (act === 'subscribe') {
+      showSubscribeSheet();
+    } else if (act === 'subscribe-confirm') {
+      await setDoc(doc(db, "subscriptions", uid()), {
+        userId: uid(), status: "pending", price: SUB_PRICE, createdAt: serverTimestamp()
       });
-      await updateDoc(doc(db, "posts", id), { commentsCount: increment(1) });
-    } catch (e) {
-      showToast('تعذر إرسال التعليق');
+      document.getElementById('subSheet')?.remove();
+      showToast("تم تسجيل طلب الاشتراك، بانتظار تأكيد الدفع");
+    } else if (act === 'subscribe-cancel') {
+      document.getElementById('subSheet')?.remove();
+    } else if (act === 'soon') {
+      showToast("هذه الميزة قريباً");
+    } else if (act === 'logout-menu') {
+      showLogoutSheet();
+    } else if (act === 'logout-confirm') {
+      document.getElementById('logoutSheet')?.remove();
+      await signOut(auth);
+    } else if (act === 'logout-switch') {
+      document.getElementById('logoutSheet')?.remove();
+      await signOut(auth);
+      showToast("سجّل الدخول بالحساب الآخر");
+    } else if (act === 'logout-cancel') {
+      document.getElementById('logoutSheet')?.remove();
     }
-  } else if (ftype === 'msg') {
-    const text = form.elements['t'].value.trim();
-    if (!text) return;
-    form.elements['t'].value = '';
-    try {
-      await addDoc(collection(db, "chats", id, "messages"), {
-        senderId: uid(), senderName: nameOf(me()), text, createdAt: serverTimestamp()
-      });
-    } catch (e) {
-      showToast('تعذر الإرسال');
-    }
-  } else if (ftype === 'create') {
-    const text = form.elements['text'].value.trim();
-    if (!text && !pendingPostImg) return showToast('أكتب شيئاً أو أضف صورة');
-    try {
-      await addDoc(collection(db, "posts"), {
-        userId: uid(), userName: nameOf(me()), userPhoto: me().photoURL || "",
-        verified: isVerified(me()), text, image: pendingPostImg || "",
-        likes: [], commentsCount: 0, createdAt: serverTimestamp()
-      });
-      showToast('تم النشر بنجاح');
-      go('home');
-    } catch (e) {
-      showToast('تعذر النشر');
-    }
-  } else if (ftype === 'edit') {
-    const name = form.elements['name'].value.trim();
-    const username = form.elements['username'].value.trim().toLowerCase();
-    const bio = form.elements['bio'].value.trim();
-    const saveBtn = $('saveBtn');
-    if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'جاري الحفظ...'; }
-    try {
-      const payload = { name, username, bio };
-      if (pendingPhoto) payload.photoURL = pendingPhoto;
-      if (pendingCover) payload.coverURL = pendingCover;
-      await updateDoc(doc(db, "users", uid()), payload);
-      showToast('تم التحديث بنجاح');
-      go('profile', uid());
-    } catch (e) {
-      showToast('تعذر التحديث');
-      if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'حفظ'; }
-    }
+  } catch (err) {
+    showToast("خطأ: " + err.message);
   }
 });
 
 document.addEventListener('input', (e) => {
   if (e.target.id === 'q') renderSearch(e.target.value);
+  if (e.target.name !== 'username') return;
+  clearTimeout(unameTimer);
+  const v = normUser(e.target.value);
+  const el = $('unameState');
+  if (!el) return;
+  if (v.length < 3) { el.innerHTML = '<span class="text-gray-500">أدخل 3 أحرف على الأقل</span>'; return; }
+  el.innerHTML = '<span class="text-gray-400">جاري الفحص...</span>';
+  unameTimer = setTimeout(async () => {
+    const free = await isUsernameFree(v);
+    const cur = $('unameState');
+    if (cur) cur.innerHTML = free
+      ? '<span class="text-emerald-400">● متاح</span>'
+      : '<span class="text-red-400">● مستخدم</span>';
+  }, 400);
 });
 
-document.addEventListener('contextmenu', e => {
-  if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
-    e.preventDefault();
+document.addEventListener('change', async (e) => {
+  const f = e.target.files?.[0];
+  if (!f) return;
+  try {
+    if (e.target.id === 'photoIn') {
+      pendingPhoto = await compressImage(f, 256, 0.7);
+      $('photoPrev').innerHTML = `<img src="${pendingPhoto}" class="w-24 h-24 rounded-full object-cover">`;
+    } else if (e.target.id === 'coverIn') {
+      pendingCover = await compressImage(f, 600, 0.6);
+      showToast("تم اختيار الغلاف");
+    } else if (e.target.id === 'postImg') {
+      pendingPostImg = await compressImage(f, 800, 0.7);
+      $('postPrev').innerHTML = `<img src="${pendingPostImg}" class="w-full rounded-xl">`;
+    }
+  } catch (err) { showToast("تعذر معالجة الصورة"); }
+});
+
+document.addEventListener('submit', async (e) => {
+  const f = e.target;
+  const type = f.dataset.form;
+  if (!type) return;
+  e.preventDefault();
+  const fd = new FormData(f);
+  const btn = f.querySelector('button[type="submit"], button:not([type])');
+  try {
+    if (type === 'comment') {
+      const t = (fd.get('t') || '').toString().trim();
+      if (!t) return;
+      const postId = f.dataset.id;
+      await addDoc(collection(db, "posts", postId, "comments"), {
+        userId: uid(), userName: nameOf(me()), userPhoto: me().photoURL || '',
+        text: t, verified: isVerified(me()), createdAt: serverTimestamp()
+      });
+      await updateDoc(doc(db, "posts", postId), { commentsCount: increment(1) });
+      f.reset();
+    } else if (type === 'msg') {
+      const t = (fd.get('t') || '').toString().trim();
+      if (!t) return;
+      await addDoc(collection(db, "chats", f.dataset.id, "messages"), {
+        text: t, senderId: uid(), senderName: nameOf(me()), createdAt: serverTimestamp()
+      });
+      f.reset();
+    } else if (type === 'create') {
+      const text = (fd.get('text') || '').toString().trim();
+      if (!text && !pendingPostImg) return showToast("اكتب شيئاً أو أضف صورة");
+      await addDoc(collection(db, "posts"), {
+        userId: uid(), userName: nameOf(me()), userPhoto: me().photoURL || '',
+        verified: isVerified(me()),
+        text, image: pendingPostImg || '', likes: [], commentsCount: 0, createdAt: serverTimestamp()
+      });
+      pendingPostImg = null;
+      showToast("تم النشر");
+      go('home');
+    } else if (type === 'edit') {
+      if (btn) { btn.disabled = true; btn.textContent = "جاري الحفظ..."; btn.classList.add('btn-busy'); }
+      const name = (fd.get('name') || '').toString().trim();
+      const username = normUser(fd.get('username'));
+      const bio = (fd.get('bio') || '').toString().trim();
+      if (!name) throw new Error("الاسم مطلوب");
+      if (username.length < 3) throw new Error("اسم المستخدم يجب أن يكون 3 أحرف على الأقل");
+      const oldName = me().username || "";
+      if (oldName !== username && !(await isUsernameFree(username))) throw new Error("اسم المستخدم مستخدم من شخص آخر");
+      await withTimeout(claimUsername(username, oldName));
+      const data = { name, username, bio };
+      if (pendingPhoto) data.photoURL = pendingPhoto;
+      if (pendingCover) data.coverURL = pendingCover;
+      await withTimeout(setDoc(doc(db, "users", uid()), data, { merge: true }));
+      pendingPhoto = null;
+      pendingCover = null;
+      showToast("تم حفظ التعديلات");
+      go('profile', uid());
+    }
+  } catch (err) {
+    showToast("خطأ: " + err.message);
+    if (type === 'edit' && btn) { btn.disabled = false; btn.textContent = "حفظ"; btn.classList.remove('btn-debounce'); }
   }
 });
 </script>
 </body>
-</html>
+        </html>
