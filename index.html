@@ -1039,4 +1039,132 @@ document.addEventListener('click', async (e) => {
         userId: uid(), status: "pending", price: SUB_PRICE, createdAt: serverTimestamp()
       });
       document.getElementById('subSheet')?.remove();
-      showToast("تم تسجيل طلب الاشترا
+      showToast("تم تسجيل طلب الاشتراك، سيتم التفعيل بعد تأكيد الدفع");
+    } else if (act === 'subscribe-cancel') {
+      document.getElementById('subSheet')?.remove();
+    } else if (act === 'logout-menu') {
+      showLogoutSheet();
+    } else if (act === 'logout-confirm' || act === 'logout-switch') {
+      document.getElementById('logoutSheet')?.remove();
+      await signOut(auth);
+    } else if (act === 'logout-cancel') {
+      document.getElementById('logoutSheet')?.remove();
+    } else if (act === 'soon') {
+      showToast("قريباً");
+    }
+  } catch (err) {
+    showToast("خطأ: " + err.message);
+  }
+});
+
+// ---------- forms ----------
+document.addEventListener('submit', async (e) => {
+  const f = e.target.closest('form[data-form]');
+  if (!f) return;
+  e.preventDefault();
+  const kind = f.dataset.form;
+  const btn = f.querySelector('button:not([type="button"])');
+  try {
+    if (kind === 'comment') {
+      const id = f.dataset.id;
+      const text = f.elements['t'].value.trim();
+      if (!text) return;
+      f.elements['t'].value = '';
+      const u = me();
+      await addDoc(collection(db, "posts", id, "comments"), {
+        userId: uid(), userName: nameOf(u), userPhoto: u.photoURL || "",
+        verified: isVerified(u), text, createdAt: serverTimestamp()
+      });
+      await updateDoc(doc(db, "posts", id), { commentsCount: increment(1) }).catch(() => {});
+    } else if (kind === 'create') {
+      const text = f.elements['text'].value.trim();
+      if (!text && !pendingPostImg) return showToast("اكتب شيئاً أو أضف صورة");
+      btn?.classList.add('btn-busy');
+      const u = me();
+      await withTimeout(addDoc(collection(db, "posts"), {
+        userId: uid(), userName: nameOf(u), userPhoto: u.photoURL || "",
+        verified: isVerified(u), text, image: pendingPostImg || "",
+        likes: [], commentsCount: 0, createdAt: serverTimestamp()
+      }));
+      pendingPostImg = null;
+      showToast("تم النشر");
+      go('home');
+    } else if (kind === 'msg') {
+      const cid = f.dataset.id;
+      const text = f.elements['t'].value.trim();
+      if (!text) return;
+      f.elements['t'].value = '';
+      await addDoc(collection(db, "chats", cid, "messages"), {
+        senderId: uid(), senderName: nameOf(me()), text, createdAt: serverTimestamp()
+      });
+    } else if (kind === 'edit') {
+      const name = f.elements['name'].value.trim();
+      const username = normUser(f.elements['username'].value);
+      const bio = f.elements['bio'].value.trim();
+      if (!name) return showToast("أدخل الاسم");
+      if (username.length < 3) return showToast("اسم المستخدم 3 أحرف على الأقل");
+      btn?.classList.add('btn-busy');
+      const oldName = me().username || "";
+      if (!(await isUsernameFree(username))) {
+        btn?.classList.remove('btn-busy');
+        return showToast("اسم المستخدم غير متاح");
+      }
+      await withTimeout(claimUsername(username, oldName));
+      const data = { name, username, bio };
+      if (pendingPhoto) data.photoURL = pendingPhoto;
+      if (pendingCover) data.coverURL = pendingCover;
+      await withTimeout(setDoc(doc(db, "users", uid()), data, { merge: true }));
+      pendingPhoto = null;
+      pendingCover = null;
+      showToast("تم حفظ الملف الشخصي");
+      go('profile', uid());
+    }
+  } catch (err) {
+    showToast("خطأ: " + err.message);
+  } finally {
+    btn?.classList.remove('btn-busy');
+  }
+});
+
+// ---------- inputs ----------
+document.addEventListener('change', async (e) => {
+  const t = e.target;
+  try {
+    if (t.id === 'postImg' && t.files[0]) {
+      pendingPostImg = await compressImage(t.files[0], 1000, 0.7);
+      $('postPrev').innerHTML = `<img src="${pendingPostImg}" class="w-full max-h-64 object-cover rounded-xl">`;
+    } else if (t.id === 'photoIn' && t.files[0]) {
+      pendingPhoto = await compressImage(t.files[0], 256, 0.8);
+      $('photoPrev').innerHTML = avatarHTML('', pendingPhoto, 'w-24 h-24 text-3xl');
+    } else if (t.id === 'coverIn' && t.files[0]) {
+      pendingCover = await compressImage(t.files[0], 900, 0.7);
+      showToast("تم اختيار صورة الغلاف");
+    }
+  } catch (err) {
+    showToast("تعذر قراءة الصورة");
+  }
+});
+
+document.addEventListener('input', (e) => {
+  const t = e.target;
+  if (t.id === 'q') {
+    renderSearch(t.value);
+  } else if (t.name === 'username' && t.closest('form[data-form="edit"]')) {
+    clearTimeout(unameTimer);
+    const state = $('unameState');
+    const val = normUser(t.value);
+    if (val.length < 3) { state.className = 'text-xs -mt-2 text-gray-500'; state.textContent = 'ثلاثة أحرف على الأقل'; return; }
+    state.className = 'text-xs -mt-2 text-gray-500';
+    state.textContent = 'جارٍ التحقق...';
+    unameTimer = setTimeout(async () => {
+      try {
+        const free = await isUsernameFree(val);
+        state.className = 'text-xs -mt-2 ' + (free ? 'text-emerald-400' : 'text-red-400');
+        state.textContent = free ? 'متاح ✔' : 'غير متاح ✖';
+      } catch (_) { state.textContent = ''; }
+    }, 400);
+  }
+});
+</script>
+</body>
+</html>
