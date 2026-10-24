@@ -142,6 +142,8 @@ let pendingPhoto = null, pendingCover = null, pendingPostImg = null;
 let profileTarget = null;
 let savedIds = new Set();
 let unameTimer = null;
+let unreadCounts = {};
+let unreadUnsubs = [];
 
 window.showToast = (msg) => {
   const box = document.createElement('div');
@@ -167,6 +169,10 @@ function timeAgo(ts) {
 function followBtn(id) {
   const f = (me().following || []).includes(id);
   return `<button data-act="follow" data-id="${id}" class="px-3 py-1.5 rounded-lg text-xs font-bold ${f ? 'bg-gray-700 text-gray-200' : 'bg-indigo-600 text-white'}">${f ? 'إلغاء المتابعة' : 'متابعة'}</button>`;
+}
+
+function unreadBadge(n) {
+  return n > 0 ? `<span class="ml-auto min-w-[20px] h-5 px-1.5 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">${n}</span>` : '';
 }
 
 function compressImage(file, max, quality) {
@@ -203,6 +209,30 @@ function backHeader(title) {
       <button data-go="menu" class="w-9 h-9 rounded-full bg-gray-800 flex items-center justify-center"><i class="fa-solid fa-arrow-right"></i></button>
       <h2 class="font-bold text-lg">${title}</h2>
     </div>`;
+}
+
+// ---------- unread messages ----------
+async function markChatRead(cid) {
+  if (!uid()) return;
+  await setDoc(doc(db, "users", uid(), "reads", cid), { at: serverTimestamp() }, { merge: true }).catch(() => {});
+}
+
+function watchUnread() {
+  unreadUnsubs.forEach(f => f());
+  unreadUnsubs = [];
+  const cids = ['global', ...((me().following || []).map(id => chatIdFor(uid(), id)))];
+  cids.forEach(cid => {
+    const unsub = onSnapshot(query(collection(db, "chats", cid, "messages"), orderBy("createdAt", "desc"), limit(50)), async (snap) => {
+      const readSnap = await getDoc(doc(db, "users", uid(), "reads", cid)).catch(() => null);
+      const readAt = readSnap && readSnap.exists() ? (readSnap.data().at?.seconds ?? 0) : 0;
+      unreadCounts[cid] = snap.docs.filter(d => {
+        const m = d.data();
+        return m.senderId !== uid() && (m.createdAt?.seconds ?? 0) > readAt;
+      }).length;
+      if (currentView === 'chats') viewChats();
+    }, () => {});
+    unreadUnsubs.push(unsub);
+  });
 }
 
 // ---------- username uniqueness ----------
@@ -488,13 +518,18 @@ function viewChats() {
       <h2 class="font-bold text-lg mb-2">الدردشات</h2>
       <button data-go="chat" data-id="global" class="card rounded-xl p-3 w-full flex items-center gap-3 text-right">
         <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-purple-600 to-pink-500 flex items-center justify-center font-bold">S</div>
-        <div><b class="text-sm block">الدردشة العامة Sovexa</b><span class="text-xs text-emerald-400">مفتوحة للجميع</span></div>
+        <div class="flex-1"><b class="text-sm block">الدردشة العامة Sovexa</b><span class="text-xs text-emerald-400">مفتوحة للجميع</span></div>
+        ${unreadBadge(unreadCounts['global'] || 0)}
       </button>
-      ${following.length ? following.map(u => `
+      ${following.length ? following.map(u => {
+        const cid = chatIdFor(uid(), u.uid);
+        return `
         <button data-go="chat" data-id="${u.uid}" class="card rounded-xl p-3 w-full flex items-center gap-3 text-right">
           ${avatarHTML(nameOf(u), u.photoURL)}
-          <div><b class="text-sm block">${esc(nameOf(u))}${badgeHTML(isVerified(u))}</b><span class="text-xs text-gray-500">${esc(handleOf(u))}</span></div>
-        </button>`).join('') : '<p class="text-center text-gray-500 py-8 text-sm">تابع أشخاصاً لتبدأ الدردشة معهم</p>'}
+          <div class="flex-1"><b class="text-sm block">${esc(nameOf(u))}${badgeHTML(isVerified(u))}</b><span class="text-xs text-gray-500">${esc(handleOf(u))}</span></div>
+          ${unreadBadge(unreadCounts[cid] || 0)}
+        </button>`;
+      }).join('') : '<p class="text-center text-gray-500 py-8 text-sm">تابع أشخاصاً لتبدأ الدردشة معهم</p>'}
     </div>`;
 }
 
@@ -504,6 +539,7 @@ function viewChat(otherId) {
   const title = isGlobal ? "الدردشة العامة Sovexa" : nameOf(o);
   const cid = isGlobal ? "global" : chatIdFor(uid(), otherId);
   if (!isGlobal) setDoc(doc(db, "chats", cid), { members: [uid(), otherId] }, { merge: true }).catch(() => {});
+  markChatRead(cid);
   V().innerHTML = `
     <div class="flex flex-col h-[calc(100vh-10.5rem)] max-w-2xl mx-auto">
       <div class="flex items-center gap-3 px-3 py-2 border-b border-gray-800 bg-[#111827]">
@@ -862,6 +898,7 @@ onAuthStateChanged(auth, async (user) => {
     if (usersUnsub) { usersUnsub(); usersUnsub = null; }
     if (postsUnsub) { postsUnsub(); postsUnsub = null; }
     if (savedUnsub) { savedUnsub(); savedUnsub = null; }
+    unreadUnsubs.forEach(f => f()); unreadUnsubs = []; unreadCounts = {};
     postsCache = {};
     savedIds = new Set();
     showLogin();
@@ -879,6 +916,7 @@ onAuthStateChanged(auth, async (user) => {
         if (data.username) usersByUsername[data.username] = d.id;
       });
       renderUsersLive();
+      watchUnread();
     }, (err) => showToast("تعذر تحميل المستخدمين: " + err.message));
   }
   if (!postsUnsub) {
@@ -1001,48 +1039,4 @@ document.addEventListener('click', async (e) => {
         userId: uid(), status: "pending", price: SUB_PRICE, createdAt: serverTimestamp()
       });
       document.getElementById('subSheet')?.remove();
-      showToast("تم تسجيل طلب الاشتراك، بانتظار تأكيد الدفع");
-    } else if (act === 'subscribe-cancel') {
-      document.getElementById('subSheet')?.remove();
-    } else if (act === 'soon') {
-      showToast("هذه الميزة قريباً");
-    } else if (act === 'logout-menu') {
-      showLogoutSheet();
-    } else if (act === 'logout-confirm') {
-      document.getElementById('logoutSheet')?.remove();
-      await signOut(auth);
-    } else if (act === 'logout-switch') {
-      document.getElementById('logoutSheet')?.remove();
-      await signOut(auth);
-      showToast("سجّل الدخول بالحساب الآخر");
-    } else if (act === 'logout-cancel') {
-      document.getElementById('logoutSheet')?.remove();
-    }
-  } catch (err) {
-    showToast("خطأ: " + err.message);
-  }
-});
-
-document.addEventListener('input', (e) => {
-  if (e.target.id === 'q') renderSearch(e.target.value);
-  if (e.target.name !== 'username') return;
-  clearTimeout(unameTimer);
-  const v = normUser(e.target.value);
-  const el = $('unameState');
-  if (!el) return;
-  if (v.length < 3) { el.innerHTML = '<span class="text-gray-500">أدخل 3 أحرف على الأقل</span>'; return; }
-  el.innerHTML = '<span class="text-gray-400">جاري الفحص...</span>';
-  unameTimer = setTimeout(async () => {
-    const free = await isUsernameFree(v);
-    const cur = $('unameState');
-    if (cur) cur.innerHTML = free
-      ? '<span class="text-emerald-400">● متاح</span>'
-      : '<span class="text-red-400">● مستخدم</span>';
-  }, 400);
-});
-
-document.addEventListener('change', async (e) => {
-  const f = e.target.files?.[0];
-  if (!f) return;
-  try {
-    if (e.target.id === 'phot
+      showToast("تم تسجيل طلب الاشترا
