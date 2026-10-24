@@ -86,7 +86,7 @@
       <button data-tab="home" data-go="home" class="tab-btn"><i class="fa-solid fa-house"></i></button>
       <button data-tab="notifications" data-go="notifications" class="tab-btn"><i class="fa-solid fa-bell"></i></button>
       <button data-tab="chats" data-go="chats" class="tab-btn"><i class="fa-solid fa-comments"></i></button>
-      <button data-tab="profile" data-go="profile" data-id="" class="tab-btn"><i class="fa-solid fa-user"></i></button>
+      <button data-tab="reels" data-go="reels" class="tab-btn"><i class="fa-solid fa-clapperboard"></i></button>
     </div>
   </header>
   <main id="view" class="flex-1 pb-8"></main>
@@ -119,7 +119,7 @@ const db = getFirestore(app);
 // ---------- verification ----------
 const ADMIN_EMAIL = "shanks377s8@gmail.com";
 const SUB_PRICE = "9.99$ شهرياً";
-const isVerified = (u) => !!u && (u.email === ADMIN_EMAIL || u.verified === true);
+const isVerified = (u) => !!u && (u.email === ADMIN_EMAIL || u.username === "sovexa");
 const badgeHTML = (on) => on ? ' <i class="fa-solid fa-circle-check text-indigo-400 text-xs"></i>' : '';
 
 // ---------- helpers ----------
@@ -238,9 +238,10 @@ function watchUnread() {
 // ---------- username uniqueness ----------
 async function isUsernameFree(name) {
   if (!name || name.length < 3) return false;
-  if (name === "sovexa" && currentUser?.email !== ADMIN_EMAIL) return false;
   const s = await getDoc(doc(db, "usernames", name));
-  return !s.exists() || s.data().uid === uid();
+  if (s.exists() && s.data().uid === uid()) return true;
+  if (name === "sovexa" && currentUser?.email !== ADMIN_EMAIL) return false;
+  return !s.exists();
 }
 
 async function claimUsername(newName, oldName) {
@@ -313,7 +314,7 @@ function postCard(p) {
     <div class="flex items-center gap-3 p-3">
       ${avatarHTML(p.userName, p.userPhoto)}
       <div class="flex-1 min-w-0">
-        <b class="block text-sm text-white truncate">${esc(p.userName)}${badgeHTML(p.verified)}</b>
+        <b class="block text-sm text-white truncate">${esc(p.userName)}${badgeHTML(isVerified(allUsers[p.userId]))}</b>
         <span class="text-xs text-gray-500">${timeAgo(p.createdAt)}</span>
       </div>
       ${p.userId === uid() ? `<button data-act="delpost" data-id="${p.id}" class="text-gray-500 px-2"><i class="fa-solid fa-trash"></i></button>` : ''}
@@ -384,7 +385,7 @@ function watchComments(id) {
     box.innerHTML = snap.docs.map(d => {
       const c = d.data();
       return `<div class="flex gap-2">${avatarHTML(c.userName, c.userPhoto, 'w-7 h-7 text-xs')}
-        <div class="bg-gray-800 rounded-xl px-3 py-2 text-xs"><b>${esc(c.userName)}${badgeHTML(c.verified)}</b><p>${esc(c.text)}</p></div></div>`;
+        <div class="bg-gray-800 rounded-xl px-3 py-2 text-xs"><b>${esc(c.userName)}${badgeHTML(isVerified(allUsers[c.userId]))}</b><p>${esc(c.text)}</p></div></div>`;
     }).join('') + `
       <form data-form="comment" data-id="${id}" class="flex gap-2 pt-1">
         <input name="t" autocomplete="off" placeholder="اكتب تعليقاً..." class="flex-1 bg-gray-800 rounded-full px-3 py-2 text-xs outline-none">
@@ -414,8 +415,8 @@ function viewHome() {
   V().innerHTML = `
     <div class="p-3 space-y-3 max-w-xl mx-auto">
       <section class="card rounded-xl p-3 flex items-center gap-3">
-        ${avatarHTML(nameOf(me()), me().photoURL)}
-        <button data-go="create" class="flex-1 text-right bg-gray-800 rounded-full px-4 py-2 text-sm text-gray-400">بماذا تفكر يا ${esc(nameOf(me()))}؟</button>
+        <button data-go="profile" data-id="${uid()}" class="shrink-0">${avatarHTML(nameOf(me()), me().photoURL)}</button>
+        <button data-go="create" class="flex-1 text-right bg-gray-800 rounded-full px-4 py-2 text-sm text-gray-400">أنشر</button>
       </section>
       <div id="feed" class="space-y-3"></div>
     </div>`;
@@ -650,9 +651,6 @@ const MENU_GROUPS = [
     ['fa-user', 'الملف الشخصي', 'profile'],
     ['fa-pen', 'تعديل الملف الشخصي', 'data-go="edit"'],
     ['fa-gear', 'الإعدادات', 'data-go="settings"'],
-  ]},
-  { title: "الاشتراك", items: [
-    ['fa-crown', 'الاشتراك في التوثيق', 'data-act="subscribe"'],
   ]},
   { title: "التواصل", items: [
     ['fa-user-group', 'الأصدقاء', 'data-go="friends"'],
