@@ -26,7 +26,6 @@
 
 <div id="toastContainer" class="fixed top-16 left-1/2 -translate-x-1/2 z-[60] flex flex-col items-center gap-2 pointer-events-none"></div>
 
-<!-- ============ LOGIN ============ -->
 <div id="loginSection" class="min-h-screen flex flex-col items-center justify-center p-4">
   <div class="w-full max-w-md card rounded-3xl p-6 shadow-2xl">
     <div class="text-center mb-5">
@@ -74,7 +73,6 @@
   </div>
 </div>
 
-<!-- ============ APP ============ -->
 <div id="appSection" class="hidden min-h-screen flex flex-col">
   <header class="sticky top-0 z-40 bg-[#111827] border-b border-gray-800 safe-top">
     <div class="flex items-center justify-between px-4 h-14">
@@ -91,7 +89,6 @@
       <button data-tab="profile" data-go="profile" data-id="" class="tab-btn"><i class="fa-solid fa-user"></i></button>
     </div>
   </header>
-
   <main id="view" class="flex-1 pb-8"></main>
 </div>
 
@@ -119,7 +116,7 @@ const auth = getAuth(app);
 setPersistence(auth, browserLocalPersistence).catch(err => console.error("persistence:", err));
 const db = getFirestore(app);
 
-// ---------- verification settings ----------
+// ---------- verification ----------
 const ADMIN_EMAIL = "shanks377s8@gmail.com";
 const SUB_PRICE = "9.99$ شهرياً";
 const isVerified = (u) => !!u && (u.email === ADMIN_EMAIL || u.verified === true);
@@ -144,6 +141,7 @@ let confirmationResult = null, recaptcha = null;
 let pendingPhoto = null, pendingCover = null, pendingPostImg = null;
 let profileTarget = null;
 let savedIds = new Set();
+let unameTimer = null;
 
 window.showToast = (msg) => {
   const box = document.createElement('div');
@@ -970,7 +968,6 @@ $('backToPhoneBtn').addEventListener('click', () => {
 });
 
 // ---------- global events ----------
-let unameTimer = null;
 document.addEventListener('click', async (e) => {
   const g = e.target.closest('[data-go]');
   if (g) { go(g.dataset.go, g.dataset.id); return; }
@@ -1048,79 +1045,4 @@ document.addEventListener('change', async (e) => {
   const f = e.target.files?.[0];
   if (!f) return;
   try {
-    if (e.target.id === 'photoIn') {
-      pendingPhoto = await compressImage(f, 256, 0.7);
-      $('photoPrev').innerHTML = `<img src="${pendingPhoto}" class="w-24 h-24 rounded-full object-cover">`;
-    } else if (e.target.id === 'coverIn') {
-      pendingCover = await compressImage(f, 600, 0.6);
-      showToast("تم اختيار الغلاف");
-    } else if (e.target.id === 'postImg') {
-      pendingPostImg = await compressImage(f, 800, 0.7);
-      $('postPrev').innerHTML = `<img src="${pendingPostImg}" class="w-full rounded-xl">`;
-    }
-  } catch (err) { showToast("تعذر معالجة الصورة"); }
-});
-
-document.addEventListener('submit', async (e) => {
-  const f = e.target;
-  const type = f.dataset.form;
-  if (!type) return;
-  e.preventDefault();
-  const fd = new FormData(f);
-  const btn = f.querySelector('button[type="submit"], button:not([type])');
-  try {
-    if (type === 'comment') {
-      const t = (fd.get('t') || '').toString().trim();
-      if (!t) return;
-      const postId = f.dataset.id;
-      await addDoc(collection(db, "posts", postId, "comments"), {
-        userId: uid(), userName: nameOf(me()), userPhoto: me().photoURL || '',
-        text: t, verified: isVerified(me()), createdAt: serverTimestamp()
-      });
-      await updateDoc(doc(db, "posts", postId), { commentsCount: increment(1) });
-      f.reset();
-    } else if (type === 'msg') {
-      const t = (fd.get('t') || '').toString().trim();
-      if (!t) return;
-      await addDoc(collection(db, "chats", f.dataset.id, "messages"), {
-        text: t, senderId: uid(), senderName: nameOf(me()), createdAt: serverTimestamp()
-      });
-      f.reset();
-    } else if (type === 'create') {
-      const text = (fd.get('text') || '').toString().trim();
-      if (!text && !pendingPostImg) return showToast("اكتب شيئاً أو أضف صورة");
-      await addDoc(collection(db, "posts"), {
-        userId: uid(), userName: nameOf(me()), userPhoto: me().photoURL || '',
-        verified: isVerified(me()),
-        text, image: pendingPostImg || '', likes: [], commentsCount: 0, createdAt: serverTimestamp()
-      });
-      pendingPostImg = null;
-      showToast("تم النشر");
-      go('home');
-    } else if (type === 'edit') {
-      if (btn) { btn.disabled = true; btn.textContent = "جاري الحفظ..."; btn.classList.add('btn-busy'); }
-      const name = (fd.get('name') || '').toString().trim();
-      const username = normUser(fd.get('username'));
-      const bio = (fd.get('bio') || '').toString().trim();
-      if (!name) throw new Error("الاسم مطلوب");
-      if (username.length < 3) throw new Error("اسم المستخدم يجب أن يكون 3 أحرف على الأقل");
-      const oldName = me().username || "";
-      if (oldName !== username && !(await isUsernameFree(username))) throw new Error("اسم المستخدم مستخدم من شخص آخر");
-      await withTimeout(claimUsername(username, oldName));
-      const data = { name, username, bio };
-      if (pendingPhoto) data.photoURL = pendingPhoto;
-      if (pendingCover) data.coverURL = pendingCover;
-      await withTimeout(setDoc(doc(db, "users", uid()), data, { merge: true }));
-      pendingPhoto = null;
-      pendingCover = null;
-      showToast("تم حفظ التعديلات");
-      go('profile', uid());
-    }
-  } catch (err) {
-    showToast("خطأ: " + err.message);
-    if (type === 'edit' && btn) { btn.disabled = false; btn.textContent = "حفظ"; btn.classList.remove('btn-debounce'); }
-  }
-});
-</script>
-</body>
-        </html>
+    if (e.target.id === 'phot
