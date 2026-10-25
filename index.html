@@ -23,9 +23,11 @@
 </style>
 </head>
 <body class="min-h-screen">
+<!-- BUILD 2 -->
 
 <div id="toastContainer" class="fixed top-16 left-1/2 -translate-x-1/2 z-[60] flex flex-col items-center gap-2 pointer-events-none"></div>
 
+<!-- ============ LOGIN ============ -->
 <div id="loginSection" class="min-h-screen flex flex-col items-center justify-center p-4">
   <div class="w-full max-w-md card rounded-3xl p-6 shadow-2xl">
     <div class="text-center mb-5">
@@ -34,6 +36,7 @@
       </div>
       <h2 class="text-xl font-bold text-white">مرحباً بك في Sovexa</h2>
       <p class="text-xs text-gray-400">سجل الدخول للمتابعة</p>
+      <p dir="ltr" class="text-[10px] text-gray-600 mt-1">BUILD 2</p>
     </div>
 
     <button id="googleLoginBtn" class="w-full py-2.5 bg-gray-900 border border-gray-700 rounded-xl text-sm font-medium flex items-center justify-center gap-3 mb-3">
@@ -73,6 +76,7 @@
   </div>
 </div>
 
+<!-- ============ APP ============ -->
 <div id="appSection" class="hidden min-h-screen flex flex-col">
   <header class="sticky top-0 z-40 bg-[#111827] border-b border-gray-800 safe-top">
     <div class="flex items-center justify-between px-4 h-14">
@@ -84,11 +88,12 @@
     </div>
     <div class="grid grid-cols-4 gap-2 px-3 pb-2">
       <button data-tab="home" data-go="home" class="tab-btn"><i class="fa-solid fa-house"></i></button>
-      <button data-tab="notifications" data-go="notifications" class="tab-btn"><i class="fa-solid fa-bell"></i></button>
+      <button data-tab="notifications" data-go="notifications" class="tab-btn"><i class="fa-solid fa-bell"></i><span id="notifBadge" class="hidden absolute top-1 right-3 min-w-[16px] h-4 px-1 rounded-full bg-pink-600 text-[10px] font-bold items-center justify-center text-white" style="display:none"></span></button>
       <button data-tab="chats" data-go="chats" class="tab-btn"><i class="fa-solid fa-comments"></i></button>
-      <button data-tab="reels" data-go="reels" class="tab-btn"><i class="fa-solid fa-clapperboard"></i></button>
+      <button data-tab="profile" data-go="profile" data-id="" class="tab-btn"><i class="fa-solid fa-user"></i></button>
     </div>
   </header>
+
   <main id="view" class="flex-1 pb-8"></main>
 </div>
 
@@ -97,12 +102,15 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/fireba
 import {
   getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult,
   signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut,
-  RecaptchaVerifier, signInWithPhoneNumber, setPersistence, browserLocalPersistence
+  RecaptchaVerifier, signInWithPhoneNumber
 } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
 import {
   getFirestore, collection, doc, getDoc, setDoc, updateDoc, deleteDoc, addDoc, onSnapshot,
-  query, orderBy, limit, serverTimestamp, arrayUnion, arrayRemove, increment, runTransaction
+  query, orderBy, limit, serverTimestamp, arrayUnion, arrayRemove, increment, where, Timestamp
 } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+import { getStorage, ref as sRef, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js";
+
+const BUILD = "BUILD 2";
 
 const app = initializeApp({
   apiKey: "AIzaSyCJm_0O6NzS0UYnoYAv5MUIp-QR9xGN18Q",
@@ -113,14 +121,33 @@ const app = initializeApp({
   appId: "1:147264654219:web:7487b91cc6c5fa041efd8e"
 });
 const auth = getAuth(app);
-setPersistence(auth, browserLocalPersistence).catch(err => console.error("persistence:", err));
 const db = getFirestore(app);
+const storage = getStorage(app);
 
-// ---------- verification ----------
+// ---------- verification settings ----------
 const ADMIN_EMAIL = "shanks377s8@gmail.com";
 const SUB_PRICE = "9.99$ شهرياً";
-const isVerified = (u) => !!u && (u.email === ADMIN_EMAIL || u.username === "sovexa");
-const badgeHTML = (on) => on ? ' <i class="fa-solid fa-circle-check text-indigo-400 text-xs"></i>' : '';
+const isAdmin = () => currentUser?.email === ADMIN_EMAIL;
+// التوثيق: للمشرف، أو لمن لديه اشتراك فعّال (لم تنتهِ مدته)
+const isVerified = (u) => {
+  if (!u) return false;
+  if (u.email === ADMIN_EMAIL) return true;
+  if (u.verified !== true) return false;
+  const t = u.verifiedUntil?.toMillis?.();
+  return !t || t > Date.now();
+};
+const badgePath = (() => {
+  let d = '';
+  for (let i = 0; i <= 180; i++) {
+    const t = i / 180 * 2 * Math.PI - Math.PI / 2;
+    const r = 44 + 3.2 * Math.cos(12 * (t + Math.PI / 2));
+    d += (i ? 'L' : 'M') + (50 + r * Math.cos(t)).toFixed(2) + ' ' + (50 + r * Math.sin(t)).toFixed(2);
+  }
+  return d + 'Z';
+})();
+const badgeSVG = (size) => `<svg viewBox="0 0 100 100" style="width:${size}px;height:${size}px;display:inline-block;vertical-align:-3px" aria-label="موثّق"><path d="${badgePath}" fill="#8b90f5"/><path d="M40.5 51.8L47.6 58.9L58.9 41.5" fill="none" stroke="#fff" stroke-width="4.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+const badgeHTML = (on) => on ? ' ' + badgeSVG(14) : '';
+const vOf = (id, fallback) => allUsers[id] ? isVerified(allUsers[id]) : !!fallback;
 
 // ---------- helpers ----------
 const $ = (id) => document.getElementById(id);
@@ -141,9 +168,13 @@ let confirmationResult = null, recaptcha = null;
 let pendingPhoto = null, pendingCover = null, pendingPostImg = null;
 let profileTarget = null;
 let savedIds = new Set();
-let unameTimer = null;
-let unreadCounts = {};
-let unreadUnsubs = [];
+let notifs = [], notifUnsub = null, subUnsub = null, mySub = null;
+let commentsData = {}, replyTo = {}, reportTarget = null;
+let pendingPostVideo = null;
+let adminData = { subs: [], reports: [] };
+let hiddenPosts = new Set();
+try { hiddenPosts = new Set(JSON.parse(localStorage.getItem('sx_hidden') || '[]')); } catch (_) {}
+const saveHidden = () => { try { localStorage.setItem('sx_hidden', JSON.stringify([...hiddenPosts])); } catch (_) {} };
 
 window.showToast = (msg) => {
   const box = document.createElement('div');
@@ -153,6 +184,19 @@ window.showToast = (msg) => {
   setTimeout(() => box.remove(), 2800);
 };
 const showToast = window.showToast;
+
+async function notify(toUid, type, extra = {}, docId) {
+  if (!toUid || toUid === uid()) return;
+  const data = {
+    toUid, fromUid: uid(), fromName: nameOf(me()), fromPhoto: me().photoURL || '',
+    type, postId: extra.postId || '', text: String(extra.text || '').slice(0, 120),
+    read: false, createdAt: serverTimestamp()
+  };
+  try {
+    if (docId) await setDoc(doc(db, "notifications", docId), data);
+    else await addDoc(collection(db, "notifications"), data);
+  } catch (_) {}
+}
 
 function avatarHTML(name, photo, cls = 'w-10 h-10 text-sm') {
   return photo
@@ -169,10 +213,6 @@ function timeAgo(ts) {
 function followBtn(id) {
   const f = (me().following || []).includes(id);
   return `<button data-act="follow" data-id="${id}" class="px-3 py-1.5 rounded-lg text-xs font-bold ${f ? 'bg-gray-700 text-gray-200' : 'bg-indigo-600 text-white'}">${f ? 'إلغاء المتابعة' : 'متابعة'}</button>`;
-}
-
-function unreadBadge(n) {
-  return n > 0 ? `<span class="ml-auto min-w-[20px] h-5 px-1.5 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">${n}</span>` : '';
 }
 
 function compressImage(file, max, quality) {
@@ -211,53 +251,6 @@ function backHeader(title) {
     </div>`;
 }
 
-// ---------- unread messages ----------
-async function markChatRead(cid) {
-  if (!uid()) return;
-  await setDoc(doc(db, "users", uid(), "reads", cid), { at: serverTimestamp() }, { merge: true }).catch(() => {});
-}
-
-function watchUnread() {
-  unreadUnsubs.forEach(f => f());
-  unreadUnsubs = [];
-  const cids = ['global', ...((me().following || []).map(id => chatIdFor(uid(), id)))];
-  cids.forEach(cid => {
-    const unsub = onSnapshot(query(collection(db, "chats", cid, "messages"), orderBy("createdAt", "desc"), limit(50)), async (snap) => {
-      const readSnap = await getDoc(doc(db, "users", uid(), "reads", cid)).catch(() => null);
-      const readAt = readSnap && readSnap.exists() ? (readSnap.data().at?.seconds ?? 0) : 0;
-      unreadCounts[cid] = snap.docs.filter(d => {
-        const m = d.data();
-        return m.senderId !== uid() && (m.createdAt?.seconds ?? 0) > readAt;
-      }).length;
-      if (currentView === 'chats') viewChats();
-    }, () => {});
-    unreadUnsubs.push(unsub);
-  });
-}
-
-// ---------- username uniqueness ----------
-async function isUsernameFree(name) {
-  if (!name || name.length < 3) return false;
-  const s = await getDoc(doc(db, "usernames", name));
-  if (s.exists() && s.data().uid === uid()) return true;
-  if (name === "sovexa" && currentUser?.email !== ADMIN_EMAIL) return false;
-  return !s.exists();
-}
-
-async function claimUsername(newName, oldName) {
-  await runTransaction(db, async (tx) => {
-    const nRef = doc(db, "usernames", newName);
-    const nSnap = await tx.get(nRef);
-    if (nSnap.exists() && nSnap.data().uid !== uid()) throw new Error("اسم المستخدم مستخدم من شخص آخر");
-    if (!nSnap.exists()) tx.set(nRef, { uid: uid() });
-    if (oldName && oldName !== newName) {
-      const oRef = doc(db, "usernames", oldName);
-      const oSnap = await tx.get(oRef);
-      if (oSnap.exists() && oSnap.data().uid === uid()) tx.delete(oRef);
-    }
-  });
-}
-
 // ---------- router ----------
 function clearListeners() {
   unsubs.forEach(f => f());
@@ -280,7 +273,8 @@ function go(view, id) {
     home: viewHome, notifications: viewNotifications, chats: viewChats, chat: viewChat,
     profile: viewProfile, edit: viewEdit, search: viewSearch, friends: viewFriends,
     create: viewCreate, reels: viewReels, menu: viewMenu, settings: viewSettings,
-    help: viewHelp, about: viewAbout, saved: viewSaved, archive: viewArchive
+    help: viewHelp, about: viewAbout, saved: viewSaved, archive: viewArchive,
+    post: viewPost, admin: viewAdmin
   };
   (views[view] || viewHome)(id);
   window.scrollTo(0, 0);
@@ -314,13 +308,16 @@ function postCard(p) {
     <div class="flex items-center gap-3 p-3">
       ${avatarHTML(p.userName, p.userPhoto)}
       <div class="flex-1 min-w-0">
-        <b class="block text-sm text-white truncate">${esc(p.userName)}${badgeHTML(isVerified(allUsers[p.userId]))}</b>
+        <b class="block text-sm text-white truncate">${esc(p.userName)}${badgeHTML(vOf(p.userId, p.verified))}</b>
         <span class="text-xs text-gray-500">${timeAgo(p.createdAt)}</span>
       </div>
-      ${p.userId === uid() ? `<button data-act="delpost" data-id="${p.id}" class="text-gray-500 px-2"><i class="fa-solid fa-trash"></i></button>` : ''}
+      ${p.userId === uid()
+        ? `<button data-act="delpost" data-id="${p.id}" class="text-gray-500 px-2"><i class="fa-solid fa-trash"></i></button>`
+        : `<button data-act="report" data-id="${p.id}" class="text-gray-500 px-2" title="إبلاغ"><i class="fa-regular fa-flag"></i></button>${isAdmin() ? `<button data-act="delpost" data-id="${p.id}" class="text-gray-500 px-2"><i class="fa-solid fa-trash"></i></button>` : ''}`}
     </div>
     ${p.text ? `<p class="px-3 pb-3 text-sm whitespace-pre-wrap">${esc(p.text)}</p>` : ''}
     ${p.image ? `<img src="${esc(p.image)}" class="w-full max-h-[480px] object-cover">` : ''}
+    ${p.video ? `<video src="${esc(p.video)}" controls playsinline preload="metadata" class="w-full max-h-[480px] bg-black"></video>` : ''}
     ${actionsHTML(p)}
     <div id="cbox-${p.id}" class="hidden p-3 border-t border-gray-800 space-y-2"></div>
   </article>`;
@@ -331,6 +328,7 @@ function renderPosts(containerId, filter, emptyMsg) {
   if (!box) return;
   const list = Object.entries(postsCache)
     .map(([id, p]) => ({ id, ...p }))
+    .filter(p => !hiddenPosts.has(p.id))
     .filter(filter || (() => true))
     .sort((a, b) => (b.createdAt?.seconds ?? Date.now() / 1000) - (a.createdAt?.seconds ?? Date.now() / 1000));
   box.innerHTML = list.length
@@ -341,6 +339,7 @@ function renderPosts(containerId, filter, emptyMsg) {
 
 function refreshPosts() {
   renderPosts('feed', null);
+  if (currentView === 'post') renderSingle();
   if (profileTarget) renderPosts('uposts', p => p.userId === profileTarget, 'لا توجد منشورات');
 }
 
@@ -353,6 +352,7 @@ async function toggleLike(id) {
   refreshPosts();
   try {
     await updateDoc(doc(db, "posts", id), { likes: liked ? arrayRemove(uid()) : arrayUnion(uid()) });
+    if (!liked) notify(p.userId, 'like', { postId: id, text: p.text || '' }, `like_${id}_${uid()}`);
   } catch (err) {
     p.likes = old;
     refreshPosts();
@@ -375,22 +375,44 @@ async function toggleSave(id) {
   }
 }
 
+function renderComments(id) {
+  const box = $('cbox-' + id);
+  if (!box) return;
+  const keep = box.querySelector('input[name="t"]')?.value || '';
+  const docs = commentsData[id] || [];
+  const kids = {};
+  docs.filter(c => c.parentId).forEach(c => (kids[c.parentId] = kids[c.parentId] || []).push(c));
+  const one = (c, reply) => `
+    <div class="flex gap-2 ${reply ? 'mr-8' : ''}">${avatarHTML(c.userName, c.userPhoto, 'w-7 h-7 text-xs')}
+      <div class="min-w-0 flex-1">
+        <div class="bg-gray-800 rounded-xl px-3 py-2 text-xs"><b>${esc(c.userName)}${badgeHTML(vOf(c.userId, c.verified))}</b>
+          <p class="whitespace-pre-wrap break-words">${c.replyToName ? `<span class="text-indigo-300">@${esc(c.replyToName)}</span> ` : ''}${esc(c.text)}</p></div>
+        <div class="flex gap-4 px-2 pt-0.5 text-[11px] text-gray-500">
+          <button type="button" data-act="creply" data-id="${id}" data-cid="${c.id}">رد</button>
+          ${c.userId !== uid() ? `<button type="button" data-act="creport" data-id="${id}" data-cid="${c.id}">إبلاغ</button>` : ''}
+        </div>
+      </div>
+    </div>`;
+  const rt = replyTo[id];
+  box.innerHTML = docs.filter(c => !c.parentId).map(c => one(c, false) + (kids[c.id] || []).map(k => one(k, true)).join('')).join('')
+    + (rt ? `<div class="flex items-center justify-between text-[11px] text-indigo-300 pt-1"><span>الرد على ${esc(rt.name)}</span><button type="button" data-act="creply-cancel" data-id="${id}" class="text-gray-400">إلغاء</button></div>` : '')
+    + `
+      <form data-form="comment" data-id="${id}" class="flex gap-2 pt-1">
+        <input name="t" autocomplete="off" placeholder="${rt ? 'اكتب رداً...' : 'اكتب تعليقاً...'}" class="flex-1 bg-gray-800 rounded-full px-3 py-2 text-xs outline-none">
+        <button class="text-indigo-400 text-xs font-bold px-2">إرسال</button>
+      </form>`;
+  const inp = box.querySelector('input[name="t"]');
+  if (inp && keep) inp.value = keep;
+}
+
 function watchComments(id) {
   commentUnsubs[id] && commentUnsubs[id]();
   $('cbox-' + id)?.classList.remove('hidden');
-  const q = query(collection(db, "posts", id, "comments"), orderBy("createdAt", "asc"), limit(50));
+  renderComments(id);
+  const q = query(collection(db, "posts", id, "comments"), orderBy("createdAt", "asc"), limit(100));
   commentUnsubs[id] = onSnapshot(q, (snap) => {
-    const box = $('cbox-' + id);
-    if (!box) return;
-    box.innerHTML = snap.docs.map(d => {
-      const c = d.data();
-      return `<div class="flex gap-2">${avatarHTML(c.userName, c.userPhoto, 'w-7 h-7 text-xs')}
-        <div class="bg-gray-800 rounded-xl px-3 py-2 text-xs"><b>${esc(c.userName)}${badgeHTML(isVerified(allUsers[c.userId]))}</b><p>${esc(c.text)}</p></div></div>`;
-    }).join('') + `
-      <form data-form="comment" data-id="${id}" class="flex gap-2 pt-1">
-        <input name="t" autocomplete="off" placeholder="اكتب تعليقاً..." class="flex-1 bg-gray-800 rounded-full px-3 py-2 text-xs outline-none">
-        <button class="text-indigo-400 text-xs font-bold px-2">إرسال</button>
-      </form>`;
+    commentsData[id] = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderComments(id);
   });
 }
 
@@ -415,34 +437,61 @@ function viewHome() {
   V().innerHTML = `
     <div class="p-3 space-y-3 max-w-xl mx-auto">
       <section class="card rounded-xl p-3 flex items-center gap-3">
-        <button data-go="profile" data-id="${uid()}" class="shrink-0">${avatarHTML(nameOf(me()), me().photoURL)}</button>
-        <button data-go="create" class="flex-1 text-right bg-gray-800 rounded-full px-4 py-2 text-sm text-gray-400">أنشر</button>
+        ${avatarHTML(nameOf(me()), me().photoURL)}
+        <button data-go="create" class="flex-1 text-right bg-gray-800 rounded-full px-4 py-2 text-sm text-gray-400">بماذا تفكر يا ${esc(nameOf(me()))}؟</button>
       </section>
       <div id="feed" class="space-y-3"></div>
     </div>`;
   refreshPosts();
 }
 
+const NOTIF_TEXT = {
+  like: 'أعجب بمنشورك', comment: 'علّق على منشورك', reply: 'ردّ على تعليقك',
+  follow: 'بدأ بمتابعتك', verified: 'تم تفعيل التوثيق لحسابك 🎉'
+};
+const NOTIF_ICON = {
+  like: ['fa-heart', 'text-pink-400'], comment: ['fa-comment', 'text-indigo-300'], reply: ['fa-reply', 'text-indigo-300'],
+  follow: ['fa-user-plus', 'text-emerald-400'], verified: ['fa-circle-check', 'text-indigo-300']
+};
+
+function updateNotifBadge() {
+  const b = $('notifBadge');
+  if (!b) return;
+  const n = notifs.filter(x => !x.read).length;
+  b.textContent = n > 9 ? '9+' : String(n);
+  b.style.display = n ? 'flex' : 'none';
+  b.classList.toggle('hidden', !n);
+}
+
 function viewNotifications() {
-  const list = Object.entries(postsCache)
-    .map(([id, p]) => ({ id, ...p }))
-    .filter(p => p.userId !== uid())
-    .sort((a, b) => (b.createdAt?.seconds ?? 0) - (a.createdAt?.seconds ?? 0))
-    .slice(0, 30);
+  const list = notifs.slice(0, 50);
+  const unread = notifs.some(n => !n.read);
   V().innerHTML = `
     <div class="p-3 space-y-2 max-w-xl mx-auto">
-      <h2 class="font-bold text-lg mb-2">الإشعارات</h2>
-      ${list.length ? list.map(p => `
-        <div class="card rounded-xl p-3 flex items-center gap-3">
-          ${avatarHTML(p.userName, p.userPhoto, 'w-9 h-9 text-xs')}
-          <div class="text-sm"><b>${esc(p.userName)}</b> نشر منشوراً جديداً
-            <div class="text-xs text-gray-500">${timeAgo(p.createdAt)}</div></div>
-        </div>`).join('') : '<p class="text-center text-gray-500 py-10">لا توجد إشعارات بعد</p>'}
+      <div class="flex items-center justify-between mb-2">
+        <h2 class="font-bold text-lg">الإشعارات</h2>
+        ${unread ? '<button data-act="notif-readall" class="text-xs text-indigo-300">تحديد الكل كمقروء</button>' : ''}
+      </div>
+      ${list.length ? list.map(n => {
+        const ic = NOTIF_ICON[n.type] || ['fa-bell', 'text-gray-400'];
+        return `
+        <button data-act="notif" data-id="${n.id}" class="card rounded-xl p-3 w-full flex items-center gap-3 text-right">
+          ${avatarHTML(n.fromName, n.fromPhoto, 'w-9 h-9 text-xs')}
+          <div class="flex-1 min-w-0 text-sm">
+            ${n.type === 'verified' ? '' : `<b>${esc(n.fromName)}</b> `}${NOTIF_TEXT[n.type] || 'إشعار جديد'}
+            ${n.text && n.type !== 'like' ? `<div class="text-xs text-gray-400 truncate">${esc(n.text)}</div>` : ''}
+            <div class="text-xs text-gray-500">${timeAgo(n.createdAt)}</div>
+          </div>
+          <i class="fa-solid ${ic[0]} ${ic[1]} text-sm"></i>
+          ${n.read ? '' : '<span class="w-2 h-2 rounded-full bg-indigo-400 shrink-0"></span>'}
+        </button>`;
+      }).join('') : '<p class="text-center text-gray-500 py-10">لا توجد إشعارات بعد</p>'}
     </div>`;
 }
 
 function viewCreate() {
   pendingPostImg = null;
+  pendingPostVideo = null;
   V().innerHTML = `
     <form data-form="create" class="p-4 space-y-3 max-w-xl mx-auto">
       <div class="flex items-center justify-between">
@@ -458,6 +507,10 @@ function viewCreate() {
       <label class="card rounded-xl p-3 flex items-center gap-2 text-emerald-400 text-sm cursor-pointer">
         <i class="fa-solid fa-image"></i> إضافة صورة
         <input type="file" id="postImg" accept="image/*" class="hidden">
+      </label>
+      <label class="card rounded-xl p-3 flex items-center gap-2 text-pink-400 text-sm cursor-pointer">
+        <i class="fa-solid fa-video"></i> إضافة فيديو
+        <input type="file" id="postVid" accept="video/*" class="hidden">
       </label>
     </form>`;
 }
@@ -519,18 +572,13 @@ function viewChats() {
       <h2 class="font-bold text-lg mb-2">الدردشات</h2>
       <button data-go="chat" data-id="global" class="card rounded-xl p-3 w-full flex items-center gap-3 text-right">
         <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-purple-600 to-pink-500 flex items-center justify-center font-bold">S</div>
-        <div class="flex-1"><b class="text-sm block">الدردشة العامة Sovexa</b><span class="text-xs text-emerald-400">مفتوحة للجميع</span></div>
-        ${unreadBadge(unreadCounts['global'] || 0)}
+        <div><b class="text-sm block">الدردشة العامة Sovexa</b><span class="text-xs text-emerald-400">مفتوحة للجميع</span></div>
       </button>
-      ${following.length ? following.map(u => {
-        const cid = chatIdFor(uid(), u.uid);
-        return `
+      ${following.length ? following.map(u => `
         <button data-go="chat" data-id="${u.uid}" class="card rounded-xl p-3 w-full flex items-center gap-3 text-right">
           ${avatarHTML(nameOf(u), u.photoURL)}
-          <div class="flex-1"><b class="text-sm block">${esc(nameOf(u))}${badgeHTML(isVerified(u))}</b><span class="text-xs text-gray-500">${esc(handleOf(u))}</span></div>
-          ${unreadBadge(unreadCounts[cid] || 0)}
-        </button>`;
-      }).join('') : '<p class="text-center text-gray-500 py-8 text-sm">تابع أشخاصاً لتبدأ الدردشة معهم</p>'}
+          <div><b class="text-sm block">${esc(nameOf(u))}${badgeHTML(isVerified(u))}</b><span class="text-xs text-gray-500">${esc(handleOf(u))}</span></div>
+        </button>`).join('') : '<p class="text-center text-gray-500 py-8 text-sm">تابع أشخاصاً لتبدأ الدردشة معهم</p>'}
     </div>`;
 }
 
@@ -540,7 +588,6 @@ function viewChat(otherId) {
   const title = isGlobal ? "الدردشة العامة Sovexa" : nameOf(o);
   const cid = isGlobal ? "global" : chatIdFor(uid(), otherId);
   if (!isGlobal) setDoc(doc(db, "chats", cid), { members: [uid(), otherId] }, { merge: true }).catch(() => {});
-  markChatRead(cid);
   V().innerHTML = `
     <div class="flex flex-col h-[calc(100vh-10.5rem)] max-w-2xl mx-auto">
       <div class="flex items-center gap-3 px-3 py-2 border-b border-gray-800 bg-[#111827]">
@@ -582,9 +629,6 @@ function viewChat(otherId) {
         </div>`;
     }).join('');
     el.scrollTop = el.scrollHeight;
-  }, (err) => {
-    const el = $('msgs');
-    if (el) el.innerHTML = `<p class="text-center text-red-400 text-xs py-10">تعذر تحميل الرسائل: ${esc(err.message)}</p>`;
   }));
 }
 
@@ -637,7 +681,6 @@ function viewEdit() {
       <label class="block text-xs text-gray-400">اسم المستخدم الفريد (إنجليزي وأرقام و _ و .)
         <input name="username" required dir="ltr" value="${esc(u.username || '')}" class="mt-1 w-full bg-gray-800 rounded-lg px-3 py-2 text-sm outline-none">
       </label>
-      <div id="unameState" class="text-xs -mt-2"></div>
       <label class="block text-xs text-gray-400">النبذة
         <textarea name="bio" rows="3" class="mt-1 w-full bg-gray-800 rounded-lg px-3 py-2 text-sm outline-none">${esc(u.bio || '')}</textarea>
       </label>
@@ -651,6 +694,9 @@ const MENU_GROUPS = [
     ['fa-user', 'الملف الشخصي', 'profile'],
     ['fa-pen', 'تعديل الملف الشخصي', 'data-go="edit"'],
     ['fa-gear', 'الإعدادات', 'data-go="settings"'],
+  ]},
+  { title: "الاشتراك", items: [
+    ['fa-crown', 'الاشتراك في التوثيق', 'data-act="subscribe"'],
   ]},
   { title: "التواصل", items: [
     ['fa-user-group', 'الأصدقاء', 'data-go="friends"'],
@@ -671,9 +717,11 @@ const MENU_GROUPS = [
   ]},
 ];
 
+const ADMIN_GROUP = { title: "الإدارة", items: [['fa-shield-halved', 'لوحة الإدارة', 'data-go="admin"']] };
+
 function viewMenu() {
   const u = me();
-  const groups = MENU_GROUPS.map((g) => {
+  const groups = (isAdmin() ? [...MENU_GROUPS, ADMIN_GROUP] : MENU_GROUPS).map((g) => {
     const items = g.items.map(([icon, label, attrs], i) => {
       const actionAttrs = attrs === 'profile' ? `data-go="profile" data-id="${uid()}"` : attrs;
       const danger = label === 'تسجيل الخروج';
@@ -745,6 +793,7 @@ function viewAbout() {
       <div class="card rounded-xl p-4 text-center text-sm text-indigo-200">
         شكراً لانضمامك إلى عائلة Sovexa.. رحلتك معنا للترفيه والتواصل تبدأ من هنا!
       </div>
+      <p dir="ltr" class="text-center text-[11px] text-gray-500">${BUILD}</p>
     </div>`;
 }
 
@@ -821,6 +870,108 @@ function renderUsersLive() {
   else if (['friends', 'chats', 'profile', 'menu', 'settings'].includes(currentView)) go(currentView, currentId);
 }
 
+// ---------- single post ----------
+function viewPost(id) {
+  V().innerHTML = `
+    <div class="p-3 space-y-3 max-w-xl mx-auto">
+      <div class="flex items-center gap-3">
+        <button data-go="notifications" class="w-9 h-9 rounded-full bg-gray-800 flex items-center justify-center"><i class="fa-solid fa-arrow-right"></i></button>
+        <h2 class="font-bold text-lg">المنشور</h2>
+      </div>
+      <div id="single"></div>
+    </div>`;
+  openSet.add(id);
+  renderSingle();
+}
+
+function renderSingle() {
+  const box = $('single');
+  if (!box) return;
+  const p = postsCache[currentId];
+  box.innerHTML = p && !hiddenPosts.has(currentId)
+    ? postCard({ id: currentId, ...p })
+    : '<p class="text-center text-gray-500 py-10 text-sm">هذا المنشور غير متوفر</p>';
+  restoreOpenComments();
+}
+
+// ---------- admin ----------
+const REPORT_REASONS = [
+  ['spam', 'محتوى مزعج أو إعلانات'],
+  ['abuse', 'إساءة أو تحرش'],
+  ['inappropriate', 'محتوى غير لائق'],
+  ['violence', 'عنف أو تهديد'],
+  ['other', 'سبب آخر']
+];
+const reasonLabel = (k) => (REPORT_REASONS.find(r => r[0] === k) || [0, k])[1];
+
+function viewAdmin() {
+  if (!isAdmin()) { go('home'); return; }
+  V().innerHTML = `
+    <div class="p-3 space-y-3 max-w-xl mx-auto">
+      ${backHeader("لوحة الإدارة")}
+      <h3 class="text-sm text-gray-400">طلبات التوثيق</h3>
+      <div id="admSubs" class="space-y-2"></div>
+      <h3 class="text-sm text-gray-400 pt-2">البلاغات</h3>
+      <div id="admReps" class="space-y-2"></div>
+    </div>`;
+  unsubs.push(onSnapshot(collection(db, "subscriptions"), (s) => {
+    adminData.subs = s.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderAdmin();
+  }, (err) => showToast("تعذر تحميل الطلبات: " + err.message)));
+  unsubs.push(onSnapshot(collection(db, "reports"), (s) => {
+    adminData.reports = s.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderAdmin();
+  }, (err) => showToast("تعذر تحميل البلاغات: " + err.message)));
+}
+
+function renderAdmin() {
+  const sb = $('admSubs'), rb = $('admReps');
+  if (!sb || !rb) return;
+  const subs = adminData.subs.filter(x => x.status === 'pending');
+  sb.innerHTML = subs.length ? subs.map(x => {
+    const u = allUsers[x.id] || {};
+    return `
+    <div class="card rounded-xl p-3 space-y-2">
+      <div class="flex items-center gap-3">${avatarHTML(nameOf(u), u.photoURL, 'w-9 h-9 text-xs')}
+        <div class="min-w-0"><b class="block text-sm truncate">${esc(x.userName || nameOf(u))}</b><span class="text-xs text-gray-500 block truncate" dir="ltr">${esc(x.email || '')}</span></div>
+        <span class="text-xs text-indigo-300 mr-auto">${esc(x.price || '')}</span></div>
+      <div class="flex gap-2">
+        <button data-act="sub-approve" data-id="${x.id}" class="flex-1 py-2 rounded-lg bg-emerald-600 text-xs font-bold">تفعيل 30 يوماً</button>
+        <button data-act="sub-reject" data-id="${x.id}" class="flex-1 py-2 rounded-lg bg-gray-700 text-xs font-bold">رفض</button>
+      </div>
+    </div>`;
+  }).join('') : '<p class="text-xs text-gray-500">لا توجد طلبات</p>';
+  const reps = adminData.reports.filter(x => x.status === 'pending')
+    .sort((a, b) => (b.createdAt?.seconds ?? 0) - (a.createdAt?.seconds ?? 0));
+  rb.innerHTML = reps.length ? reps.map(x => `
+    <div class="card rounded-xl p-3 space-y-2">
+      <div class="text-xs text-gray-400">${x.targetType === 'comment' ? 'تعليق' : 'منشور'} · ${esc(reasonLabel(x.reason))} · من ${esc(x.reporterName || '')}</div>
+      <p class="text-sm whitespace-pre-wrap break-words">${esc(x.snippet || '(بدون نص)')}</p>
+      <div class="flex gap-2">
+        <button data-act="rep-delete" data-id="${x.id}" class="flex-1 py-2 rounded-lg bg-red-600/30 text-red-300 text-xs font-bold">حذف المحتوى</button>
+        <button data-act="rep-dismiss" data-id="${x.id}" class="flex-1 py-2 rounded-lg bg-gray-700 text-xs font-bold">تجاهل</button>
+      </div>
+    </div>`).join('') : '<p class="text-xs text-gray-500">لا توجد بلاغات</p>';
+}
+
+// ---------- report sheet ----------
+function showReportSheet() {
+  document.getElementById('reportSheet')?.remove();
+  const sheet = document.createElement('div');
+  sheet.id = 'reportSheet';
+  sheet.className = 'fixed inset-0 z-[70] bg-black/60 flex items-end justify-center';
+  sheet.innerHTML = `
+    <div class="card w-full max-w-md rounded-t-3xl p-4 space-y-2 safe-bottom">
+      <div class="mx-auto w-12 h-1.5 rounded-full bg-gray-600 mb-2"></div>
+      <h3 class="text-center font-bold">إبلاغ عن محتوى</h3>
+      <p class="text-center text-xs text-gray-400 mb-1">اختر سبب البلاغ، وسيراجعه فريق Sovexa</p>
+      ${REPORT_REASONS.map(([k, label]) => `<button data-act="report-send" data-reason="${k}" class="w-full py-3 rounded-xl bg-gray-800 text-sm font-bold">${label}</button>`).join('')}
+      <button data-act="report-cancel" class="w-full py-3 rounded-xl bg-gray-900 text-sm text-gray-400">إلغاء</button>
+    </div>`;
+  sheet.addEventListener('click', (e) => { if (e.target === sheet) sheet.remove(); });
+  document.body.appendChild(sheet);
+}
+
 // ---------- logout sheet ----------
 function showLogoutSheet() {
   document.getElementById('logoutSheet')?.remove();
@@ -846,15 +997,20 @@ function showSubscribeSheet() {
   sheet.id = 'subSheet';
   sheet.className = 'fixed inset-0 z-[70] bg-black/60 flex items-end justify-center';
   const verified = isVerified(me());
+  const pending = mySub?.status === 'pending';
+  const until = me().verifiedUntil?.toDate?.();
   sheet.innerHTML = `
     <div class="card w-full max-w-md rounded-t-3xl p-5 space-y-3 safe-bottom">
       <div class="mx-auto w-12 h-1.5 rounded-full bg-gray-600 mb-2"></div>
       <div class="text-center">
-        <i class="fa-solid fa-circle-check text-indigo-400 text-4xl"></i>
+        ${badgeSVG(56)}
         <h3 class="text-lg font-bold mt-2">التوثيق Sovexa</h3>
         <p class="text-sm text-gray-400 mt-1">${verified ? 'حسابك موثّق بالفعل ✔' : 'علامة زرقاء بجوار اسمك تدل على حساب موثّق'}</p>
+        ${verified && until && !isAdmin() ? `<p class="text-xs text-gray-500 mt-1">ينتهي في ${until.toLocaleDateString('ar')}</p>` : ''}
       </div>
-      ${verified ? '' : `
+      ${verified ? '' : pending
+        ? '<div class="card rounded-xl p-3 text-sm text-center text-indigo-200">طلبك قيد المراجعة ⏳</div>'
+        : `
         <div class="card rounded-xl p-3 text-sm text-center"><b class="text-indigo-300">${SUB_PRICE}</b></div>
         <button data-act="subscribe-confirm" class="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-pink-600 font-bold text-sm">طلب الاشتراك</button>
         <p class="text-[11px] text-gray-500 text-center">سيتم تفعيل التوثيق بعد تأكيد الدفع</p>`}
@@ -896,7 +1052,10 @@ onAuthStateChanged(auth, async (user) => {
     if (usersUnsub) { usersUnsub(); usersUnsub = null; }
     if (postsUnsub) { postsUnsub(); postsUnsub = null; }
     if (savedUnsub) { savedUnsub(); savedUnsub = null; }
-    unreadUnsubs.forEach(f => f()); unreadUnsubs = []; unreadCounts = {};
+    if (notifUnsub) { notifUnsub(); notifUnsub = null; }
+    if (subUnsub) { subUnsub(); subUnsub = null; }
+    notifs = []; mySub = null; commentsData = {}; replyTo = {};
+    updateNotifBadge();
     postsCache = {};
     savedIds = new Set();
     showLogin();
@@ -914,7 +1073,7 @@ onAuthStateChanged(auth, async (user) => {
         if (data.username) usersByUsername[data.username] = d.id;
       });
       renderUsersLive();
-      watchUnread();
+      refreshPosts();
     }, (err) => showToast("تعذر تحميل المستخدمين: " + err.message));
   }
   if (!postsUnsub) {
@@ -932,6 +1091,17 @@ onAuthStateChanged(auth, async (user) => {
       refreshPosts();
       if (currentView === 'saved') renderSavedList();
     }, () => {});
+  }
+  if (!notifUnsub) {
+    notifUnsub = onSnapshot(query(collection(db, "notifications"), where("toUid", "==", user.uid)), (s) => {
+      notifs = s.docs.map(d => ({ id: d.id, ...d.data() }))
+        .sort((a, b) => (b.createdAt?.seconds ?? Date.now() / 1000) - (a.createdAt?.seconds ?? Date.now() / 1000));
+      updateNotifBadge();
+      if (currentView === 'notifications') viewNotifications();
+    }, () => {});
+  }
+  if (!subUnsub) {
+    subUnsub = onSnapshot(doc(db, "subscriptions", user.uid), (s) => { mySub = s.exists() ? s.data() : null; }, () => {});
   }
   go('home');
 });
@@ -1009,7 +1179,7 @@ document.addEventListener('click', async (e) => {
   if (g) { go(g.dataset.go, g.dataset.id); return; }
   const a = e.target.closest('[data-act]');
   if (!a) return;
-  const { act, id } = a.dataset;
+  const { act, id, cid } = a.dataset;
   try {
     if (act === 'like') {
       await toggleLike(id);
@@ -1030,137 +1200,217 @@ document.addEventListener('click', async (e) => {
     } else if (act === 'follow') {
       const isF = (me().following || []).includes(id);
       await updateDoc(doc(db, "users", uid()), { following: isF ? arrayRemove(id) : arrayUnion(id) });
+      if (!isF) notify(id, 'follow', {}, `follow_${uid()}_${id}`);
     } else if (act === 'subscribe') {
       showSubscribeSheet();
     } else if (act === 'subscribe-confirm') {
       await setDoc(doc(db, "subscriptions", uid()), {
-        userId: uid(), status: "pending", price: SUB_PRICE, createdAt: serverTimestamp()
+        userId: uid(), userName: nameOf(me()), email: currentUser?.email || '', status: "pending", price: SUB_PRICE, createdAt: serverTimestamp()
       });
       document.getElementById('subSheet')?.remove();
-      showToast("تم تسجيل طلب الاشتراك، سيتم التفعيل بعد تأكيد الدفع");
+      showToast("تم تسجيل طلب الاشتراك، بانتظار تأكيد الدفع");
     } else if (act === 'subscribe-cancel') {
       document.getElementById('subSheet')?.remove();
+    } else if (act === 'soon') {
+      showToast("هذه الميزة قريباً");
     } else if (act === 'logout-menu') {
       showLogoutSheet();
-    } else if (act === 'logout-confirm' || act === 'logout-switch') {
+    } else if (act === 'logout-confirm') {
       document.getElementById('logoutSheet')?.remove();
       await signOut(auth);
+    } else if (act === 'logout-switch') {
+      document.getElementById('logoutSheet')?.remove();
+      await signOut(auth);
+      showToast("سجّل الدخول بالحساب الآخر");
     } else if (act === 'logout-cancel') {
       document.getElementById('logoutSheet')?.remove();
-    } else if (act === 'soon') {
-      showToast("قريباً");
+    } else if (act === 'creply') {
+      const c = (commentsData[id] || []).find(x => x.id === cid);
+      if (c) {
+        replyTo[id] = { parentId: c.parentId || c.id, name: c.userName, userId: c.userId };
+        renderComments(id);
+        $('cbox-' + id)?.querySelector('input[name="t"]')?.focus();
+      }
+    } else if (act === 'creply-cancel') {
+      delete replyTo[id];
+      renderComments(id);
+    } else if (act === 'report' || act === 'creport') {
+      reportTarget = { postId: id, commentId: act === 'creport' ? cid : '' };
+      showReportSheet();
+    } else if (act === 'report-cancel') {
+      document.getElementById('reportSheet')?.remove();
+    } else if (act === 'report-send') {
+      const t = reportTarget;
+      if (!t) return;
+      const post = postsCache[t.postId] || {};
+      let target = post;
+      if (t.commentId) target = (commentsData[t.postId] || []).find(x => x.id === t.commentId) || post;
+      const key = `${uid()}_${t.postId}${t.commentId ? '_' + t.commentId : ''}`;
+      try {
+        await setDoc(doc(db, "reports", key), {
+          reporterId: uid(), reporterName: nameOf(me()), postId: t.postId, commentId: t.commentId || '',
+          targetUserId: target.userId || '', targetType: t.commentId ? 'comment' : 'post',
+          reason: a.dataset.reason, snippet: String(target.text || '').slice(0, 200),
+          status: 'pending', createdAt: serverTimestamp()
+        });
+      } catch (_) {}
+      document.getElementById('reportSheet')?.remove();
+      reportTarget = null;
+      if (!t.commentId) {
+        hiddenPosts.add(t.postId);
+        saveHidden();
+        if (currentView === 'post') go('home'); else refreshPosts();
+      }
+      showToast("تم إرسال البلاغ، شكراً لمساعدتك في إبقاء Sovexa آمناً");
+    } else if (act === 'notif') {
+      const n = notifs.find(x => x.id === id);
+      if (!n) return;
+      if (!n.read) updateDoc(doc(db, "notifications", id), { read: true }).catch(() => {});
+      if (n.postId && postsCache[n.postId]) go('post', n.postId);
+      else if (n.type === 'verified') go('profile', uid());
+      else go('profile', n.fromUid);
+    } else if (act === 'notif-readall') {
+      await Promise.all(notifs.filter(n => !n.read).map(n => updateDoc(doc(db, "notifications", n.id), { read: true }).catch(() => {})));
+    } else if (act === 'sub-approve') {
+      await setDoc(doc(db, "users", id), { verified: true, verifiedUntil: Timestamp.fromMillis(Date.now() + 30 * 86400000) }, { merge: true });
+      await updateDoc(doc(db, "subscriptions", id), { status: 'active', approvedAt: serverTimestamp() });
+      notify(id, 'verified');
+      showToast("تم تفعيل التوثيق لمدة 30 يوماً");
+    } else if (act === 'sub-reject') {
+      await updateDoc(doc(db, "subscriptions", id), { status: 'rejected' });
+      showToast("تم رفض الطلب");
+    } else if (act === 'rep-delete') {
+      const r = adminData.reports.find(x => x.id === id);
+      if (r && confirm('حذف هذا المحتوى نهائياً؟')) {
+        if (r.commentId) {
+          await deleteDoc(doc(db, "posts", r.postId, "comments", r.commentId));
+          updateDoc(doc(db, "posts", r.postId), { commentsCount: increment(-1) }).catch(() => {});
+        } else {
+          await deleteDoc(doc(db, "posts", r.postId));
+        }
+        await updateDoc(doc(db, "reports", id), { status: 'resolved' });
+        showToast("تم حذف المحتوى");
+      }
+    } else if (act === 'rep-dismiss') {
+      await updateDoc(doc(db, "reports", id), { status: 'dismissed' });
     }
   } catch (err) {
     showToast("خطأ: " + err.message);
   }
 });
 
-// ---------- forms ----------
-document.addEventListener('submit', async (e) => {
-  const f = e.target.closest('form[data-form]');
+document.addEventListener('input', (e) => {
+  if (e.target.id === 'q') renderSearch(e.target.value);
+});
+
+document.addEventListener('change', async (e) => {
+  const f = e.target.files?.[0];
   if (!f) return;
-  e.preventDefault();
-  const kind = f.dataset.form;
-  const btn = f.querySelector('button:not([type="button"])');
   try {
-    if (kind === 'comment') {
-      const id = f.dataset.id;
-      const text = f.elements['t'].value.trim();
-      if (!text) return;
-      f.elements['t'].value = '';
-      const u = me();
-      await addDoc(collection(db, "posts", id, "comments"), {
-        userId: uid(), userName: nameOf(u), userPhoto: u.photoURL || "",
-        verified: isVerified(u), text, createdAt: serverTimestamp()
-      });
-      await updateDoc(doc(db, "posts", id), { commentsCount: increment(1) }).catch(() => {});
-    } else if (kind === 'create') {
-      const text = f.elements['text'].value.trim();
-      if (!text && !pendingPostImg) return showToast("اكتب شيئاً أو أضف صورة");
-      btn?.classList.add('btn-busy');
-      const u = me();
-      await withTimeout(addDoc(collection(db, "posts"), {
-        userId: uid(), userName: nameOf(u), userPhoto: u.photoURL || "",
-        verified: isVerified(u), text, image: pendingPostImg || "",
-        likes: [], commentsCount: 0, createdAt: serverTimestamp()
-      }));
+    if (e.target.id === 'photoIn') {
+      pendingPhoto = await compressImage(f, 256, 0.7);
+      $('photoPrev').innerHTML = `<img src="${pendingPhoto}" class="w-24 h-24 rounded-full object-cover">`;
+    } else if (e.target.id === 'coverIn') {
+      pendingCover = await compressImage(f, 600, 0.6);
+      showToast("تم اختيار الغلاف");
+    } else if (e.target.id === 'postImg') {
+      pendingPostImg = await compressImage(f, 800, 0.7);
+      pendingPostVideo = null;
+      $('postPrev').innerHTML = `<img src="${pendingPostImg}" class="w-full rounded-xl">`;
+    } else if (e.target.id === 'postVid') {
+      if (!f.type.startsWith('video/')) return showToast("اختر ملف فيديو");
+      if (f.size > 50 * 1024 * 1024) return showToast("حجم الفيديو يجب ألا يتجاوز 50 ميغابايت");
+      pendingPostVideo = f;
       pendingPostImg = null;
+      $('postPrev').innerHTML = `<video src="${URL.createObjectURL(f)}" controls playsinline class="w-full rounded-xl max-h-80 bg-black"></video>`;
+    }
+  } catch (err) { showToast("تعذر معالجة الملف"); }
+});
+
+document.addEventListener('submit', async (e) => {
+  const f = e.target;
+  const type = f.dataset.form;
+  if (!type) return;
+  e.preventDefault();
+  const fd = new FormData(f);
+  const btn = f.querySelector('button[type="submit"], button:not([type])');
+  try {
+    if (type === 'comment') {
+      const t = (fd.get('t') || '').toString().trim();
+      if (!t) return;
+      const postId = f.dataset.id;
+      const rt = replyTo[postId];
+      await addDoc(collection(db, "posts", postId, "comments"), {
+        userId: uid(), userName: nameOf(me()), userPhoto: me().photoURL || '',
+        text: t, verified: isVerified(me()), createdAt: serverTimestamp(),
+        parentId: rt?.parentId || '', replyToName: rt?.name || '', replyToUid: rt?.userId || ''
+      });
+      await updateDoc(doc(db, "posts", postId), { commentsCount: increment(1) });
+      const owner = postsCache[postId]?.userId;
+      if (rt) {
+        notify(rt.userId, 'reply', { postId, text: t });
+        if (owner && owner !== rt.userId) notify(owner, 'comment', { postId, text: t });
+      } else {
+        notify(owner, 'comment', { postId, text: t });
+      }
+      delete replyTo[postId];
+      f.reset();
+      renderComments(postId);
+    } else if (type === 'msg') {
+      const t = (fd.get('t') || '').toString().trim();
+      if (!t) return;
+      await addDoc(collection(db, "chats", f.dataset.id, "messages"), {
+        text: t, senderId: uid(), senderName: nameOf(me()), createdAt: serverTimestamp()
+      });
+      f.reset();
+    } else if (type === 'create') {
+      const text = (fd.get('text') || '').toString().trim();
+      if (!text && !pendingPostImg && !pendingPostVideo) return showToast("اكتب شيئاً أو أضف صورة أو فيديو");
+      if (btn) { btn.disabled = true; btn.classList.add('btn-busy'); }
+      try {
+        let videoURL = '';
+        if (pendingPostVideo) {
+          const ext = ((pendingPostVideo.name.split('.').pop() || 'mp4').replace(/[^a-z0-9]/gi, '').slice(0, 5)) || 'mp4';
+          const r = sRef(storage, `posts/${uid()}/${Date.now()}.${ext}`);
+          const task = uploadBytesResumable(r, pendingPostVideo, { contentType: pendingPostVideo.type });
+          await new Promise((res, rej) => task.on('state_changed',
+            (sn) => { if (btn) btn.textContent = `جاري الرفع ${Math.round(sn.bytesTransferred / sn.totalBytes * 100)}%`; },
+            rej, res));
+          videoURL = await getDownloadURL(task.snapshot.ref);
+        }
+        await addDoc(collection(db, "posts"), {
+          userId: uid(), userName: nameOf(me()), userPhoto: me().photoURL || '',
+          verified: isVerified(me()),
+          text, image: pendingPostImg || '', video: videoURL, likes: [], commentsCount: 0, createdAt: serverTimestamp()
+        });
+      } finally {
+        if (btn) { btn.disabled = false; btn.textContent = "نشر"; btn.classList.remove('btn-busy'); }
+      }
+      pendingPostImg = null;
+      pendingPostVideo = null;
       showToast("تم النشر");
       go('home');
-    } else if (kind === 'msg') {
-      const cid = f.dataset.id;
-      const text = f.elements['t'].value.trim();
-      if (!text) return;
-      f.elements['t'].value = '';
-      await addDoc(collection(db, "chats", cid, "messages"), {
-        senderId: uid(), senderName: nameOf(me()), text, createdAt: serverTimestamp()
-      });
-    } else if (kind === 'edit') {
-      const name = f.elements['name'].value.trim();
-      const username = normUser(f.elements['username'].value);
-      const bio = f.elements['bio'].value.trim();
-      if (!name) return showToast("أدخل الاسم");
-      if (username.length < 3) return showToast("اسم المستخدم 3 أحرف على الأقل");
-      btn?.classList.add('btn-busy');
-      const oldName = me().username || "";
-      if (!(await isUsernameFree(username))) {
-        btn?.classList.remove('btn-busy');
-        return showToast("اسم المستخدم غير متاح");
-      }
-      await withTimeout(claimUsername(username, oldName));
+    } else if (type === 'edit') {
+      if (btn) { btn.disabled = true; btn.textContent = "جاري الحفظ..."; btn.classList.add('btn-busy'); }
+      const name = (fd.get('name') || '').toString().trim();
+      const username = normUser(fd.get('username'));
+      const bio = (fd.get('bio') || '').toString().trim();
+      if (!name) throw new Error("الاسم مطلوب");
+      if (username.length < 3) throw new Error("اسم المستخدم يجب أن يكون 3 أحرف على الأقل");
+      const takenBy = usersByUsername[username];
+      if (takenBy && takenBy !== uid()) throw new Error("اسم المستخدم مستخدم من شخص آخر، اختر اسماً مختلفاً");
       const data = { name, username, bio };
       if (pendingPhoto) data.photoURL = pendingPhoto;
       if (pendingCover) data.coverURL = pendingCover;
       await withTimeout(setDoc(doc(db, "users", uid()), data, { merge: true }));
       pendingPhoto = null;
       pendingCover = null;
-      showToast("تم حفظ الملف الشخصي");
+      showToast("تم حفظ التعديلات");
       go('profile', uid());
     }
   } catch (err) {
     showToast("خطأ: " + err.message);
-  } finally {
-    btn?.classList.remove('btn-busy');
-  }
-});
-
-// ---------- inputs ----------
-document.addEventListener('change', async (e) => {
-  const t = e.target;
-  try {
-    if (t.id === 'postImg' && t.files[0]) {
-      pendingPostImg = await compressImage(t.files[0], 1000, 0.7);
-      $('postPrev').innerHTML = `<img src="${pendingPostImg}" class="w-full max-h-64 object-cover rounded-xl">`;
-    } else if (t.id === 'photoIn' && t.files[0]) {
-      pendingPhoto = await compressImage(t.files[0], 256, 0.8);
-      $('photoPrev').innerHTML = avatarHTML('', pendingPhoto, 'w-24 h-24 text-3xl');
-    } else if (t.id === 'coverIn' && t.files[0]) {
-      pendingCover = await compressImage(t.files[0], 900, 0.7);
-      showToast("تم اختيار صورة الغلاف");
-    }
-  } catch (err) {
-    showToast("تعذر قراءة الصورة");
-  }
-});
-
-document.addEventListener('input', (e) => {
-  const t = e.target;
-  if (t.id === 'q') {
-    renderSearch(t.value);
-  } else if (t.name === 'username' && t.closest('form[data-form="edit"]')) {
-    clearTimeout(unameTimer);
-    const state = $('unameState');
-    const val = normUser(t.value);
-    if (val.length < 3) { state.className = 'text-xs -mt-2 text-gray-500'; state.textContent = 'ثلاثة أحرف على الأقل'; return; }
-    state.className = 'text-xs -mt-2 text-gray-500';
-    state.textContent = 'جارٍ التحقق...';
-    unameTimer = setTimeout(async () => {
-      try {
-        const free = await isUsernameFree(val);
-        state.className = 'text-xs -mt-2 ' + (free ? 'text-emerald-400' : 'text-red-400');
-        state.textContent = free ? 'متاح ✔' : 'غير متاح ✖';
-      } catch (_) { state.textContent = ''; }
-    }, 400);
+    if (type === 'edit' && btn) { btn.disabled = false; btn.textContent = "حفظ"; btn.classList.remove('btn-busy'); }
   }
 });
 </script>
