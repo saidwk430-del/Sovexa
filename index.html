@@ -14,7 +14,6 @@
   .hidden { display:none !important; }
   .safe-top { padding-top: env(safe-area-inset-top, 0px); }
   .safe-bottom { padding-bottom: env(safe-area-inset-bottom, 0px); }
-  .btn-busy { opacity:.6; pointer-events:none; }
   .tab-btn { height:2.75rem; border-radius:0.9rem; background:#111827; border:1px solid #1f2937; color:#9ca3af; display:flex; align-items:center; justify-content:center; font-size:1.05rem; position:relative; }
   .tab-on { background:rgba(99,102,241,.22); color:#a5b4fc; border-color:rgba(129,140,248,.5); }
   .icon-btn { width:2.5rem; height:2.5rem; border-radius:9999px; background:#1f2937; display:flex; align-items:center; justify-content:center; }
@@ -23,7 +22,6 @@
 </style>
 </head>
 <body class="min-h-screen">
-<!-- BUILD 5 -->
 
 <div id="splash" class="fixed inset-0 z-[80] bg-[#0b0f17] flex items-center justify-center"><div class="w-20 h-20 rounded-3xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center"><span class="font-black text-4xl text-white" style="font-family:Outfit">S</span></div></div>
 <div id="toastContainer" class="fixed top-16 left-1/2 -translate-x-1/2 z-[60] flex flex-col items-center gap-2 pointer-events-none"></div>
@@ -39,20 +37,14 @@
       <p class="text-xs text-gray-400">سجل الدخول للمتابعة</p>
     </div>
 
-    <button id="googleLoginBtn" class="w-full py-2.5 bg-gray-900 border border-gray-700 rounded-xl text-sm font-medium flex items-center justify-center gap-3 mb-3">
-      <svg class="w-4 h-4" viewBox="0 0 24 24">
-        <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.7 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.2 9 5 12 5z"/>
-        <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.8z"/>
-        <path fill="#FBBC05" d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.3s.2-1.6.4-2.3L1.9 7.3C.7 9.7 0 10.8 0 12.3s.7 2.6 1.9 5l3.7-2.5z"/>
-        <path fill="#34A853" d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.2-6.4-5.2L1.9 16C3.7 19.7 7.5 23 12 23z"/>
-      </svg>
+    <button id="googleLoginBtn" class="w-full py-2.5 bg-gray-900 border border-gray-700 rounded-xl text-sm font-medium flex items-center justify-center gap-3 mb-3 text-white">
       متابعة باستخدام Google
     </button>
 
     <form id="emailForm" class="space-y-3 mt-4">
-      <input type="email" id="emailInput" required placeholder="البريد الإلكتروني" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2.5 text-sm outline-none">
-      <input type="password" id="passwordInput" required placeholder="كلمة المرور" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2.5 text-sm outline-none">
-      <button type="submit" class="w-full py-3 bg-gradient-to-r from-indigo-600 to-pink-600 rounded-xl text-sm font-bold">تسجيل الدخول / إنشاء حساب</button>
+      <input type="email" id="emailInput" required placeholder="البريد الإلكتروني" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2.5 text-sm outline-none text-white">
+      <input type="password" id="passwordInput" required placeholder="كلمة المرور" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2.5 text-sm outline-none text-white">
+      <button type="submit" class="w-full py-3 bg-gradient-to-r from-indigo-600 to-pink-600 rounded-xl text-sm font-bold text-white">تسجيل الدخول / إنشاء حساب</button>
     </form>
   </div>
 </div>
@@ -63,8 +55,8 @@
     <div class="flex items-center justify-between px-4 h-14">
       <span class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-pink-400" style="font-family:Outfit">Sovexa</span>
       <div class="flex gap-2">
-        <button data-go="search" class="icon-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
-        <button data-go="menu" class="icon-btn"><i class="fa-solid fa-bars"></i></button>
+        <button data-go="search" class="icon-btn text-white"><i class="fa-solid fa-magnifying-glass"></i></button>
+        <button data-go="menu" class="icon-btn text-white"><i class="fa-solid fa-bars"></i></button>
       </div>
     </div>
     <div class="grid grid-cols-4 gap-2 px-3 pb-2">
@@ -87,8 +79,7 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
-import { getFirestore, collection, doc, getDoc, setDoc, updateDoc, deleteDoc, addDoc, onSnapshot, query, orderBy, limit, serverTimestamp, arrayUnion, arrayRemove, increment, where, Timestamp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
-import { getStorage, ref as sRef, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js";
+import { getFirestore, collection, doc, getDoc, setDoc, updateDoc, deleteDoc, addDoc, onSnapshot, query, orderBy, limit, serverTimestamp, arrayUnion, arrayRemove, increment, where } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
 const app = initializeApp({
   apiKey: "AIzaSyCJm_0O6NzS0UYnoYAv5MUIp-QR9xGN18Q",
@@ -100,12 +91,9 @@ const app = initializeApp({
 });
 const auth = getAuth(app);
 const db = getFirestore(app);
-const storage = getStorage(app);
 
 const ADMIN_EMAIL = "shanks377s8@gmail.com";
-const SUB_PRICE = "9.99$ شهرياً";
 const isOfficial = (u) => !!u && (u.email === ADMIN_EMAIL || u.official === true);
-const isAdmin = () => currentUser?.email === ADMIN_EMAIL;
 const isVerified = (u) => {
   if (!u) return false;
   if (isOfficial(u)) return true;
@@ -114,9 +102,7 @@ const isVerified = (u) => {
   return !t || t > Date.now();
 };
 
-// الشارة المتعرجة الخاصة بالمستخدمين المشتركين/الموثقين
 const verifiedFlowerSVG = (size) => `<svg viewBox="0 0 1024 1024" style="width:${size}px;height:${size}px;display:inline-block;vertical-align:-3px" fill="#8b90f5"><path d="M512 64C537.4 64 559 81.3 565.6 105.8C570.6 124.2 590.2 136.1 609.4 130.6C633.3 123.7 658.9 135.2 669.9 157.1C679 175.2 700.5 184.2 720 176.5C743.3 167.3 770.1 180.8 777.8 204.8C783.8 223.3 804.8 234.3 824.1 227.1C848 218.1 876 233.8 881.2 258.8C886 281.8 908.5 296.8 931.7 292.6C956.4 288.1 980.7 308.2 982.5 333.4C984.1 356.9 1003.5 375.3 1027 377.9C1051.8 380.7 1070 404.2 1064.8 428.8C1059.5 454 1073.4 479.5 1096.5 490C1117.8 499.7 1128.5 524 1120.3 546.2C1112.5 567.4 1121.2 591.9 1141.2 605.5C1161.9 619.6 1167.3 647.4 1153.9 668.6C1141 689 1144.3 715.4 1161.4 731.9C1179.3 749.1 1179.5 777.9 1161.8 795.3C1144.7 812.1 1143.1 838.7 1157.6 857.3C1172.9 876.8 1170.1 905 1150.9 921C1132.3 936.4 1125.7 962.5 1134.4 985.3C1143.5 1009.2 1128.3 1035.7 1103.8 1040.6C1081.1 1045.2 1063.9 1063.4 1060.1 1086.2C1055.7 1112.6 1029.7 1128.8 1004.1 1122.2C981.3 1116.4 956.8 1129.2 947.1 1151.4C936.8 1175.2 909.4 1187.6 884.9 1177.3C863.3 1168.3 838.3 1177.2 825.4 1197.3C812.2 1217.9 785.7 1225.1 762.3 1215.1C740.1 1205.6 714.2 1211.9 699.2 1231.2C684.7 1249.7 658.7 1253.9 638.6 1240.2C617.9 1226.1 591.4 1229.1 573.9 1247.3C555.7 1266.3 528.2 1267.4 508.8 1250C488.5 1231.8 460.1 1231 438.4 1247.3C419.1 1261.9 392.3 1259.9 375.4 1242.3C359.1 1225.4 333.6 1220.4 311.9 1231.5C289.4 1243.1 262.3 1238.1 247.1 1217.5C232.8 1198.1 206.5 1190.7 183.7 1201.3C161.1 1211.8 134.9 1201.3 125.1 1178.5C115.3 1155.1 92.4 1140.9 68.9 1143.5C45.3 1146.1 22.8 1127.3 20.3 1103.5C17.7 1079.4 -1.4 1060.1 -23.7 1056.2C-47.5 1052 -63.5 1029.1 -59.8 1005.6C-56.5 981.1 -74.4 959.3 -97.8 954.2C-121.7 949 -136.2 925.3 -130.6 901.7C-125 877 -141.2 851.6 -164.7 843.4C-187.3 835.5 -199.1 810.1 -190.6 786.8C-182.5 764.5 -193.3 739.3 -215.3 727.6C-237.5 715.7 -247.2 689 -238 666.2C-229.4 644.2 -238.9 618.3 -261.2 605.3C-282.8 592.6 -290.9 565.3 -279.9 542.8C-269.4 521.6 -275.5 494.6 -296.8 480.9C-317.4 467.6 -322.2 440.1 -309.2 419.3C-296.7 399.1 -300.9 372.4 -318.5 355.5C-335.8 338.9 -337.3 311.6 -320.7 293.1C-304.7 275.3 -307.7 248.1 -326.6 231.7C-344.8 216 -348.5 189 -334.8 168.1C-321.6 147.9 -326.1 120.3 -347.1 105.1C-367.4 90.5 -372.6 63.1 -359.8 41.2C-347.4 19.9 -322.4 9.1 -299.7 17.5C-278.3 25.4 -253.1 15.6 -241.7 -4.8C-229.9 -25.7 -204.4 -35.2 -181.7 -26.1C-159.2 -17.2 -133.7 -26.2 -121.2 -47.1C-109 -67.3 -84 -77.2 -61.2 -68.3C-39.3 -59.8 -14.6 -70 -4.6 -91.9C5.1 -112.9 30.6 -123.6 53.3 -115.4C75.4 -107.4 99.7 -117.8 111.4 -138.8C123.4 -159.9 149.6 -169 171.9 -158.4C193.5 -148.1 219.2 -156.4 231.8 -177.1C244 -197.1 270.2 -205.8 292.9 -196.4C315 -187.3 340.6 -194.8 354.3 -215.1C368.1 -235.7 394.8 -243.3 416.9 -232.8C439 -222.4 464.9 -229.2 478.9 -250C492.5 -270.2 518.7 -277 541 -267C563.8 -256.7 590 -262.9 604.2 -283.4C618.9 -304.3 645.7 -310.8 667.4 -298.6C688.8 -286.7 715.4 -291.6 730.7 -311.6C745.5 -331.1 772.3 -336.8 794.6 -325.2C816.5 -313.9 843.4 -318.5 858.7 -339.1C873.5 -359.1 900.2 -364 922.3 -351.9C944 -340 970.6 -343.8 985.9 -363.3C1000.7 -382.4 1027.2 -387.3 1049.2 -376.1C1071.4 -364.7 1098.2 -368.1 1113.8 -388.2C1129.1 -407.7 1156.1 -411.3 1178.4 -398.9C1200.2 -386.9 1227.1 -389.2 1242.9 -408.8C1258.3 -427.8 1285.5 -430.2 1308 -416.9C1330.1 -403.9 1357.3 -405 1373.4 -423.8C1389.1 -442.1 1416.5 -443.2 1438.9 -428.8C1460.8 -414.8 1488.2 -414.7 1510.3 -428.2Z" transform="translate(350,350) scale(0.4)"/><path d="M378 616L238 476L294 420L378 504L730 152L786 208L378 616Z" fill="#fff"/></svg>`;
-
 const officialSVG = (size) => `<svg viewBox="0 0 24 24" style="width:${size}px;height:${size}px;display:inline-block;vertical-align:-3px" fill="#818cf8"><circle cx="12" cy="12" r="12"/><path d="M7 12.6l3.2 3.2L17 8.9" fill="none" stroke="#111827" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 
 const badgeKind = (u) => isOfficial(u) ? 'official' : (isVerified(u) ? 'sub' : false);
@@ -125,35 +111,33 @@ const vOf = (id, fallback) => allUsers[id] ? badgeKind(allUsers[id]) : (fallback
 
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-const nameOf = (u) => u.name || u.displayName || (u.email ? u.email.split("@")[0] : "") || "مستخدم";
+const nameOf = (u) => u?.name || u?.displayName || (u?.email ? u.email.split("@")[0] : "") || "مستخدم";
 const uid = () => currentUser?.uid;
 const me = () => allUsers[uid()] || { uid: uid(), name: "", email: currentUser?.email || "" };
 const V = () => $('view');
 const chatIdFor = (a, b) => [a, b].sort().join("_");
-const handleOf = (u) => u.username ? "@" + u.username : "";
+const handleOf = (u) => u?.username ? "@" + u.username : "";
 
 let currentUser = null, currentView = "home", currentId = null;
 let allUsers = {}, postsCache = {};
-let usersUnsub = null, postsUnsub = null, savedUnsub = null;
+let usersUnsub = null, postsUnsub = null, notifUnsub = null, chatsUnsub = null;
 let unsubs = [], commentUnsubs = {}, openSet = new Set();
 let savedIds = new Set();
-let notifs = [], notifUnsub = null, chatsUnsub = null, chatUnreadCount = 0;
-let commentsData = {}, replyTo = {}, reportTarget = null;
-let pendingPostImg = null, pendingPostVideo = null, pendingCommentImg = null, pendingChatImg = null;
+let notifs = [], chatUnreadCount = 0;
+let commentsData = {};
+let pendingPostImg = null;
 let profileTarget = null;
 let hiddenPosts = new Set();
 try { hiddenPosts = new Set(JSON.parse(localStorage.getItem('sx_hidden') || '[]')); } catch (_) {}
-const saveHidden = () => { try { localStorage.setItem('sx_hidden', JSON.stringify([...hiddenPosts])); } catch (_) {} };
 
 window.showToast = (msg) => {
   const box = document.createElement('div');
   box.className = 'card px-4 py-2 rounded-xl text-xs font-bold text-white shadow-xl';
   box.textContent = msg;
-  $('toastContainer').appendChild(box);
+  $('toastContainer')?.appendChild(box);
   setTimeout(() => box.remove(), 2800);
 };
 
-// --- تحديث العدادات الحمراء للإشعارات والرسائل ---
 function updateBadges() {
   const notifBadge = $('notifBadge');
   if (notifBadge) {
@@ -168,15 +152,6 @@ function updateBadges() {
   }
 }
 
-async function notify(toUid, type, extra = {}) {
-  if (!toUid || toUid === uid()) return;
-  await addDoc(collection(db, "notifications"), {
-    toUid, fromUid: uid(), fromName: nameOf(me()), fromPhoto: me().photoURL || '',
-    type, postId: extra.postId || '', text: String(extra.text || '').slice(0, 120),
-    read: false, createdAt: serverTimestamp()
-  });
-}
-
 function avatarHTML(name, photo, cls = 'w-10 h-10 text-sm') {
   return photo
     ? `<img src="${esc(photo)}" class="${cls} rounded-full object-cover shrink-0">`
@@ -185,8 +160,10 @@ function avatarHTML(name, photo, cls = 'w-10 h-10 text-sm') {
 
 function timeAgo(ts) {
   if (!ts) return "الآن";
-  const d = ts.toDate ? ts.toDate() : new Date(ts);
-  return d.toLocaleString('ar', { dateStyle: 'medium', timeStyle: 'short' });
+  try {
+    const d = ts.toDate ? ts.toDate() : new Date(ts);
+    return d.toLocaleString('ar', { dateStyle: 'medium', timeStyle: 'short' });
+  } catch { return "الآن"; }
 }
 
 function followBtn(id) {
@@ -195,7 +172,7 @@ function followBtn(id) {
 }
 
 function compressImage(file, max, quality) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const reader = new FileReader();
     reader.onload = () => {
       const img = new Image();
@@ -207,28 +184,18 @@ function compressImage(file, max, quality) {
         c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
         resolve(c.toDataURL('image/jpeg', quality));
       };
-      img.onerror = reject;
+      img.onerror = () => resolve(reader.result);
       img.src = reader.result;
     };
-    reader.onerror = reject;
+    reader.onerror = () => resolve(null);
     reader.readAsDataURL(file);
   });
 }
 
-function backHeader(title) {
-  return `
-    <div class="flex items-center gap-3">
-      <button data-go="home" class="w-9 h-9 rounded-full bg-gray-800 flex items-center justify-center"><i class="fa-solid fa-arrow-right"></i></button>
-      <h2 class="font-bold text-lg">${title}</h2>
-    </div>`;
-}
-
-// --- معالجة زر الرجوع في الهاتف لمنع خروج التطبيق ---
 window.addEventListener('popstate', (e) => {
   e.preventDefault();
   if (currentView !== 'home') {
     go('home');
-    history.pushState({ view: 'home' }, '', '');
   }
 });
 
@@ -249,12 +216,11 @@ function go(view, id) {
   currentView = view;
   currentId = id || null;
   setActiveTab(view);
-  history.pushState({ view, id }, '', '');
+  try { history.pushState({ view, id }, '', ''); } catch {}
   const views = {
     home: viewHome, notifications: viewNotifications, chats: viewChats, chat: viewChat,
-    profile: viewProfile, edit: viewEdit, search: viewSearch, friends: viewFriends,
-    create: viewCreate, reels: viewReels, menu: viewMenu, settings: viewSettings,
-    help: viewHelp, about: viewAbout, saved: viewSaved, admin: viewAdmin, live: viewLive, golive: viewGoLive, watch: viewWatch
+    profile: viewProfile, edit: viewEdit, search: viewSearch,
+    create: viewCreate, reels: viewReels, menu: viewMenu, saved: viewSaved, live: viewLive
   };
   (views[view] || viewHome)(id);
   window.scrollTo(0, 0);
@@ -266,7 +232,7 @@ function postCard(p) {
   const liked = likes.includes(uid());
   const saved = savedIds.has(p.id);
   return `
-  <article class="card rounded-xl overflow-hidden">
+  <article class="card rounded-xl overflow-hidden mb-3">
     <div class="flex items-center gap-3 p-3">
       ${avatarHTML(p.userName, p.userPhoto)}
       <div class="flex-1 min-w-0">
@@ -277,14 +243,14 @@ function postCard(p) {
     </div>
     ${p.text ? `<p class="px-3 pb-3 text-sm whitespace-pre-wrap">${esc(p.text)}</p>` : ''}
     ${p.image ? `<img src="${esc(p.image)}" class="w-full max-h-[480px] object-cover">` : ''}
-    <div class="flex justify-around items-center border-t border-gray-800 text-sm text-gray-400 py-1">
-      <button data-act="like" data-id="${p.id}" class="flex-1 py-2 flex items-center justify-center gap-1.5 ${liked ? 'text-pink-400 font-bold' : ''}">
-        <i class="fa-${liked ? 'solid' : 'regular'} fa-heart"><span>${likes.length}</span></i>
+    <div class="flex justify-around items-center border-t border-gray-800 text-sm text-gray-400 py-2">
+      <button data-act="like" data-id="${p.id}" class="flex-1 py-1 flex items-center justify-center gap-1.5 ${liked ? 'text-pink-400 font-bold' : ''}">
+        <i class="fa-${liked ? 'solid' : 'regular'} fa-heart"></i><span>${likes.length}</span>
       </button>
-      <button data-act="comments" data-id="${p.id}" class="flex-1 py-2 flex items-center justify-center gap-1.5">
-        <i class="fa-regular fa-comment"><span>${p.commentsCount || 0}</span></i>
+      <button data-act="comments" data-id="${p.id}" class="flex-1 py-1 flex items-center justify-center gap-1.5">
+        <i class="fa-regular fa-comment"></i><span>${p.commentsCount || 0}</span>
       </button>
-      <button data-act="save" data-id="${p.id}" class="flex-1 py-2 flex items-center justify-center gap-1.5 ${saved ? 'text-amber-400' : ''}">
+      <button data-act="save" data-id="${p.id}" class="flex-1 py-1 flex items-center justify-center gap-1.5 ${saved ? 'text-amber-400' : ''}">
         <i class="fa-${saved ? 'solid' : 'regular'} fa-bookmark"></i>
       </button>
     </div>
@@ -309,13 +275,12 @@ function refreshPosts() {
   if (profileTarget) renderPosts('uposts', p => p.userId === profileTarget, 'لا توجد منشورات');
 }
 
-// --- تعليقات تدعم النصوص والصور ---
 function renderComments(id) {
   const box = $('cbox-' + id);
   if (!box) return;
   const docs = commentsData[id] || [];
   box.innerHTML = docs.map(c => `
-    <div class="flex gap-2">
+    <div class="flex gap-2 mb-2">
       ${avatarHTML(c.userName, c.userPhoto, 'w-7 h-7 text-xs')}
       <div class="min-w-0 flex-1 bg-gray-800 rounded-xl px-3 py-2 text-xs">
         <b>${esc(c.userName)}${badgeHTML(vOf(c.userId, c.verified))}</b>
@@ -323,10 +288,8 @@ function renderComments(id) {
         ${c.image ? `<img src="${esc(c.image)}" class="mt-2 rounded-lg max-h-40 object-cover">` : ''}
       </div>
     </div>`).join('') + `
-    <div id="commentPrev-${id}"></div>
-    <form data-form="comment" data-id="${id}" class="flex items-center gap-2 pt-1">
-      <label class="text-emerald-400 cursor-pointer p-2"><i class="fa-solid fa-image"></i><input type="file" accept="image/*" class="hidden comment-img-input" data-id="${id}"></label>
-      <input name="t" autocomplete="off" placeholder="اكتب تعليقاً..." class="flex-1 bg-gray-800 rounded-full px-3 py-2 text-xs outline-none">
+    <form data-form="comment" data-id="${id}" class="flex items-center gap-2 pt-2">
+      <input name="t" autocomplete="off" placeholder="اكتب تعليقاً..." class="flex-1 bg-gray-800 rounded-full px-3 py-2 text-xs outline-none text-white">
       <button class="text-indigo-400 text-xs font-bold px-2">إرسال</button>
     </form>`;
 }
@@ -338,7 +301,7 @@ function watchComments(id) {
   commentUnsubs[id] = onSnapshot(query(collection(db, "posts", id, "comments"), orderBy("createdAt", "asc"), limit(50)), (snap) => {
     commentsData[id] = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     renderComments(id);
-  });
+  }, () => {});
 }
 
 function openComments(id) {
@@ -374,11 +337,11 @@ function viewHome() {
 function viewNotifications() {
   V().innerHTML = `
     <div class="p-3 space-y-2 max-w-xl mx-auto">
-      <div class="flex items-center justify-between mb-2"><h2 class="font-bold text-lg">الإشعارات</h2></div>
+      <h2 class="font-bold text-lg mb-2">الإشعارات</h2>
       ${notifs.length ? notifs.map(n => `
         <div class="card rounded-xl p-3 flex items-center gap-3">
           ${avatarHTML(n.fromName, n.fromPhoto, 'w-9 h-9 text-xs')}
-          <div class="flex-1 text-sm"><b>${esc(n.fromName)}</b> ${n.text || 'تفاعل معك'}</div>
+          <div class="flex-1 text-sm text-white"><b>${esc(n.fromName)}</b> ${n.text || 'تفاعل معك'}</div>
         </div>`).join('') : '<p class="text-center text-gray-500 py-10">لا توجد إشعارات</p>'}
     </div>`;
 }
@@ -388,10 +351,10 @@ function viewCreate() {
   V().innerHTML = `
     <form data-form="create" class="p-4 space-y-3 max-w-xl mx-auto">
       <div class="flex items-center justify-between">
-        <h2 class="font-bold">إنشاء منشور</h2>
-        <button class="px-4 py-1.5 rounded-lg bg-gradient-to-r from-indigo-600 to-pink-600 text-sm font-bold">نشر</button>
+        <h2 class="font-bold text-white">إنشاء منشور</h2>
+        <button class="px-4 py-1.5 rounded-lg bg-gradient-to-r from-indigo-600 to-pink-600 text-sm font-bold text-white">نشر</button>
       </div>
-      <textarea name="text" rows="5" placeholder="بماذا تفكر؟" class="w-full bg-transparent text-base outline-none resize-none"></textarea>
+      <textarea name="text" rows="5" placeholder="بماذا تفكر؟" class="w-full bg-transparent text-base outline-none resize-none text-white"></textarea>
       <div id="postPrev"></div>
       <label class="card rounded-xl p-3 flex items-center gap-2 text-emerald-400 text-sm cursor-pointer">
         <i class="fa-solid fa-image"></i> إضافة صورة
@@ -403,14 +366,14 @@ function viewCreate() {
 function viewSearch() {
   V().innerHTML = `
     <div class="p-3 space-y-3 max-w-xl mx-auto">
-      <input id="q" type="search" placeholder="ابحث عن المستخدمين..." class="w-full bg-gray-800 rounded-full px-4 py-2.5 text-sm outline-none">
+      <input id="q" type="search" placeholder="ابحث عن المستخدمين..." class="w-full bg-gray-800 rounded-full px-4 py-2.5 text-sm outline-none text-white">
       <div id="res" class="space-y-2"></div>
     </div>`;
   renderSearch('');
 }
 
 function renderSearch(term) {
-  const t = term.trim().toLowerCase();
+  const t = (term || '').trim().toLowerCase();
   const list = Object.values(allUsers).filter(u => u.uid !== uid() && nameOf(u).toLowerCase().includes(t));
   const res = $('res');
   if (!res) return;
@@ -418,7 +381,7 @@ function renderSearch(term) {
     <div class="card rounded-xl p-3 flex items-center gap-3">
       <button data-go="profile" data-id="${u.uid}" class="flex items-center gap-3 flex-1 text-right">
         ${avatarHTML(nameOf(u), u.photoURL)}
-        <div><b class="text-sm block">${esc(nameOf(u))}${badgeHTML(badgeKind(u))}</b></div>
+        <div><b class="text-sm block text-white">${esc(nameOf(u))}${badgeHTML(badgeKind(u))}</b></div>
       </button>
       ${followBtn(u.uid)}
     </div>`).join('') : '<p class="text-center text-gray-500 py-8">لا توجد نتائج</p>';
@@ -428,20 +391,19 @@ function viewChats() {
   const following = (me().following || []).map(id => allUsers[id]).filter(Boolean);
   V().innerHTML = `
     <div class="p-3 space-y-2 max-w-xl mx-auto">
-      <h2 class="font-bold text-lg mb-2">الدردشات</h2>
+      <h2 class="font-bold text-lg mb-2 text-white">الدردشات</h2>
       <button data-go="chat" data-id="global" class="card rounded-xl p-3 w-full flex items-center gap-3 text-right">
-        <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-purple-600 to-pink-500 flex items-center justify-center font-bold">S</div>
-        <div><b class="text-sm block">الدردشة العامة Sovexa</b><span class="text-xs text-emerald-400">مفتوحة للجميع</span></div>
+        <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-purple-600 to-pink-500 flex items-center justify-center font-bold text-white">S</div>
+        <div><b class="text-sm block text-white">الدردشة العامة Sovexa</b><span class="text-xs text-emerald-400">مفتوحة للجميع</span></div>
       </button>
       ${following.map(u => `
         <button data-go="chat" data-id="${u.uid}" class="card rounded-xl p-3 w-full flex items-center gap-3 text-right">
           ${avatarHTML(nameOf(u), u.photoURL)}
-          <div><b class="text-sm block">${esc(nameOf(u))}${badgeHTML(badgeKind(u))}</b></div>
+          <div><b class="text-sm block text-white">${esc(nameOf(u))}${badgeHTML(badgeKind(u))}</b></div>
         </button>`).join('')}
     </div>`;
 }
 
-// --- محادثة تدعم النصوص وإرسال الصور ---
 function viewChat(otherId) {
   const isGlobal = otherId === 'global';
   const o = allUsers[otherId] || { uid: otherId, name: "مستخدم" };
@@ -449,14 +411,12 @@ function viewChat(otherId) {
   V().innerHTML = `
     <div class="flex flex-col h-[calc(100vh-10.5rem)] max-w-2xl mx-auto">
       <div class="flex items-center gap-3 px-3 py-2 border-b border-gray-800 bg-[#111827]">
-        <button data-go="chats" class="w-9 h-9 rounded-full bg-gray-800 flex items-center justify-center"><i class="fa-solid fa-arrow-right"></i></button>
-        <b class="text-sm">${isGlobal ? "الدردشة العامة" : esc(nameOf(o))}</b>
+        <button data-go="chats" class="w-9 h-9 rounded-full bg-gray-800 flex items-center justify-center text-white"><i class="fa-solid fa-arrow-right"></i></button>
+        <b class="text-sm text-white">${isGlobal ? "الدردشة العامة" : esc(nameOf(o))}</b>
       </div>
       <div id="msgs" class="flex-1 overflow-y-auto p-3 space-y-2 bg-[#0b0f17]"></div>
-      <div id="chatImgPrev" class="px-3"></div>
       <form data-form="msg" data-id="${cid}" class="p-2 flex items-center gap-2 border-t border-gray-800 bg-[#111827]">
-        <label class="text-emerald-400 cursor-pointer p-2"><i class="fa-solid fa-image"></i><input type="file" id="chatImgIn" accept="image/*" class="hidden"></label>
-        <input name="t" autocomplete="off" placeholder="اكتب رسالة..." class="flex-1 bg-gray-800 rounded-full px-4 py-2 text-sm outline-none">
+        <input name="t" autocomplete="off" placeholder="اكتب رسالة..." class="flex-1 bg-gray-800 rounded-full px-4 py-2 text-sm outline-none text-white">
         <button class="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white"><i class="fa-solid fa-paper-plane"></i></button>
       </form>
     </div>`;
@@ -470,15 +430,13 @@ function viewChat(otherId) {
         <div class="flex ${mine ? 'justify-end' : 'justify-start'}">
           <div class="${mine ? 'bubble-me' : 'bubble-other'} px-3 py-2 text-sm max-w-[75%] rounded-2xl">
             ${m.text ? `<p>${esc(m.text)}</p>` : ''}
-            ${m.image ? `<img src="${esc(m.image)}" class="mt-1 rounded-xl max-h-48 object-cover">` : ''}
           </div>
         </div>`;
     }).join('');
     el.scrollTop = el.scrollHeight;
-  }));
+  }, () => {}));
 }
 
-// --- الملف الشخصي وتنسيق فيسبوك للأزرار الوسطى ---
 function viewProfile(id) {
   const target = id || uid();
   profileTarget = target;
@@ -487,10 +445,10 @@ function viewProfile(id) {
   const followers = Object.values(allUsers).filter(x => (x.following || []).includes(target)).length;
   
   V().innerHTML = `
-    <div class="h-32 bg-gradient-to-r from-indigo-700 to-pink-600 bg-cover bg-center" style="${u.coverURL ? `background-image:url('${esc(u.coverURL)}')` : ''}"></div>
+    <div class="h-32 bg-gradient-to-r from-indigo-700 to-pink-600 bg-cover bg-center"></div>
     <div class="px-4 -mt-12 text-center">
       <div class="inline-block ring-4 ring-[#0b0f17] rounded-full">${avatarHTML(nameOf(u), u.photoURL, 'w-24 h-24 text-3xl')}</div>
-      <h2 class="text-xl font-black mt-2">${esc(nameOf(u))}${badgeHTML(badgeKind(u))}</h2>
+      <h2 class="text-xl font-black mt-2 text-white">${esc(nameOf(u))}${badgeHTML(badgeKind(u))}</h2>
       <p class="text-xs text-indigo-300">${esc(handleOf(u))}</p>
       <p class="text-sm text-gray-400 mt-1">${esc(u.bio || '')}</p>
       <div class="flex gap-2 justify-center mt-3">
@@ -498,7 +456,6 @@ function viewProfile(id) {
       </div>
     </div>
 
-    <!-- صندوق التفاصيل الشخصية -->
     <div class="p-3 max-w-xl mx-auto">
       <div class="card rounded-2xl p-4 space-y-3">
         <h3 class="font-bold text-sm text-white">التفاصيل الشخصية</h3>
@@ -511,7 +468,6 @@ function viewProfile(id) {
       </div>
     </div>
 
-    <!-- أزرار النشر والفيديو والبث المباشر (مثل فيسبوك تماماً بين التفاصيل والمنشورات) -->
     <div class="p-3 max-w-xl mx-auto grid grid-cols-3 gap-2">
       <button data-go="create" class="card py-2.5 rounded-xl text-xs font-bold text-emerald-400 flex items-center justify-center gap-1.5"><i class="fa-solid fa-pen-to-square"></i> منشور</button>
       <button data-go="reels" class="card py-2.5 rounded-xl text-xs font-bold text-pink-400 flex items-center justify-center gap-1.5"><i class="fa-solid fa-video"></i> فيديو</button>
@@ -526,83 +482,86 @@ function viewEdit() {
   const u = me();
   V().innerHTML = `
     <form data-form="edit" class="p-4 space-y-4 max-w-md mx-auto">
-      <h2 class="text-lg font-bold">تعديل الملف الشخصي</h2>
-      <input name="name" required value="${esc(nameOf(u))}" class="w-full bg-gray-800 rounded-lg px-3 py-2 text-sm outline-none">
-      <textarea name="bio" rows="3" class="w-full bg-gray-800 rounded-lg px-3 py-2 text-sm outline-none">${esc(u.bio || '')}</textarea>
+      <h2 class="text-lg font-bold text-white">تعديل الملف الشخصي</h2>
+      <input name="name" required value="${esc(nameOf(u))}" class="w-full bg-gray-800 rounded-lg px-3 py-2 text-sm outline-none text-white">
+      <textarea name="bio" rows="3" class="w-full bg-gray-800 rounded-lg px-3 py-2 text-sm outline-none text-white">${esc(u.bio || '')}</textarea>
       <button class="w-full py-2.5 rounded-lg bg-gradient-to-r from-indigo-600 to-pink-600 font-bold text-sm text-white">حفظ</button>
     </form>`;
 }
 
-function viewReels() {
-  V().innerHTML = `<div class="p-6 text-center mt-16"><h2 class="text-lg font-bold">الريلز وفيديوهات Sovexa</h2></div>`;
-}
-function viewLive() {
-  V().innerHTML = `<div class="p-6 text-center mt-16"><h2 class="text-lg font-bold">البث المباشر</h2></div>`;
-}
+function viewReels() { V().innerHTML = `<div class="p-6 text-center mt-16 text-white"><h2 class="text-lg font-bold">الريلز وفيديوهات Sovexa</h2></div>`; }
+function viewLive() { V().innerHTML = `<div class="p-6 text-center mt-16 text-white"><h2 class="text-lg font-bold">البث المباشر</h2></div>`; }
 function viewSaved() {
-  V().innerHTML = `<div class="p-3 max-w-xl mx-auto"><h2 class="font-bold mb-3">المحفوظات</h2><div id="savedList" class="space-y-3"></div></div>`;
+  V().innerHTML = `<div class="p-3 max-w-xl mx-auto"><h2 class="font-bold mb-3 text-white">المحفوظات</h2><div id="savedList" class="space-y-3"></div></div>`;
   const box = $('savedList');
   if (box) box.innerHTML = [...savedIds].map(id => postsCache[id] ? postCard({id, ...postsCache[id]}) : '').join('');
 }
 function viewMenu() {
   V().innerHTML = `
     <div class="p-3 space-y-2 max-w-xl mx-auto">
-      <button data-go="profile" data-id="${uid()}" class="card p-3 w-full text-right font-bold">الملف الشخصي</button>
-      <button data-go="saved" class="card p-3 w-full text-right font-bold">المحفوظات</button>
+      <button data-go="profile" data-id="${uid()}" class="card p-3 w-full text-right font-bold text-white">الملف الشخصي</button>
+      <button data-go="saved" class="card p-3 w-full text-right font-bold text-white">المحفوظات</button>
       <button data-act="logout" class="card p-3 w-full text-right text-red-400 font-bold">تسجيل الخروج</button>
     </div>`;
 }
-function viewHelp() { V().innerHTML = `<div class="p-3 max-w-xl mx-auto"><h2 class="font-bold">المساعدة</h2></div>`; }
-function viewAbout() { V().innerHTML = `<div class="p-3 max-w-xl mx-auto"><h2 class="font-bold">عن التطبيق</h2></div>`; }
 
-// ---------- Firebase Init & Auth ----------
+// ---------- Auth & Init ----------
 onAuthStateChanged(auth, async (user) => {
   currentUser = user;
   $('splash')?.remove();
   if (!user) {
     clearListeners();
-    $('loginSection').classList.remove('hidden');
-    $('appSection').classList.add('hidden');
+    $('loginSection')?.classList.remove('hidden');
+    $('appSection')?.classList.add('hidden');
     return;
   }
-  $('loginSection').classList.add('hidden');
-  $('appSection').classList.remove('hidden');
+  $('loginSection')?.classList.add('hidden');
+  $('appSection')?.classList.remove('hidden');
 
-  // الاستماع للمستخدمين والمنشورات والإشعارات والدردشات لتحديث العدادات الحمراء
-  usersUnsub = onSnapshot(collection(db, "users"), (s) => {
-    allUsers = {};
-    s.forEach(d => allUsers[d.id] = { uid: d.id, ...d.data() });
-    refreshPosts();
-  });
-  postsUnsub = onSnapshot(query(collection(db, "posts"), orderBy("createdAt", "desc"), limit(50)), (s) => {
-    postsCache = {};
-    s.forEach(d => postsCache[d.id] = d.data());
-    refreshPosts();
-  });
-  notifUnsub = onSnapshot(query(collection(db, "notifications"), where("toUid", "==", user.uid)), (s) => {
-    notifs = s.docs.map(d => ({ id: d.id, ...d.data() }));
-    updateBadges();
-  });
-  chatsUnsub = onSnapshot(query(collection(db, "chats"), where("members", "array-contains", user.uid)), (s) => {
-    chatUnreadCount = s.size; // تحديث عدد المحادثات النشطة/الرسائل
-    updateBadges();
-  });
+  try {
+    usersUnsub = onSnapshot(collection(db, "users"), (s) => {
+      allUsers = {};
+      s.forEach(d => allUsers[d.id] = { uid: d.id, ...d.data() });
+      refreshPosts();
+    }, () => {});
+
+    postsUnsub = onSnapshot(query(collection(db, "posts"), orderBy("createdAt", "desc"), limit(50)), (s) => {
+      postsCache = {};
+      s.forEach(d => postsCache[d.id] = d.data());
+      refreshPosts();
+    }, () => {});
+
+    notifUnsub = onSnapshot(query(collection(db, "notifications"), where("toUid", "==", user.uid)), (s) => {
+      notifs = s.docs.map(d => ({ id: d.id, ...d.data() }));
+      updateBadges();
+    }, () => {});
+
+    chatsUnsub = onSnapshot(query(collection(db, "chats"), where("members", "array-contains", user.uid)), (s) => {
+      chatUnreadCount = s.size;
+      updateBadges();
+    }, () => {});
+  } catch (err) {
+    console.error(err);
+  }
 
   go('home');
 });
 
-$('emailForm').addEventListener('submit', async (e) => {
+$('googleLoginBtn')?.addEventListener('click', async () => {
+  try { await signInWithPopup(auth, new GoogleAuthProvider()); } catch (e) { showToast(e.message); }
+});
+
+$('emailForm')?.addEventListener('submit', async (e) => {
   e.preventDefault();
   const email = $('emailInput').value.trim();
   const password = $('passwordInput').value;
   try {
     await signInWithEmailAndPassword(auth, email, password);
   } catch {
-    await createUserWithEmailAndPassword(auth, email, password);
+    try { await createUserWithEmailAndPassword(auth, email, password); } catch (err) { showToast(err.message); }
   }
 });
 
-// ---------- Events ----------
 document.addEventListener('click', async (e) => {
   const g = e.target.closest('[data-go]');
   if (g) { go(g.dataset.go, g.dataset.id); return; }
@@ -613,7 +572,7 @@ document.addEventListener('click', async (e) => {
     const p = postsCache[id];
     if (!p) return;
     const liked = (p.likes || []).includes(uid());
-    await updateDoc(doc(db, "posts", id), { likes: liked ? arrayRemove(uid()) : arrayUnion(uid()) });
+    await updateDoc(doc(db, "posts", id), { likes: liked ? arrayRemove(uid()) : arrayUnion(uid()) }).catch(() => {});
   } else if (act === 'comments') {
     openComments(id);
   } else if (act === 'save') {
@@ -621,7 +580,7 @@ document.addEventListener('click', async (e) => {
     refreshPosts();
   } else if (act === 'follow') {
     const isF = (me().following || []).includes(id);
-    await updateDoc(doc(db, "users", uid()), { following: isF ? arrayRemove(id) : arrayUnion(id) });
+    await updateDoc(doc(db, "users", uid()), { following: isF ? arrayRemove(id) : arrayUnion(id) }).catch(() => {});
   } else if (act === 'logout') {
     signOut(auth);
   }
@@ -631,13 +590,6 @@ document.addEventListener('change', async (e) => {
   const f = e.target.files?.[0];
   if (!f) return;
   if (e.target.id === 'postImg') pendingPostImg = await compressImage(f, 800, 0.7);
-  if (e.target.id === 'chatImgIn') pendingChatImg = await compressImage(f, 800, 0.7);
-  if (e.target.classList.contains('comment-img-input')) {
-    pendingCommentImg = await compressImage(f, 800, 0.7);
-    const pid = e.target.dataset.id;
-    const prev = $(`commentPrev-${pid}`);
-    if (prev) prev.innerHTML = `<img src="${pendingCommentImg}" class="w-20 h-20 rounded-lg object-cover mt-1">`;
-  }
 });
 
 document.addEventListener('submit', async (e) => {
@@ -651,30 +603,28 @@ document.addEventListener('submit', async (e) => {
     await addDoc(collection(db, "posts"), {
       userId: uid(), userName: nameOf(me()), userPhoto: me().photoURL || '',
       verified: isVerified(me()), text, image: pendingPostImg || '', likes: [], commentsCount: 0, createdAt: serverTimestamp()
-    });
+    }).catch(() => {});
     pendingPostImg = null;
     go('home');
   } else if (type === 'comment') {
     const postId = f.dataset.id;
     const text = fd.get('t');
-    if (!text && !pendingCommentImg) return;
+    if (!text) return;
     await addDoc(collection(db, "posts", postId, "comments"), {
       userId: uid(), userName: nameOf(me()), userPhoto: me().photoURL || '',
-      text, image: pendingCommentImg || '', verified: isVerified(me()), createdAt: serverTimestamp()
-    });
-    await updateDoc(doc(db, "posts", postId), { commentsCount: increment(1) });
-    pendingCommentImg = null;
+      text, verified: isVerified(me()), createdAt: serverTimestamp()
+    }).catch(() => {});
+    await updateDoc(doc(db, "posts", postId), { commentsCount: increment(1) }).catch(() => {});
     f.reset();
   } else if (type === 'msg') {
     const text = fd.get('t');
-    if (!text && !pendingChatImg) return;
+    if (!text) return;
     await addDoc(collection(db, "chats", f.dataset.id, "messages"), {
-      text, image: pendingChatImg || '', senderId: uid(), senderName: nameOf(me()), createdAt: serverTimestamp()
-    });
-    pendingChatImg = null;
+      text, senderId: uid(), senderName: nameOf(me()), createdAt: serverTimestamp()
+    }).catch(() => {});
     f.reset();
   } else if (type === 'edit') {
-    await updateDoc(doc(db, "users", uid()), { name: fd.get('name'), bio: fd.get('bio') });
+    await updateDoc(doc(db, "users", uid()), { name: fd.get('name'), bio: fd.get('bio') }).catch(() => {});
     go('profile', uid());
   }
 });
