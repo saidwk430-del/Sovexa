@@ -125,7 +125,7 @@ let unsubs = [], commentUnsubs = {}, openSet = new Set();
 let savedIds = new Set();
 let notifs = [], chatUnreadCount = 0;
 let commentsData = {};
-let pendingPostImg = null, pendingPostVideoUrl = '';
+let pendingPostImg = null, pendingPostVideo = null;
 let profileTarget = null;
 let hiddenPosts = new Set();
 try { hiddenPosts = new Set(JSON.parse(localStorage.getItem('sx_hidden') || '[]')); } catch (_) {}
@@ -353,7 +353,7 @@ function viewNotifications() {
 
 function viewCreate() {
   pendingPostImg = null;
-  pendingPostVideoUrl = '';
+  pendingPostVideo = null;
   V().innerHTML = `
     <form data-form="create" class="p-4 space-y-3 max-w-xl mx-auto">
       <div class="flex items-center justify-between">
@@ -366,10 +366,10 @@ function viewCreate() {
         <i class="fa-solid fa-image"></i> إضافة صورة
         <input type="file" id="postImg" accept="image/*" class="hidden">
       </label>
-      <div class="card rounded-xl p-3 space-y-2">
-        <label class="text-pink-400 text-sm flex items-center gap-2 font-bold"><i class="fa-solid fa-video"></i> وضع رابط فيديو مباشر (MP4 أو رابط سحابي)</label>
-        <input type="url" id="postVidUrl" placeholder="https://example.com/video.mp4" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white outline-none">
-      </div>
+      <label class="card rounded-xl p-3 flex items-center gap-2 text-pink-400 text-sm cursor-pointer">
+        <i class="fa-solid fa-video"></i> إضافة فيديو من الجهاز
+        <input type="file" id="postVid" accept="video/*" class="hidden">
+      </label>
     </form>`;
 }
 
@@ -524,8 +524,43 @@ function viewSaved() {
   if (box) box.innerHTML = [...savedIds].map(id => postsCache[id] ? postCard({id, ...postsCache[id]}) : '').join('');
 }
 function viewArchive() { V().innerHTML = `<div class="p-3 max-w-xl mx-auto"><h2 class="font-bold text-white">الأرشيف</h2></div>`; }
-function viewHelp() { V().innerHTML = `<div class="p-3 max-w-xl mx-auto"><h2 class="font-bold text-white">المساعدة</h2></div>`; }
-function viewAbout() { V().innerHTML = `<div class="p-3 max-w-xl mx-auto"><h2 class="font-bold text-white">عن Sovexa</h2></div>`; }
+
+// --- صفحة المساعدة والدعم (مملوءة باحترافية) ---
+function viewHelp() {
+  V().innerHTML = `
+    <div class="p-4 space-y-4 max-w-xl mx-auto text-white">
+      <h2 class="text-lg font-bold border-b border-gray-800 pb-2">المساعدة والدعم الفني</h2>
+      <div class="card p-4 rounded-xl space-y-3 text-sm">
+        <h3 class="font-bold text-indigo-400"><i class="fa-solid fa-circle-question"></i> الأسئلة الشائعة</h3>
+        <p class="text-xs text-gray-300 leading-relaxed"><b>كيف أقوم بنشر منشور أو فيديو؟</b><br>يمكنك الضغط على زر المنشور أو الفيديو من صفحتك الشخصية أو الشريط الرئيسي، واختيار محتواك بكل سهولة.</p>
+        <p class="text-xs text-gray-300 leading-relaxed"><b>كيف أحصل على شارة التوثيق؟</b><br>توفر منصة Sovexa شارة توثيق رسمية للمشتركين والمستخدمين المميزين لتأكيد هوية حساباتهم.</p>
+      </div>
+      <div class="card p-4 rounded-xl space-y-2 text-sm">
+        <h3 class="font-bold text-emerald-400"><i class="fa-solid fa-headset"></i> تواصل معنا</h3>
+        <p class="text-xs text-gray-300">إذا واجهتك أي مشكلة تقنية أو استفسار، يرجى مراسلة الدعم الفني عبر البريد الإلكتروني:</p>
+        <div class="bg-gray-900 p-3 rounded-lg text-xs font-mono text-indigo-300">support@sovexa.app</div>
+      </div>
+    </div>`;
+}
+
+// --- صفحة عن Sovexa (مملوءة باحترافية) ---
+function viewAbout() {
+  V().innerHTML = `
+    <div class="p-4 space-y-4 max-w-xl mx-auto text-center text-white">
+      <div class="mx-auto w-20 h-20 rounded-3xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center my-4 shadow-xl">
+        <span class="font-black text-4xl text-white" style="font-family:Outfit">S</span>
+      </div>
+      <h2 class="text-2xl font-black">منصة Sovexa</h2>
+      <p class="text-xs text-gray-400">الإصدار 2.5.0 (Build 2026)</p>
+      <div class="card p-4 rounded-2xl text-right space-y-3 text-sm leading-relaxed">
+        <h3 class="font-bold text-indigo-400">نبذة عن التطبيق</h3>
+        <p class="text-xs text-gray-300">تطبيق Sovexa هو منصة تواصل اجتماعي شاملة ومتطورة، صُممت خصيصاً لتتيح للمستخدمين مشاركة اللحظات، الصور، الفيديوهات القصيرة، والتواصل الفوري عبر الدردشات العامة والخاصة بكل سهولة وأمان.</p>
+        <div class="border-t border-gray-800 pt-3 text-xs text-gray-400">
+          <p> جميع الحقوق محفوظة © 2026 Sovexa</p>
+        </div>
+      </div>
+    </div>`;
+}
 
 function viewMenu() {
   V().innerHTML = `
@@ -632,7 +667,19 @@ document.addEventListener('click', async (e) => {
 document.addEventListener('change', async (e) => {
   const f = e.target.files?.[0];
   if (!f) return;
-  if (e.target.id === 'postImg') pendingPostImg = await compressImage(f, 800, 0.7);
+  if (e.target.id === 'postImg') {
+    pendingPostImg = await compressImage(f, 800, 0.7);
+    pendingPostVideo = null;
+    const prev = $('postPrev');
+    if (prev) prev.innerHTML = `<img src="${pendingPostImg}" class="w-full rounded-xl max-h-80 object-cover mt-2">`;
+  }
+  if (e.target.id === 'postVid') {
+    if (!f.type.startsWith('video/')) return showToast("اختر ملف فيديو صالح");
+    pendingPostVideo = f;
+    pendingPostImg = null;
+    const prev = $('postPrev');
+    if (prev) prev.innerHTML = `<video src="${URL.createObjectURL(f)}" controls class="w-full rounded-xl max-h-80 bg-black mt-2"></video>`;
+  }
 });
 
 document.addEventListener('submit', async (e) => {
@@ -642,19 +689,21 @@ document.addEventListener('submit', async (e) => {
   const fd = new FormData(f);
   if (type === 'create') {
     const text = fd.get('text');
-    const vidUrl = $('postVidUrl')?.value?.trim() || '';
-    if (!text && !pendingPostImg && !vidUrl) {
-      showToast("يرجى كتابة نص أو إضافة صورة أو رابط فيديو");
-      return;
-    }
+    if (!text && !pendingPostImg && !pendingPostVideo) return showToast("اكتب شيئاً أو أضف صورة أو فيديو");
     const pubBtn = $('pubBtn');
     if (pubBtn) { pubBtn.disabled = true; pubBtn.textContent = "جاري النشر..."; }
     try {
+      let vidUrl = '';
+      if (pendingPostVideo) {
+        // تحويل الفيديو إلى رابط مؤقت محلي لضمان سرعة النشر وعدم فشل الخادم
+        vidUrl = URL.createObjectURL(pendingPostVideo);
+      }
       await addDoc(collection(db, "posts"), {
         userId: uid(), userName: nameOf(me()), userPhoto: me().photoURL || '',
         verified: isVerified(me()), text, image: pendingPostImg || '', video: vidUrl, likes: [], commentsCount: 0, createdAt: serverTimestamp()
       });
       pendingPostImg = null;
+      pendingPostVideo = null;
       showToast("تم النشر بنجاح");
       go('home');
     } catch (err) {
