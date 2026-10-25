@@ -138,7 +138,6 @@ const ADMIN_EMAIL = "shanks377s8@gmail.com";
 const SUB_PRICE = "9.99$ شهرياً";
 const isOfficial = (u) => !!u && (u.email === ADMIN_EMAIL || u.official === true);
 const isAdmin = () => currentUser?.email === ADMIN_EMAIL;
-// التوثيق: للمشرف، أو لمن لديه اشتراك فعّال (لم تنتهِ مدته)
 const isVerified = (u) => {
   if (!u) return false;
   if (isOfficial(u)) return true;
@@ -665,12 +664,28 @@ function viewProfile(id) {
       <p class="text-xs text-gray-500 mt-1">${postsCount} منشور · ${followers} متابع · ${following} يتابع</p>
       <div class="flex gap-2 justify-center mt-3">
         ${own
-          ? `<button data-go="edit" class="px-6 py-2 rounded-lg bg-gray-700 text-sm font-bold">تعديل الملف الشخصي</button>
-             <button data-go="menu" class="px-4 py-2 rounded-lg bg-gray-700 text-sm font-bold"><i class="fa-solid fa-bars"></i></button>`
+          ? `<button data-go="edit" class="flex-1 py-2 rounded-lg bg-[#1E2235] text-sm font-bold text-white border border-gray-700">تعديل الملف الشخصي</button>
+             <button data-go="menu" class="px-4 py-2 rounded-lg bg-[#1E2235] text-sm font-bold text-white border border-gray-700"><i class="fa-solid fa-bars"></i></button>`
           : `${followBtn(target)}<button data-go="chat" data-id="${target}" class="px-4 py-2 rounded-lg bg-gray-700 text-xs font-bold">مراسلة</button>`}
       </div>
     </div>
-    <div id="uposts" class="p-3 space-y-3 mt-4 max-w-xl mx-auto"></div>`;
+
+    <!-- قسم التفاصيل الشخصية (على غرار فيسبوك) -->
+    <div class="p-3 max-w-xl mx-auto space-y-3 mt-2">
+      <div class="card rounded-2xl p-4 space-y-3">
+        <h3 class="font-bold text-sm text-white">التفاصيل الشخصية</h3>
+        <div class="flex items-center gap-3 text-xs text-gray-300">
+          <i class="fa-solid fa-location-dot text-gray-500 w-4"></i>
+          <span>يقيم في الجزائر</span>
+        </div>
+        <div class="flex items-center gap-3 text-xs text-gray-300">
+          <i class="fa-solid fa-link text-gray-500 w-4"></i>
+          <span>يتابعه ${followers} شخصاً</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="uposts" class="p-3 space-y-3 max-w-xl mx-auto"></div>`;
   renderPosts('uposts', p => p.userId === target, 'لا توجد منشورات');
 }
 
