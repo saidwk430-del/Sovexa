@@ -23,7 +23,7 @@
 </style>
 </head>
 <body class="min-h-screen">
-<!-- BUILD 3 -->
+<!-- BUILD 4 -->
 
 <div id="splash" class="fixed inset-0 z-[80] bg-[#0b0f17] flex items-center justify-center"><div class="w-20 h-20 rounded-3xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center"><span class="font-black text-4xl text-white" style="font-family:Outfit">S</span></div></div>
 <div id="toastContainer" class="fixed top-16 left-1/2 -translate-x-1/2 z-[60] flex flex-col items-center gap-2 pointer-events-none"></div>
@@ -37,7 +37,7 @@
       </div>
       <h2 class="text-xl font-bold text-white">مرحباً بك في Sovexa</h2>
       <p class="text-xs text-gray-400">سجل الدخول للمتابعة</p>
-      <p dir="ltr" class="text-[10px] text-gray-600 mt-1">BUILD 3</p>
+      <p dir="ltr" class="text-[10px] text-gray-600 mt-1">BUILD 4</p>
     </div>
 
     <button id="googleLoginBtn" class="w-full py-2.5 bg-gray-900 border border-gray-700 rounded-xl text-sm font-medium flex items-center justify-center gap-3 mb-3">
@@ -108,11 +108,11 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
 import {
   getFirestore, collection, doc, getDoc, setDoc, updateDoc, deleteDoc, addDoc, onSnapshot,
-  query, orderBy, limit, serverTimestamp, arrayUnion, arrayRemove, increment, where, Timestamp
+  query, orderBy, limit, serverTimestamp, arrayUnion, arrayRemove, increment, where, Timestamp, getDocs
 } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 import { getStorage, ref as sRef, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js";
 
-const BUILD = "BUILD 3";
+const BUILD = "BUILD 4";
 
 const app = initializeApp({
   apiKey: "AIzaSyCJm_0O6NzS0UYnoYAv5MUIp-QR9xGN18Q",
@@ -183,6 +183,7 @@ let savedIds = new Set();
 let notifs = [], notifUnsub = null, subUnsub = null, mySub = null;
 let commentsData = {}, replyTo = {}, reportTarget = null;
 let pendingPostVideo = null;
+let liveState = null, liveList = [];
 let adminData = { subs: [], reports: [] };
 let hiddenPosts = new Set();
 try { hiddenPosts = new Set(JSON.parse(localStorage.getItem('sx_hidden') || '[]')); } catch (_) {}
@@ -265,6 +266,7 @@ function backHeader(title) {
 
 // ---------- router ----------
 function clearListeners() {
+  liveCleanup();
   unsubs.forEach(f => f());
   unsubs = [];
   Object.values(commentUnsubs).forEach(f => f && f());
@@ -286,7 +288,7 @@ function go(view, id) {
     profile: viewProfile, edit: viewEdit, search: viewSearch, friends: viewFriends,
     create: viewCreate, reels: viewReels, menu: viewMenu, settings: viewSettings,
     help: viewHelp, about: viewAbout, saved: viewSaved, archive: viewArchive,
-    post: viewPost, admin: viewAdmin
+    post: viewPost, admin: viewAdmin, live: viewLive, golive: viewGoLive, watch: viewWatch
   };
   (views[view] || viewHome)(id);
   window.scrollTo(0, 0);
@@ -451,6 +453,7 @@ function viewHome() {
       <section class="card rounded-xl p-3 flex items-center gap-3">
         <button data-go="profile" data-id="${uid()}" class="shrink-0">${avatarHTML(nameOf(me()), me().photoURL)}</button>
         <button data-go="create" class="flex-1 text-right bg-gray-800 rounded-full px-4 py-2 text-sm text-gray-400">أنشر</button>
+        <button data-go="live" class="shrink-0 px-3 py-2 rounded-full bg-red-600/20 text-red-400 text-xs font-bold flex items-center gap-1"><i class="fa-solid fa-tower-broadcast"></i> بث</button>
       </section>
       <div id="feed" class="space-y-3"></div>
     </div>`;
@@ -717,6 +720,7 @@ const MENU_GROUPS = [
     ['fa-bell', 'الإشعارات', 'data-go="notifications"'],
   ]},
   { title: "المزيد", items: [
+    ['fa-tower-broadcast', 'البث المباشر', 'data-go="live"'],
     ['fa-clapperboard', 'الريلز', 'data-go="reels"'],
     ['fa-bookmark', 'المحفوظات', 'data-go="saved"'],
     ['fa-clock-rotate-left', 'الأرشيف', 'data-go="archive"'],
@@ -982,6 +986,283 @@ function showReportSheet() {
     </div>`;
   sheet.addEventListener('click', (e) => { if (e.target === sheet) sheet.remove(); });
   document.body.appendChild(sheet);
+}
+
+// ---------- live streaming (WebRTC + Firestore signaling) ----------
+const ICE_SERVERS = [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }];
+
+function liveCleanup() {
+  const L = liveState;
+  if (!L) return;
+  liveState = null;
+  try { (L.timers || []).forEach(t => clearInterval(t)); } catch (_) {}
+  try { (L.unsubs || []).forEach(f => f()); } catch (_) {}
+  try { Object.values(L.pcs || {}).forEach(pc => pc.close()); } catch (_) {}
+  try { L.pc && L.pc.close(); } catch (_) {}
+  try { L.stream && L.stream.getTracks().forEach(t => t.stop()); } catch (_) {}
+  if (L.role === 'host' && L.started) updateDoc(doc(db, 'lives', L.hostId), { status: 'ended', viewerCount: 0 }).catch(() => {});
+  if (L.role === 'viewer' && L.viewerDoc) deleteDoc(L.viewerDoc).catch(() => {});
+}
+window.addEventListener('pagehide', () => liveCleanup());
+
+function addCand(pc, pend, c) {
+  if (pc.remoteDescription) pc.addIceCandidate(c).catch(() => {});
+  else pend.push(c);
+}
+function flushCand(pc, pend) {
+  pend.splice(0).forEach(c => pc.addIceCandidate(c).catch(() => {}));
+}
+
+function liveHeader(title) {
+  return `
+    <div class="flex items-center gap-3">
+      <button data-go="live" class="w-9 h-9 rounded-full bg-gray-800 flex items-center justify-center"><i class="fa-solid fa-arrow-right"></i></button>
+      <h2 class="font-bold text-lg flex-1 truncate">${title}</h2>
+    </div>`;
+}
+function chatBlock(hostId) {
+  return `
+    <div id="liveChat" class="h-40 overflow-y-auto space-y-1 card rounded-xl p-2 text-sm"></div>
+    <form data-form="livechat" data-id="${hostId}" class="flex gap-2">
+      <input name="t" autocomplete="off" placeholder="اكتب تعليقاً..." class="flex-1 bg-gray-800 rounded-full px-4 py-2.5 text-sm outline-none">
+      <button class="px-4 rounded-full bg-gradient-to-r from-indigo-600 to-pink-600 text-sm font-bold">إرسال</button>
+    </form>`;
+}
+function watchLiveChat(hostId) {
+  const L = liveState;
+  if (!L) return;
+  L.unsubs.push(onSnapshot(query(collection(db, 'lives', hostId, 'chat'), orderBy('createdAt', 'asc'), limit(100)), (snap) => {
+    const el = $('liveChat');
+    if (!el) return;
+    el.innerHTML = snap.docs.map(d => {
+      const m = d.data();
+      return `<div><b class="text-indigo-300">${esc(m.userName)}${badgeHTML(vOf(m.userId, false))}</b> <span class="break-words">${esc(m.text)}</span></div>`;
+    }).join('') || '<p class="text-center text-gray-500 text-xs py-4">لا توجد تعليقات بعد</p>';
+    el.scrollTop = el.scrollHeight;
+  }));
+}
+
+// ----- hub -----
+function viewLive() {
+  V().innerHTML = `
+    <div class="p-3 space-y-3 max-w-xl mx-auto">
+      ${backHeader("البث المباشر")}
+      <button data-go="golive" class="w-full py-3 rounded-xl bg-red-600 font-bold text-sm flex items-center justify-center gap-2"><i class="fa-solid fa-tower-broadcast"></i> ابدأ بثاً مباشراً</button>
+      <h3 class="text-sm text-gray-400 pt-1">المباشر الآن</h3>
+      <div id="liveList" class="space-y-2"></div>
+    </div>`;
+  unsubs.push(onSnapshot(collection(db, 'lives'), (s) => {
+    liveList = s.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderLiveList();
+  }, (err) => showToast("تعذر تحميل البثوث: " + err.message)));
+  const t = setInterval(renderLiveList, 15000);
+  unsubs.push(() => clearInterval(t));
+}
+function renderLiveList() {
+  const box = $('liveList');
+  if (!box) return;
+  const now = Date.now();
+  const list = liveList.filter(l => l.status === 'live' && l.hostId !== uid() && (now - (l.lastBeat?.toMillis?.() ?? now)) < 120000);
+  box.innerHTML = list.length ? list.map(l => {
+    const h = allUsers[l.hostId] || {};
+    return `
+      <button data-go="watch" data-id="${l.hostId}" class="card rounded-xl p-3 w-full flex items-center gap-3 text-right">
+        ${avatarHTML(l.hostName, l.hostPhoto || h.photoURL)}
+        <div class="flex-1 min-w-0">
+          <b class="block text-sm truncate">${esc(l.hostName || nameOf(h))}${badgeHTML(vOf(l.hostId, false))}</b>
+          <span class="text-xs text-gray-400 truncate block">${esc(l.title || 'بث مباشر')}</span>
+        </div>
+        <div class="text-xs text-red-400 font-bold">● مباشر<div class="text-gray-400 font-normal"><i class="fa-regular fa-eye"></i> ${l.viewerCount || 0}</div></div>
+      </button>`;
+  }).join('') : '<p class="text-center text-gray-500 py-8 text-sm">لا يوجد بث مباشر حالياً</p>';
+}
+
+// ----- broadcaster -----
+async function viewGoLive() {
+  V().innerHTML = `
+    <div class="p-3 space-y-3 max-w-xl mx-auto">
+      ${liveHeader('بث مباشر')}
+      <div class="relative rounded-xl overflow-hidden bg-black mx-auto" style="aspect-ratio:3/4;max-height:58vh">
+        <video id="localVid" autoplay muted playsinline class="w-full h-full object-cover"></video>
+        <div id="liveTag" class="hidden absolute top-2 right-2 px-2 py-0.5 rounded bg-red-600 text-xs font-bold">● مباشر</div>
+        <div id="liveCount" class="hidden absolute top-2 left-2 px-2 py-0.5 rounded bg-black/60 text-xs"><i class="fa-regular fa-eye"></i> <span id="liveViewerCount">0</span></div>
+      </div>
+      <div id="liveControls" class="space-y-2">
+        <input id="liveTitle" maxlength="80" placeholder="عنوان البث (اختياري)" class="w-full bg-gray-800 rounded-xl px-3 py-2.5 text-sm outline-none">
+        <button data-act="live-start" class="w-full py-3 rounded-xl bg-red-600 font-bold text-sm">ابدأ البث الآن</button>
+      </div>
+      <div id="liveChatWrap" class="hidden space-y-2"></div>
+    </div>`;
+  const L = liveState = { role: 'host', hostId: uid(), pcs: {}, pend: {}, unsubs: [], timers: [], facing: 'user', started: false, lastCount: 0 };
+  if (!navigator.mediaDevices?.getUserMedia) { showToast("هذا المتصفح لا يدعم الكاميرا"); return; }
+  try {
+    L.stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: true });
+  } catch (err) { showToast("تعذر فتح الكاميرا أو الميكروفون: " + err.message); return; }
+  if (liveState !== L) { L.stream.getTracks().forEach(t => t.stop()); return; }
+  const v = $('localVid');
+  if (v) v.srcObject = L.stream;
+}
+
+async function startLive() {
+  const L = liveState;
+  if (!L || L.role !== 'host' || L.started || !L.stream) return showToast("انتظر حتى تعمل الكاميرا");
+  const hostId = L.hostId;
+  const title = ($('liveTitle')?.value || '').trim().slice(0, 80);
+  L.started = true;
+  try {
+    for (const sub of ['viewers', 'chat']) {
+      const old = await getDocs(collection(db, 'lives', hostId, sub));
+      await Promise.all(old.docs.map(d => deleteDoc(d.ref).catch(() => {})));
+    }
+    await setDoc(doc(db, 'lives', hostId), {
+      hostId, hostName: nameOf(me()), hostPhoto: me().photoURL || '', title,
+      status: 'live', viewerCount: 0, createdAt: serverTimestamp(), lastBeat: serverTimestamp()
+    });
+  } catch (err) { L.started = false; showToast("تعذر بدء البث: " + err.message); return; }
+  L.timers.push(setInterval(() => updateDoc(doc(db, 'lives', hostId), { lastBeat: serverTimestamp() }).catch(() => {}), 20000));
+  L.unsubs.push(onSnapshot(collection(db, 'lives', hostId, 'viewers'), (snap) => {
+    snap.docChanges().forEach(ch => {
+      if (ch.type === 'added') hostAccept(ch.doc);
+      if (ch.type === 'removed' && L.pcs[ch.doc.id]) { try { L.pcs[ch.doc.id].close(); } catch (_) {} delete L.pcs[ch.doc.id]; hostCount(); }
+    });
+  }));
+  $('liveControls').innerHTML = `
+    <div class="flex gap-2">
+      <button data-act="live-flip" class="flex-1 py-2.5 rounded-xl bg-gray-800 text-sm"><i class="fa-solid fa-camera-rotate"></i> قلب</button>
+      <button data-act="live-mic" id="micBtn" class="flex-1 py-2.5 rounded-xl bg-gray-800 text-sm"><i class="fa-solid fa-microphone"></i> الصوت</button>
+      <button data-act="live-end" class="flex-1 py-2.5 rounded-xl bg-red-600 text-sm font-bold">إنهاء</button>
+    </div>`;
+  $('liveTag')?.classList.remove('hidden');
+  $('liveCount')?.classList.remove('hidden');
+  const w = $('liveChatWrap');
+  if (w) { w.innerHTML = chatBlock(hostId); w.classList.remove('hidden'); }
+  watchLiveChat(hostId);
+  showToast("بدأ البث 🔴");
+}
+
+async function hostAccept(d) {
+  const L = liveState;
+  if (!L || L.role !== 'host') return;
+  const vid = d.id, data = d.data();
+  if (!data.offer || L.pcs[vid]) return;
+  const pc = new RTCPeerConnection({ iceServers: ICE_SERVERS });
+  const pend = [];
+  L.pcs[vid] = pc;
+  L.stream.getTracks().forEach(t => pc.addTrack(t, L.stream));
+  pc.onicecandidate = (e) => { if (e.candidate) addDoc(collection(d.ref, 'hostCandidates'), e.candidate.toJSON()).catch(() => {}); };
+  pc.onconnectionstatechange = () => {
+    if (pc.connectionState === 'failed' || pc.connectionState === 'closed') { try { pc.close(); } catch (_) {} delete L.pcs[vid]; }
+    hostCount();
+  };
+  L.unsubs.push(onSnapshot(collection(d.ref, 'viewerCandidates'), (snap) => {
+    snap.docChanges().forEach(ch => { if (ch.type === 'added') addCand(pc, pend, ch.doc.data()); });
+  }));
+  try {
+    await pc.setRemoteDescription(data.offer);
+    flushCand(pc, pend);
+    const ans = await pc.createAnswer();
+    await pc.setLocalDescription(ans);
+    await updateDoc(d.ref, { answer: { type: ans.type, sdp: ans.sdp } });
+  } catch (_) { try { pc.close(); } catch (e) {} delete L.pcs[vid]; }
+}
+
+function hostCount() {
+  const L = liveState;
+  if (!L || !L.started) return;
+  const n = Object.values(L.pcs).filter(pc => pc.connectionState === 'connected').length;
+  const el = $('liveViewerCount');
+  if (el) el.textContent = n;
+  if (n !== L.lastCount) { L.lastCount = n; updateDoc(doc(db, 'lives', L.hostId), { viewerCount: n }).catch(() => {}); }
+}
+
+async function flipCamera() {
+  const L = liveState;
+  if (!L || !L.stream) return;
+  L.facing = L.facing === 'user' ? 'environment' : 'user';
+  try {
+    L.stream.getVideoTracks().forEach(t => { t.stop(); L.stream.removeTrack(t); });
+    const ns = await navigator.mediaDevices.getUserMedia({ video: { facingMode: L.facing }, audio: false });
+    const nt = ns.getVideoTracks()[0];
+    L.stream.addTrack(nt);
+    Object.values(L.pcs).forEach(pc => { const sd = pc.getSenders().find(x => x.track && x.track.kind === 'video'); if (sd) sd.replaceTrack(nt).catch(() => {}); });
+    const v = $('localVid');
+    if (v) v.srcObject = L.stream;
+  } catch (err) { showToast("تعذر تبديل الكاميرا"); }
+}
+
+function toggleMic() {
+  const L = liveState;
+  if (!L || !L.stream) return;
+  const tracks = L.stream.getAudioTracks();
+  const on = !(tracks[0] && tracks[0].enabled);
+  tracks.forEach(t => { t.enabled = on; });
+  const b = $('micBtn');
+  if (b) b.innerHTML = on ? '<i class="fa-solid fa-microphone"></i> الصوت' : '<i class="fa-solid fa-microphone-slash text-red-400"></i> مكتوم';
+}
+
+// ----- viewer -----
+async function viewWatch(hostId) {
+  const h = allUsers[hostId] || {};
+  V().innerHTML = `
+    <div class="p-3 space-y-3 max-w-xl mx-auto">
+      ${liveHeader(esc(nameOf(h)) + badgeHTML(badgeKind(h)))}
+      <div class="relative rounded-xl overflow-hidden bg-black mx-auto" style="aspect-ratio:3/4;max-height:58vh">
+        <video id="remoteVid" autoplay playsinline class="w-full h-full object-cover"></video>
+        <div id="watchTag" class="absolute top-2 right-2 px-2 py-0.5 rounded bg-red-600 text-xs font-bold">● مباشر</div>
+        <div class="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/60 text-xs"><i class="fa-regular fa-eye"></i> <span id="watchCount">0</span></div>
+        <div id="watchStatus" class="absolute inset-0 flex items-center justify-center text-sm text-gray-200 bg-black/50 text-center px-4">جاري الاتصال بالبث...</div>
+        <button id="tapPlay" data-act="live-play" class="hidden absolute inset-0 flex items-center justify-center bg-black/50 text-white text-sm font-bold">اضغط للتشغيل ▶</button>
+      </div>
+      <p id="watchTitle" class="text-sm text-gray-300"></p>
+      ${chatBlock(hostId)}
+    </div>`;
+  const L = liveState = { role: 'viewer', hostId, unsubs: [], timers: [] };
+  const setStatus = (txt) => {
+    const el = $('watchStatus');
+    if (!el) return;
+    if (txt) { el.textContent = txt; el.classList.remove('hidden'); } else el.classList.add('hidden');
+  };
+  L.unsubs.push(onSnapshot(doc(db, 'lives', hostId), (sn) => {
+    const d = sn.data();
+    if (!d || d.status !== 'live') { setStatus('انتهى البث'); $('watchTag')?.classList.add('hidden'); return; }
+    const c = $('watchCount'); if (c) c.textContent = d.viewerCount || 0;
+    const t = $('watchTitle'); if (t) t.textContent = d.title || '';
+  }));
+  watchLiveChat(hostId);
+  try {
+    const pc = new RTCPeerConnection({ iceServers: ICE_SERVERS });
+    L.pc = pc;
+    const pend = [];
+    const stream = new MediaStream();
+    pc.addTransceiver('video', { direction: 'recvonly' });
+    pc.addTransceiver('audio', { direction: 'recvonly' });
+    pc.ontrack = (e) => {
+      stream.addTrack(e.track);
+      const v = $('remoteVid');
+      if (v) { v.srcObject = stream; v.play().catch(() => $('tapPlay')?.classList.remove('hidden')); }
+    };
+    const vref = doc(db, 'lives', hostId, 'viewers', `${uid()}_${Date.now()}`);
+    L.viewerDoc = vref;
+    pc.onicecandidate = (e) => { if (e.candidate) addDoc(collection(vref, 'viewerCandidates'), e.candidate.toJSON()).catch(() => {}); };
+    pc.onconnectionstatechange = () => {
+      if (pc.connectionState === 'connected') setStatus('');
+      else if (pc.connectionState === 'failed') setStatus('تعذر الاتصال بالبث. قد تحتاج شبكتك إلى خادم TURN.');
+    };
+    const offer = await pc.createOffer();
+    await pc.setLocalDescription(offer);
+    await setDoc(vref, { viewerId: uid(), offer: { type: offer.type, sdp: offer.sdp }, ts: Date.now() });
+    L.unsubs.push(onSnapshot(vref, (sn) => {
+      const d = sn.data();
+      if (d && d.answer && !L.answered) {
+        L.answered = true;
+        pc.setRemoteDescription(d.answer).then(() => flushCand(pc, pend)).catch(() => {});
+      }
+    }));
+    L.unsubs.push(onSnapshot(collection(vref, 'hostCandidates'), (snap) => {
+      snap.docChanges().forEach(ch => { if (ch.type === 'added') addCand(pc, pend, ch.doc.data()); });
+    }));
+    L.timers.push(setTimeout(() => { if (pc.connectionState !== 'connected') setStatus('لم يتم الاتصال بعد... تأكد أن البث ما زال مستمراً.'); }, 25000));
+  } catch (err) { setStatus('تعذر الاتصال: ' + err.message); }
 }
 
 // ---------- logout sheet ----------
@@ -1305,6 +1586,18 @@ document.addEventListener('click', async (e) => {
         await updateDoc(doc(db, "reports", id), { status: 'resolved' });
         showToast("تم حذف المحتوى");
       }
+    } else if (act === 'live-start') {
+      await startLive();
+    } else if (act === 'live-flip') {
+      await flipCamera();
+    } else if (act === 'live-mic') {
+      toggleMic();
+    } else if (act === 'live-end') {
+      go('live');
+      showToast("انتهى البث");
+    } else if (act === 'live-play') {
+      $('remoteVid')?.play().catch(() => {});
+      $('tapPlay')?.classList.add('hidden');
     } else if (act === 'rep-dismiss') {
       await updateDoc(doc(db, "reports", id), { status: 'dismissed' });
     }
@@ -1370,6 +1663,13 @@ document.addEventListener('submit', async (e) => {
       delete replyTo[postId];
       f.reset();
       renderComments(postId);
+    } else if (type === 'livechat') {
+      const t = (fd.get('t') || '').toString().trim();
+      if (!t) return;
+      await addDoc(collection(db, "lives", f.dataset.id, "chat"), {
+        userId: uid(), userName: nameOf(me()), text: t.slice(0, 300), createdAt: serverTimestamp()
+      });
+      f.reset();
     } else if (type === 'msg') {
       const t = (fd.get('t') || '').toString().trim();
       if (!t) return;
