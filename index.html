@@ -23,7 +23,7 @@
 </style>
 </head>
 <body class="min-h-screen">
-<!-- BUILD 4 -->
+<!-- BUILD 5 -->
 
 <div id="splash" class="fixed inset-0 z-[80] bg-[#0b0f17] flex items-center justify-center"><div class="w-20 h-20 rounded-3xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center"><span class="font-black text-4xl text-white" style="font-family:Outfit">S</span></div></div>
 <div id="toastContainer" class="fixed top-16 left-1/2 -translate-x-1/2 z-[60] flex flex-col items-center gap-2 pointer-events-none"></div>
@@ -37,7 +37,6 @@
       </div>
       <h2 class="text-xl font-bold text-white">مرحباً بك في Sovexa</h2>
       <p class="text-xs text-gray-400">سجل الدخول للمتابعة</p>
-      <p dir="ltr" class="text-[10px] text-gray-600 mt-1">BUILD 4</p>
     </div>
 
     <button id="googleLoginBtn" class="w-full py-2.5 bg-gray-900 border border-gray-700 rounded-xl text-sm font-medium flex items-center justify-center gap-3 mb-3">
@@ -50,30 +49,11 @@
       متابعة باستخدام Google
     </button>
 
-    <button id="togglePhoneBtn" class="w-full py-2.5 bg-gray-900 border border-gray-700 rounded-xl text-sm font-medium flex items-center justify-center gap-3 mb-3">
-      <i class="fa-solid fa-phone text-emerald-400"></i> متابعة برقم الهاتف
-    </button>
-
-    <div id="phonePanel" class="hidden space-y-3 mb-3">
-      <div id="phoneStep">
-        <input type="tel" id="phoneInput" placeholder="+966500000000" dir="ltr" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2.5 text-sm outline-none">
-        <button id="sendCodeBtn" type="button" class="w-full mt-2 py-2.5 bg-emerald-600 rounded-xl text-sm font-bold">إرسال رمز التحقق</button>
-      </div>
-      <div id="codeStep" class="hidden">
-        <input type="text" id="codeInput" inputmode="numeric" maxlength="6" placeholder="123456" dir="ltr" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2.5 text-sm text-center tracking-widest outline-none">
-        <button id="verifyCodeBtn" type="button" class="w-full mt-2 py-2.5 bg-emerald-600 rounded-xl text-sm font-bold">تأكيد الرمز</button>
-        <button id="backToPhoneBtn" type="button" class="w-full mt-2 text-xs text-gray-400">تغيير الرقم</button>
-      </div>
-    </div>
-
-    <div class="flex items-center gap-3 my-4 text-xs text-gray-500"><div class="flex-1 border-t border-gray-700"></div>أو بالبريد<div class="flex-1 border-t border-gray-700"></div></div>
-
-    <form id="emailForm" class="space-y-3">
+    <form id="emailForm" class="space-y-3 mt-4">
       <input type="email" id="emailInput" required placeholder="البريد الإلكتروني" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2.5 text-sm outline-none">
       <input type="password" id="passwordInput" required placeholder="كلمة المرور" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2.5 text-sm outline-none">
       <button type="submit" class="w-full py-3 bg-gradient-to-r from-indigo-600 to-pink-600 rounded-xl text-sm font-bold">تسجيل الدخول / إنشاء حساب</button>
     </form>
-    <div id="recaptcha-container"></div>
   </div>
 </div>
 
@@ -89,30 +69,26 @@
     </div>
     <div class="grid grid-cols-4 gap-2 px-3 pb-2">
       <button data-tab="home" data-go="home" class="tab-btn"><i class="fa-solid fa-house"></i></button>
-      <button data-tab="notifications" data-go="notifications" class="tab-btn"><i class="fa-solid fa-bell"></i><span id="notifBadge" class="hidden absolute top-1 right-3 min-w-[16px] h-4 px-1 rounded-full bg-pink-600 text-[10px] font-bold items-center justify-center text-white" style="display:none"></span></button>
-      <button data-tab="chats" data-go="chats" class="tab-btn"><i class="fa-solid fa-comments"></i></button>
+      <button data-tab="notifications" data-go="notifications" class="tab-btn">
+        <i class="fa-solid fa-bell"></i>
+        <span id="notifBadge" class="absolute top-1 right-2 min-w-[18px] h-[18px] px-1 rounded-full bg-red-600 text-[10px] font-bold flex items-center justify-center text-white hidden">0</span>
+      </button>
+      <button data-tab="chats" data-go="chats" class="tab-btn">
+        <i class="fa-solid fa-comments"></i>
+        <span id="chatBadge" class="absolute top-1 right-2 min-w-[18px] h-[18px] px-1 rounded-full bg-red-600 text-[10px] font-bold flex items-center justify-center text-white hidden">0</span>
+      </button>
       <button data-tab="reels" data-go="reels" class="tab-btn"><i class="fa-solid fa-clapperboard"></i></button>
     </div>
   </header>
 
-  <main id="view" class="flex-1 pb-8"></main>
+  <main id="view" class="flex-1 pb-16"></main>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-import {
-  getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult,
-  signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut,
-  RecaptchaVerifier, signInWithPhoneNumber,
-  initializeAuth, browserLocalPersistence, indexedDBLocalPersistence, browserSessionPersistence, browserPopupRedirectResolver
-} from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
-import {
-  getFirestore, collection, doc, getDoc, setDoc, updateDoc, deleteDoc, addDoc, onSnapshot,
-  query, orderBy, limit, serverTimestamp, arrayUnion, arrayRemove, increment, where, Timestamp, getDocs
-} from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+import { getFirestore, collection, doc, getDoc, setDoc, updateDoc, deleteDoc, addDoc, onSnapshot, query, orderBy, limit, serverTimestamp, arrayUnion, arrayRemove, increment, where, Timestamp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 import { getStorage, ref as sRef, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js";
-
-const BUILD = "BUILD 4";
 
 const app = initializeApp({
   apiKey: "AIzaSyCJm_0O6NzS0UYnoYAv5MUIp-QR9xGN18Q",
@@ -122,18 +98,10 @@ const app = initializeApp({
   messagingSenderId: "147264654219",
   appId: "1:147264654219:web:7487b91cc6c5fa041efd8e"
 });
-let auth;
-try {
-  auth = initializeAuth(app, {
-    persistence: [browserLocalPersistence, indexedDBLocalPersistence, browserSessionPersistence],
-    popupRedirectResolver: browserPopupRedirectResolver
-  });
-} catch (_) { auth = getAuth(app); }
-try { navigator.storage?.persist?.(); } catch (_) {}
+const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
 
-// ---------- verification settings ----------
 const ADMIN_EMAIL = "shanks377s8@gmail.com";
 const SUB_PRICE = "9.99$ شهرياً";
 const isOfficial = (u) => !!u && (u.email === ADMIN_EMAIL || u.official === true);
@@ -145,45 +113,34 @@ const isVerified = (u) => {
   const t = u.verifiedUntil?.toMillis?.();
   return !t || t > Date.now();
 };
-const badgePath = (() => {
-  let d = '';
-  for (let i = 0; i <= 180; i++) {
-    const t = i / 180 * 2 * Math.PI - Math.PI / 2;
-    const r = 44 + 3.2 * Math.cos(12 * (t + Math.PI / 2));
-    d += (i ? 'L' : 'M') + (50 + r * Math.cos(t)).toFixed(2) + ' ' + (50 + r * Math.sin(t)).toFixed(2);
-  }
-  return d + 'Z';
-})();
-const badgeSVG = (size) => `<svg viewBox="0 0 100 100" style="width:${size}px;height:${size}px;display:inline-block;vertical-align:-3px" aria-label="موثّق"><path d="${badgePath}" fill="#8b90f5"/><path d="M40.5 51.8L47.6 58.9L58.9 41.5" fill="none" stroke="#fff" stroke-width="4.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-const officialSVG = (size) => `<svg viewBox="0 0 24 24" style="width:${size}px;height:${size}px;display:inline-block;vertical-align:-3px" aria-label="الحساب الرسمي"><circle cx="12" cy="12" r="12" fill="#818cf8"/><path d="M7 12.6l3.2 3.2L17 8.9" fill="none" stroke="#111827" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+// الشارة المتعرجة الخاصة بالمستخدمين المشتركين/الموثقين
+const verifiedFlowerSVG = (size) => `<svg viewBox="0 0 1024 1024" style="width:${size}px;height:${size}px;display:inline-block;vertical-align:-3px" fill="#8b90f5"><path d="M512 64C537.4 64 559 81.3 565.6 105.8C570.6 124.2 590.2 136.1 609.4 130.6C633.3 123.7 658.9 135.2 669.9 157.1C679 175.2 700.5 184.2 720 176.5C743.3 167.3 770.1 180.8 777.8 204.8C783.8 223.3 804.8 234.3 824.1 227.1C848 218.1 876 233.8 881.2 258.8C886 281.8 908.5 296.8 931.7 292.6C956.4 288.1 980.7 308.2 982.5 333.4C984.1 356.9 1003.5 375.3 1027 377.9C1051.8 380.7 1070 404.2 1064.8 428.8C1059.5 454 1073.4 479.5 1096.5 490C1117.8 499.7 1128.5 524 1120.3 546.2C1112.5 567.4 1121.2 591.9 1141.2 605.5C1161.9 619.6 1167.3 647.4 1153.9 668.6C1141 689 1144.3 715.4 1161.4 731.9C1179.3 749.1 1179.5 777.9 1161.8 795.3C1144.7 812.1 1143.1 838.7 1157.6 857.3C1172.9 876.8 1170.1 905 1150.9 921C1132.3 936.4 1125.7 962.5 1134.4 985.3C1143.5 1009.2 1128.3 1035.7 1103.8 1040.6C1081.1 1045.2 1063.9 1063.4 1060.1 1086.2C1055.7 1112.6 1029.7 1128.8 1004.1 1122.2C981.3 1116.4 956.8 1129.2 947.1 1151.4C936.8 1175.2 909.4 1187.6 884.9 1177.3C863.3 1168.3 838.3 1177.2 825.4 1197.3C812.2 1217.9 785.7 1225.1 762.3 1215.1C740.1 1205.6 714.2 1211.9 699.2 1231.2C684.7 1249.7 658.7 1253.9 638.6 1240.2C617.9 1226.1 591.4 1229.1 573.9 1247.3C555.7 1266.3 528.2 1267.4 508.8 1250C488.5 1231.8 460.1 1231 438.4 1247.3C419.1 1261.9 392.3 1259.9 375.4 1242.3C359.1 1225.4 333.6 1220.4 311.9 1231.5C289.4 1243.1 262.3 1238.1 247.1 1217.5C232.8 1198.1 206.5 1190.7 183.7 1201.3C161.1 1211.8 134.9 1201.3 125.1 1178.5C115.3 1155.1 92.4 1140.9 68.9 1143.5C45.3 1146.1 22.8 1127.3 20.3 1103.5C17.7 1079.4 -1.4 1060.1 -23.7 1056.2C-47.5 1052 -63.5 1029.1 -59.8 1005.6C-56.5 981.1 -74.4 959.3 -97.8 954.2C-121.7 949 -136.2 925.3 -130.6 901.7C-125 877 -141.2 851.6 -164.7 843.4C-187.3 835.5 -199.1 810.1 -190.6 786.8C-182.5 764.5 -193.3 739.3 -215.3 727.6C-237.5 715.7 -247.2 689 -238 666.2C-229.4 644.2 -238.9 618.3 -261.2 605.3C-282.8 592.6 -290.9 565.3 -279.9 542.8C-269.4 521.6 -275.5 494.6 -296.8 480.9C-317.4 467.6 -322.2 440.1 -309.2 419.3C-296.7 399.1 -300.9 372.4 -318.5 355.5C-335.8 338.9 -337.3 311.6 -320.7 293.1C-304.7 275.3 -307.7 248.1 -326.6 231.7C-344.8 216 -348.5 189 -334.8 168.1C-321.6 147.9 -326.1 120.3 -347.1 105.1C-367.4 90.5 -372.6 63.1 -359.8 41.2C-347.4 19.9 -322.4 9.1 -299.7 17.5C-278.3 25.4 -253.1 15.6 -241.7 -4.8C-229.9 -25.7 -204.4 -35.2 -181.7 -26.1C-159.2 -17.2 -133.7 -26.2 -121.2 -47.1C-109 -67.3 -84 -77.2 -61.2 -68.3C-39.3 -59.8 -14.6 -70 -4.6 -91.9C5.1 -112.9 30.6 -123.6 53.3 -115.4C75.4 -107.4 99.7 -117.8 111.4 -138.8C123.4 -159.9 149.6 -169 171.9 -158.4C193.5 -148.1 219.2 -156.4 231.8 -177.1C244 -197.1 270.2 -205.8 292.9 -196.4C315 -187.3 340.6 -194.8 354.3 -215.1C368.1 -235.7 394.8 -243.3 416.9 -232.8C439 -222.4 464.9 -229.2 478.9 -250C492.5 -270.2 518.7 -277 541 -267C563.8 -256.7 590 -262.9 604.2 -283.4C618.9 -304.3 645.7 -310.8 667.4 -298.6C688.8 -286.7 715.4 -291.6 730.7 -311.6C745.5 -331.1 772.3 -336.8 794.6 -325.2C816.5 -313.9 843.4 -318.5 858.7 -339.1C873.5 -359.1 900.2 -364 922.3 -351.9C944 -340 970.6 -343.8 985.9 -363.3C1000.7 -382.4 1027.2 -387.3 1049.2 -376.1C1071.4 -364.7 1098.2 -368.1 1113.8 -388.2C1129.1 -407.7 1156.1 -411.3 1178.4 -398.9C1200.2 -386.9 1227.1 -389.2 1242.9 -408.8C1258.3 -427.8 1285.5 -430.2 1308 -416.9C1330.1 -403.9 1357.3 -405 1373.4 -423.8C1389.1 -442.1 1416.5 -443.2 1438.9 -428.8C1460.8 -414.8 1488.2 -414.7 1510.3 -428.2Z" transform="translate(350,350) scale(0.4)"/><path d="M378 616L238 476L294 420L378 504L730 152L786 208L378 616Z" fill="#fff"/></svg>`;
+
+const officialSVG = (size) => `<svg viewBox="0 0 24 24" style="width:${size}px;height:${size}px;display:inline-block;vertical-align:-3px" fill="#818cf8"><circle cx="12" cy="12" r="12"/><path d="M7 12.6l3.2 3.2L17 8.9" fill="none" stroke="#111827" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
 const badgeKind = (u) => isOfficial(u) ? 'official' : (isVerified(u) ? 'sub' : false);
-const badgeHTML = (k) => k === 'official' ? ' ' + officialSVG(15) : (k ? ' ' + badgeSVG(14) : '');
+const badgeHTML = (k) => k === 'official' ? ' ' + officialSVG(16) : (k ? ' ' + verifiedFlowerSVG(16) : '');
 const vOf = (id, fallback) => allUsers[id] ? badgeKind(allUsers[id]) : (fallback ? 'sub' : false);
 
-// ---------- helpers ----------
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-const nameOf = (u) => u.name || u.displayName || (u.email ? u.email.split("@")[0] : "") || u.phoneNumber || "مستخدم";
+const nameOf = (u) => u.name || u.displayName || (u.email ? u.email.split("@")[0] : "") || "مستخدم";
 const uid = () => currentUser?.uid;
 const me = () => allUsers[uid()] || { uid: uid(), name: "", email: currentUser?.email || "" };
 const V = () => $('view');
 const chatIdFor = (a, b) => [a, b].sort().join("_");
-const normUser = (s) => String(s || "").trim().toLowerCase().replace(/^@/, "").replace(/[^a-z0-9_.]/g, "");
 const handleOf = (u) => u.username ? "@" + u.username : "";
 
 let currentUser = null, currentView = "home", currentId = null;
-let allUsers = {}, usersByUsername = {}, postsCache = {};
+let allUsers = {}, postsCache = {};
 let usersUnsub = null, postsUnsub = null, savedUnsub = null;
 let unsubs = [], commentUnsubs = {}, openSet = new Set();
-let confirmationResult = null, recaptcha = null;
-let pendingPhoto = null, pendingCover = null, pendingPostImg = null;
-let profileTarget = null;
 let savedIds = new Set();
-let notifs = [], notifUnsub = null, subUnsub = null, mySub = null;
+let notifs = [], notifUnsub = null, chatsUnsub = null, chatUnreadCount = 0;
 let commentsData = {}, replyTo = {}, reportTarget = null;
-let pendingPostVideo = null;
-let liveState = null, liveList = [];
-let adminData = { subs: [], reports: [] };
+let pendingPostImg = null, pendingPostVideo = null, pendingCommentImg = null, pendingChatImg = null;
+let profileTarget = null;
 let hiddenPosts = new Set();
 try { hiddenPosts = new Set(JSON.parse(localStorage.getItem('sx_hidden') || '[]')); } catch (_) {}
 const saveHidden = () => { try { localStorage.setItem('sx_hidden', JSON.stringify([...hiddenPosts])); } catch (_) {} };
@@ -195,19 +152,29 @@ window.showToast = (msg) => {
   $('toastContainer').appendChild(box);
   setTimeout(() => box.remove(), 2800);
 };
-const showToast = window.showToast;
 
-async function notify(toUid, type, extra = {}, docId) {
+// --- تحديث العدادات الحمراء للإشعارات والرسائل ---
+function updateBadges() {
+  const notifBadge = $('notifBadge');
+  if (notifBadge) {
+    const unreadNotifs = notifs.filter(n => !n.read).length;
+    notifBadge.textContent = unreadNotifs;
+    notifBadge.classList.toggle('hidden', unreadNotifs === 0);
+  }
+  const chatBadge = $('chatBadge');
+  if (chatBadge) {
+    chatBadge.textContent = chatUnreadCount;
+    chatBadge.classList.toggle('hidden', chatUnreadCount === 0);
+  }
+}
+
+async function notify(toUid, type, extra = {}) {
   if (!toUid || toUid === uid()) return;
-  const data = {
+  await addDoc(collection(db, "notifications"), {
     toUid, fromUid: uid(), fromName: nameOf(me()), fromPhoto: me().photoURL || '',
     type, postId: extra.postId || '', text: String(extra.text || '').slice(0, 120),
     read: false, createdAt: serverTimestamp()
-  };
-  try {
-    if (docId) await setDoc(doc(db, "notifications", docId), data);
-    else await addDoc(collection(db, "notifications"), data);
-  } catch (_) {}
+  });
 }
 
 function avatarHTML(name, photo, cls = 'w-10 h-10 text-sm') {
@@ -248,24 +215,24 @@ function compressImage(file, max, quality) {
   });
 }
 
-function withTimeout(promise, ms = 15000) {
-  return Promise.race([
-    promise,
-    new Promise((_, rej) => setTimeout(() => rej(new Error("انتهت المهلة، تحقق من الاتصال أو من قواعد Firestore")), ms))
-  ]);
-}
-
 function backHeader(title) {
   return `
     <div class="flex items-center gap-3">
-      <button data-go="menu" class="w-9 h-9 rounded-full bg-gray-800 flex items-center justify-center"><i class="fa-solid fa-arrow-right"></i></button>
+      <button data-go="home" class="w-9 h-9 rounded-full bg-gray-800 flex items-center justify-center"><i class="fa-solid fa-arrow-right"></i></button>
       <h2 class="font-bold text-lg">${title}</h2>
     </div>`;
 }
 
-// ---------- router ----------
+// --- معالجة زر الرجوع في الهاتف لمنع خروج التطبيق ---
+window.addEventListener('popstate', (e) => {
+  e.preventDefault();
+  if (currentView !== 'home') {
+    go('home');
+    history.pushState({ view: 'home' }, '', '');
+  }
+});
+
 function clearListeners() {
-  liveCleanup();
   unsubs.forEach(f => f());
   unsubs = [];
   Object.values(commentUnsubs).forEach(f => f && f());
@@ -282,40 +249,22 @@ function go(view, id) {
   currentView = view;
   currentId = id || null;
   setActiveTab(view);
+  history.pushState({ view, id }, '', '');
   const views = {
     home: viewHome, notifications: viewNotifications, chats: viewChats, chat: viewChat,
     profile: viewProfile, edit: viewEdit, search: viewSearch, friends: viewFriends,
     create: viewCreate, reels: viewReels, menu: viewMenu, settings: viewSettings,
-    help: viewHelp, about: viewAbout, saved: viewSaved, archive: viewArchive,
-    post: viewPost, admin: viewAdmin, live: viewLive, golive: viewGoLive, watch: viewWatch
+    help: viewHelp, about: viewAbout, saved: viewSaved, admin: viewAdmin, live: viewLive, golive: viewGoLive, watch: viewWatch
   };
   (views[view] || viewHome)(id);
   window.scrollTo(0, 0);
 }
 
-// ---------- posts ----------
-function actionsHTML(p) {
+// ---------- Posts ----------
+function postCard(p) {
   const likes = p.likes || [];
   const liked = likes.includes(uid());
   const saved = savedIds.has(p.id);
-  return `
-  <div class="flex justify-around items-center border-t border-gray-800 text-sm text-gray-400 py-1">
-    <button data-act="like" data-id="${p.id}" class="flex-1 py-2 flex items-center justify-center gap-1.5 ${liked ? 'text-pink-400 font-bold' : ''}">
-      <i class="fa-${liked ? 'solid' : 'regular'} fa-heart"></i><span>إعجاب</span><span class="text-xs">${likes.length}</span>
-    </button>
-    <button data-act="comments" data-id="${p.id}" class="flex-1 py-2 flex items-center justify-center gap-1.5">
-      <i class="fa-regular fa-comment"></i><span>تعليق</span><span class="text-xs">${p.commentsCount || 0}</span>
-    </button>
-    <button data-act="save" data-id="${p.id}" class="flex-1 py-2 flex items-center justify-center gap-1.5 ${saved ? 'text-amber-400' : ''}">
-      <i class="fa-${saved ? 'solid' : 'regular'} fa-bookmark"></i><span>حفظ</span>
-    </button>
-    <button data-act="share" data-id="${p.id}" class="flex-1 py-2 flex items-center justify-center gap-1.5">
-      <i class="fa-solid fa-share"></i><span>مشاركة</span>
-    </button>
-  </div>`;
-}
-
-function postCard(p) {
   return `
   <article class="card rounded-xl overflow-hidden">
     <div class="flex items-center gap-3 p-3">
@@ -324,14 +273,21 @@ function postCard(p) {
         <b class="block text-sm text-white truncate">${esc(p.userName)}${badgeHTML(vOf(p.userId, p.verified))}</b>
         <span class="text-xs text-gray-500">${timeAgo(p.createdAt)}</span>
       </div>
-      ${p.userId === uid()
-        ? `<button data-act="delpost" data-id="${p.id}" class="text-gray-500 px-2"><i class="fa-solid fa-trash"></i></button>`
-        : `<button data-act="report" data-id="${p.id}" class="text-gray-500 px-2" title="إبلاغ"><i class="fa-regular fa-flag"></i></button>${isAdmin() ? `<button data-act="delpost" data-id="${p.id}" class="text-gray-500 px-2"><i class="fa-solid fa-trash"></i></button>` : ''}`}
+      ${p.userId === uid() ? `<button data-act="delpost" data-id="${p.id}" class="text-gray-500 px-2"><i class="fa-solid fa-trash"></i></button>` : ''}
     </div>
     ${p.text ? `<p class="px-3 pb-3 text-sm whitespace-pre-wrap">${esc(p.text)}</p>` : ''}
     ${p.image ? `<img src="${esc(p.image)}" class="w-full max-h-[480px] object-cover">` : ''}
-    ${p.video ? `<video src="${esc(p.video)}" controls playsinline preload="metadata" class="w-full max-h-[480px] bg-black"></video>` : ''}
-    ${actionsHTML(p)}
+    <div class="flex justify-around items-center border-t border-gray-800 text-sm text-gray-400 py-1">
+      <button data-act="like" data-id="${p.id}" class="flex-1 py-2 flex items-center justify-center gap-1.5 ${liked ? 'text-pink-400 font-bold' : ''}">
+        <i class="fa-${liked ? 'solid' : 'regular'} fa-heart"><span>${likes.length}</span></i>
+      </button>
+      <button data-act="comments" data-id="${p.id}" class="flex-1 py-2 flex items-center justify-center gap-1.5">
+        <i class="fa-regular fa-comment"><span>${p.commentsCount || 0}</span></i>
+      </button>
+      <button data-act="save" data-id="${p.id}" class="flex-1 py-2 flex items-center justify-center gap-1.5 ${saved ? 'text-amber-400' : ''}">
+        <i class="fa-${saved ? 'solid' : 'regular'} fa-bookmark"></i>
+      </button>
+    </div>
     <div id="cbox-${p.id}" class="hidden p-3 border-t border-gray-800 space-y-2"></div>
   </article>`;
 }
@@ -343,87 +299,43 @@ function renderPosts(containerId, filter, emptyMsg) {
     .map(([id, p]) => ({ id, ...p }))
     .filter(p => !hiddenPosts.has(p.id))
     .filter(filter || (() => true))
-    .sort((a, b) => (b.createdAt?.seconds ?? Date.now() / 1000) - (a.createdAt?.seconds ?? Date.now() / 1000));
-  box.innerHTML = list.length
-    ? list.map(postCard).join('')
-    : `<p class="text-center text-gray-500 py-10">${emptyMsg || 'لا توجد منشورات بعد'}</p>`;
+    .sort((a, b) => (b.createdAt?.seconds ?? 0) - (a.createdAt?.seconds ?? 0));
+  box.innerHTML = list.length ? list.map(postCard).join('') : `<p class="text-center text-gray-500 py-10">${emptyMsg || 'لا توجد منشورات بعد'}</p>`;
   restoreOpenComments();
 }
 
 function refreshPosts() {
   renderPosts('feed', null);
-  if (currentView === 'post') renderSingle();
   if (profileTarget) renderPosts('uposts', p => p.userId === profileTarget, 'لا توجد منشورات');
 }
 
-async function toggleLike(id) {
-  const p = postsCache[id];
-  if (!p) return;
-  const old = [...(p.likes || [])];
-  const liked = old.includes(uid());
-  p.likes = liked ? old.filter(x => x !== uid()) : [...old, uid()];
-  refreshPosts();
-  try {
-    await updateDoc(doc(db, "posts", id), { likes: liked ? arrayRemove(uid()) : arrayUnion(uid()) });
-    if (!liked) notify(p.userId, 'like', { postId: id, text: p.text || '' }, `like_${id}_${uid()}`);
-  } catch (err) {
-    p.likes = old;
-    refreshPosts();
-    showToast("تعذر تسجيل الإعجاب: " + err.message);
-  }
-}
-
-async function toggleSave(id) {
-  const ref = doc(db, "users", uid(), "saved", id);
-  if (savedIds.has(id)) {
-    savedIds.delete(id);
-    refreshPosts();
-    await deleteDoc(ref);
-    showToast("أُزيل من المحفوظات");
-  } else {
-    savedIds.add(id);
-    refreshPosts();
-    await setDoc(ref, { postId: id, savedAt: serverTimestamp() });
-    showToast("تم الحفظ 🔖");
-  }
-}
-
+// --- تعليقات تدعم النصوص والصور ---
 function renderComments(id) {
   const box = $('cbox-' + id);
   if (!box) return;
-  const keep = box.querySelector('input[name="t"]')?.value || '';
   const docs = commentsData[id] || [];
-  const kids = {};
-  docs.filter(c => c.parentId).forEach(c => (kids[c.parentId] = kids[c.parentId] || []).push(c));
-  const one = (c, reply) => `
-    <div class="flex gap-2 ${reply ? 'mr-8' : ''}">${avatarHTML(c.userName, c.userPhoto, 'w-7 h-7 text-xs')}
-      <div class="min-w-0 flex-1">
-        <div class="bg-gray-800 rounded-xl px-3 py-2 text-xs"><b>${esc(c.userName)}${badgeHTML(vOf(c.userId, c.verified))}</b>
-          <p class="whitespace-pre-wrap break-words">${c.replyToName ? `<span class="text-indigo-300">@${esc(c.replyToName)}</span> ` : ''}${esc(c.text)}</p></div>
-        <div class="flex gap-4 px-2 pt-0.5 text-[11px] text-gray-500">
-          <button type="button" data-act="creply" data-id="${id}" data-cid="${c.id}">رد</button>
-          ${c.userId !== uid() ? `<button type="button" data-act="creport" data-id="${id}" data-cid="${c.id}">إبلاغ</button>` : ''}
-        </div>
+  box.innerHTML = docs.map(c => `
+    <div class="flex gap-2">
+      ${avatarHTML(c.userName, c.userPhoto, 'w-7 h-7 text-xs')}
+      <div class="min-w-0 flex-1 bg-gray-800 rounded-xl px-3 py-2 text-xs">
+        <b>${esc(c.userName)}${badgeHTML(vOf(c.userId, c.verified))}</b>
+        <p class="whitespace-pre-wrap break-words mt-1">${esc(c.text)}</p>
+        ${c.image ? `<img src="${esc(c.image)}" class="mt-2 rounded-lg max-h-40 object-cover">` : ''}
       </div>
-    </div>`;
-  const rt = replyTo[id];
-  box.innerHTML = docs.filter(c => !c.parentId).map(c => one(c, false) + (kids[c.id] || []).map(k => one(k, true)).join('')).join('')
-    + (rt ? `<div class="flex items-center justify-between text-[11px] text-indigo-300 pt-1"><span>الرد على ${esc(rt.name)}</span><button type="button" data-act="creply-cancel" data-id="${id}" class="text-gray-400">إلغاء</button></div>` : '')
-    + `
-      <form data-form="comment" data-id="${id}" class="flex gap-2 pt-1">
-        <input name="t" autocomplete="off" placeholder="${rt ? 'اكتب رداً...' : 'اكتب تعليقاً...'}" class="flex-1 bg-gray-800 rounded-full px-3 py-2 text-xs outline-none">
-        <button class="text-indigo-400 text-xs font-bold px-2">إرسال</button>
-      </form>`;
-  const inp = box.querySelector('input[name="t"]');
-  if (inp && keep) inp.value = keep;
+    </div>`).join('') + `
+    <div id="commentPrev-${id}"></div>
+    <form data-form="comment" data-id="${id}" class="flex items-center gap-2 pt-1">
+      <label class="text-emerald-400 cursor-pointer p-2"><i class="fa-solid fa-image"></i><input type="file" accept="image/*" class="hidden comment-img-input" data-id="${id}"></label>
+      <input name="t" autocomplete="off" placeholder="اكتب تعليقاً..." class="flex-1 bg-gray-800 rounded-full px-3 py-2 text-xs outline-none">
+      <button class="text-indigo-400 text-xs font-bold px-2">إرسال</button>
+    </form>`;
 }
 
 function watchComments(id) {
   commentUnsubs[id] && commentUnsubs[id]();
   $('cbox-' + id)?.classList.remove('hidden');
   renderComments(id);
-  const q = query(collection(db, "posts", id, "comments"), orderBy("createdAt", "asc"), limit(100));
-  commentUnsubs[id] = onSnapshot(q, (snap) => {
+  commentUnsubs[id] = onSnapshot(query(collection(db, "posts", id, "comments"), orderBy("createdAt", "asc"), limit(50)), (snap) => {
     commentsData[id] = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     renderComments(id);
   });
@@ -445,13 +357,13 @@ function restoreOpenComments() {
   openSet.forEach(id => { if ($('cbox-' + id)) watchComments(id); });
 }
 
-// ---------- views ----------
+// ---------- Views ----------
 function viewHome() {
   V().innerHTML = `
     <div class="p-3 space-y-3 max-w-xl mx-auto">
       <section class="card rounded-xl p-3 flex items-center gap-3">
         <button data-go="profile" data-id="${uid()}" class="shrink-0">${avatarHTML(nameOf(me()), me().photoURL)}</button>
-        <button data-go="create" class="flex-1 text-right bg-gray-800 rounded-full px-4 py-2 text-sm text-gray-400">أنشر</button>
+        <button data-go="create" class="flex-1 text-right bg-gray-800 rounded-full px-4 py-2 text-sm text-gray-400">بماذا تفكر؟</button>
         <button data-go="live" class="shrink-0 px-3 py-2 rounded-full bg-red-600/20 text-red-400 text-xs font-bold flex items-center gap-1"><i class="fa-solid fa-tower-broadcast"></i> بث</button>
       </section>
       <div id="feed" class="space-y-3"></div>
@@ -459,62 +371,25 @@ function viewHome() {
   refreshPosts();
 }
 
-const NOTIF_TEXT = {
-  like: 'أعجب بمنشورك', comment: 'علّق على منشورك', reply: 'ردّ على تعليقك',
-  follow: 'بدأ بمتابعتك', verified: 'تم تفعيل التوثيق لحسابك 🎉'
-};
-const NOTIF_ICON = {
-  like: ['fa-heart', 'text-pink-400'], comment: ['fa-comment', 'text-indigo-300'], reply: ['fa-reply', 'text-indigo-300'],
-  follow: ['fa-user-plus', 'text-emerald-400'], verified: ['fa-circle-check', 'text-indigo-300']
-};
-
-function updateNotifBadge() {
-  const b = $('notifBadge');
-  if (!b) return;
-  const n = notifs.filter(x => !x.read).length;
-  b.textContent = n > 9 ? '9+' : String(n);
-  b.style.display = n ? 'flex' : 'none';
-  b.classList.toggle('hidden', !n);
-}
-
 function viewNotifications() {
-  const list = notifs.slice(0, 50);
-  const unread = notifs.some(n => !n.read);
   V().innerHTML = `
     <div class="p-3 space-y-2 max-w-xl mx-auto">
-      <div class="flex items-center justify-between mb-2">
-        <h2 class="font-bold text-lg">الإشعارات</h2>
-        ${unread ? '<button data-act="notif-readall" class="text-xs text-indigo-300">تحديد الكل كمقروء</button>' : ''}
-      </div>
-      ${list.length ? list.map(n => {
-        const ic = NOTIF_ICON[n.type] || ['fa-bell', 'text-gray-400'];
-        return `
-        <button data-act="notif" data-id="${n.id}" class="card rounded-xl p-3 w-full flex items-center gap-3 text-right">
+      <div class="flex items-center justify-between mb-2"><h2 class="font-bold text-lg">الإشعارات</h2></div>
+      ${notifs.length ? notifs.map(n => `
+        <div class="card rounded-xl p-3 flex items-center gap-3">
           ${avatarHTML(n.fromName, n.fromPhoto, 'w-9 h-9 text-xs')}
-          <div class="flex-1 min-w-0 text-sm">
-            ${n.type === 'verified' ? '' : `<b>${esc(n.fromName)}</b> `}${NOTIF_TEXT[n.type] || 'إشعار جديد'}
-            ${n.text && n.type !== 'like' ? `<div class="text-xs text-gray-400 truncate">${esc(n.text)}</div>` : ''}
-            <div class="text-xs text-gray-500">${timeAgo(n.createdAt)}</div>
-          </div>
-          <i class="fa-solid ${ic[0]} ${ic[1]} text-sm"></i>
-          ${n.read ? '' : '<span class="w-2 h-2 rounded-full bg-indigo-400 shrink-0"></span>'}
-        </button>`;
-      }).join('') : '<p class="text-center text-gray-500 py-10">لا توجد إشعارات بعد</p>'}
+          <div class="flex-1 text-sm"><b>${esc(n.fromName)}</b> ${n.text || 'تفاعل معك'}</div>
+        </div>`).join('') : '<p class="text-center text-gray-500 py-10">لا توجد إشعارات</p>'}
     </div>`;
 }
 
 function viewCreate() {
   pendingPostImg = null;
-  pendingPostVideo = null;
   V().innerHTML = `
     <form data-form="create" class="p-4 space-y-3 max-w-xl mx-auto">
       <div class="flex items-center justify-between">
         <h2 class="font-bold">إنشاء منشور</h2>
         <button class="px-4 py-1.5 rounded-lg bg-gradient-to-r from-indigo-600 to-pink-600 text-sm font-bold">نشر</button>
-      </div>
-      <div class="flex items-center gap-3">
-        ${avatarHTML(nameOf(me()), me().photoURL)}
-        <b class="text-sm">${esc(nameOf(me()))}${badgeHTML(badgeKind(me()))}</b>
       </div>
       <textarea name="text" rows="5" placeholder="بماذا تفكر؟" class="w-full bg-transparent text-base outline-none resize-none"></textarea>
       <div id="postPrev"></div>
@@ -522,61 +397,31 @@ function viewCreate() {
         <i class="fa-solid fa-image"></i> إضافة صورة
         <input type="file" id="postImg" accept="image/*" class="hidden">
       </label>
-      <label class="card rounded-xl p-3 flex items-center gap-2 text-pink-400 text-sm cursor-pointer">
-        <i class="fa-solid fa-video"></i> إضافة فيديو
-        <input type="file" id="postVid" accept="video/*" class="hidden">
-      </label>
     </form>`;
 }
 
 function viewSearch() {
   V().innerHTML = `
     <div class="p-3 space-y-3 max-w-xl mx-auto">
-      <input id="q" type="search" placeholder="ابحث بالاسم أو @اسم_المستخدم..." class="w-full bg-gray-800 rounded-full px-4 py-2.5 text-sm outline-none">
+      <input id="q" type="search" placeholder="ابحث عن المستخدمين..." class="w-full bg-gray-800 rounded-full px-4 py-2.5 text-sm outline-none">
       <div id="res" class="space-y-2"></div>
     </div>`;
   renderSearch('');
 }
 
-function userRow(u) {
-  return `
-    <div class="card rounded-xl p-3 flex items-center gap-3">
-      <button data-go="profile" data-id="${u.uid}" class="flex items-center gap-3 flex-1 min-w-0 text-right">
-        ${avatarHTML(nameOf(u), u.photoURL)}
-        <div class="min-w-0">
-          <b class="block text-sm truncate">${esc(nameOf(u))}${badgeHTML(badgeKind(u))}</b>
-          <span class="text-xs text-indigo-300 truncate block">${esc(handleOf(u))}</span>
-        </div>
-      </button>
-      ${followBtn(u.uid)}
-    </div>`;
-}
-
 function renderSearch(term) {
-  const t = term.trim().toLowerCase().replace(/^@/, "");
-  const list = Object.values(allUsers)
-    .filter(u => u.uid !== uid() && ((nameOf(u) + ' ' + (u.username || '')).toLowerCase().includes(t)))
-    .slice(0, 30);
+  const t = term.trim().toLowerCase();
+  const list = Object.values(allUsers).filter(u => u.uid !== uid() && nameOf(u).toLowerCase().includes(t));
   const res = $('res');
   if (!res) return;
-  res.innerHTML = list.length ? list.map(userRow).join('') : '<p class="text-center text-gray-500 py-8">لا توجد نتائج</p>';
-}
-
-function viewFriends() {
-  const following = (me().following || []).map(id => allUsers[id]).filter(Boolean);
-  const suggestions = Object.values(allUsers).filter(u => u.uid !== uid() && !(me().following || []).includes(u.uid));
-  V().innerHTML = `
-    <div class="p-3 space-y-4 max-w-xl mx-auto">
-      <h2 class="font-bold text-lg">الأصدقاء</h2>
-      <section class="space-y-2">
-        <h3 class="text-sm text-gray-400">أصدقاؤك (${following.length})</h3>
-        ${following.length ? following.map(userRow).join('') : '<p class="text-xs text-gray-500">لم تتابع أحداً بعد</p>'}
-      </section>
-      <section class="space-y-2">
-        <h3 class="text-sm text-gray-400">اقتراحات لك</h3>
-        ${suggestions.length ? suggestions.map(userRow).join('') : '<p class="text-xs text-gray-500">لا توجد اقتراحات</p>'}
-      </section>
-    </div>`;
+  res.innerHTML = list.length ? list.map(u => `
+    <div class="card rounded-xl p-3 flex items-center gap-3">
+      <button data-go="profile" data-id="${u.uid}" class="flex items-center gap-3 flex-1 text-right">
+        ${avatarHTML(nameOf(u), u.photoURL)}
+        <div><b class="text-sm block">${esc(nameOf(u))}${badgeHTML(badgeKind(u))}</b></div>
+      </button>
+      ${followBtn(u.uid)}
+    </div>`).join('') : '<p class="text-center text-gray-500 py-8">لا توجد نتائج</p>';
 }
 
 function viewChats() {
@@ -588,57 +433,44 @@ function viewChats() {
         <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-purple-600 to-pink-500 flex items-center justify-center font-bold">S</div>
         <div><b class="text-sm block">الدردشة العامة Sovexa</b><span class="text-xs text-emerald-400">مفتوحة للجميع</span></div>
       </button>
-      ${following.length ? following.map(u => `
+      ${following.map(u => `
         <button data-go="chat" data-id="${u.uid}" class="card rounded-xl p-3 w-full flex items-center gap-3 text-right">
           ${avatarHTML(nameOf(u), u.photoURL)}
-          <div><b class="text-sm block">${esc(nameOf(u))}${badgeHTML(badgeKind(u))}</b><span class="text-xs text-gray-500">${esc(handleOf(u))}</span></div>
-        </button>`).join('') : '<p class="text-center text-gray-500 py-8 text-sm">تابع أشخاصاً لتبدأ الدردشة معهم</p>'}
+          <div><b class="text-sm block">${esc(nameOf(u))}${badgeHTML(badgeKind(u))}</b></div>
+        </button>`).join('')}
     </div>`;
 }
 
+// --- محادثة تدعم النصوص وإرسال الصور ---
 function viewChat(otherId) {
   const isGlobal = otherId === 'global';
   const o = allUsers[otherId] || { uid: otherId, name: "مستخدم" };
-  const title = isGlobal ? "الدردشة العامة Sovexa" : nameOf(o);
   const cid = isGlobal ? "global" : chatIdFor(uid(), otherId);
-  if (!isGlobal) setDoc(doc(db, "chats", cid), { members: [uid(), otherId] }, { merge: true }).catch(() => {});
   V().innerHTML = `
     <div class="flex flex-col h-[calc(100vh-10.5rem)] max-w-2xl mx-auto">
       <div class="flex items-center gap-3 px-3 py-2 border-b border-gray-800 bg-[#111827]">
         <button data-go="chats" class="w-9 h-9 rounded-full bg-gray-800 flex items-center justify-center"><i class="fa-solid fa-arrow-right"></i></button>
-        ${isGlobal
-          ? `<div class="w-9 h-9 rounded-full bg-gradient-to-tr from-purple-600 to-pink-500 flex items-center justify-center font-bold text-sm">S</div>`
-          : avatarHTML(nameOf(o), o.photoURL, 'w-9 h-9 text-xs')}
-        <div class="min-w-0">
-          <b class="block text-sm truncate">${esc(title)}</b>
-          <span class="text-[11px] text-emerald-400">${isGlobal ? 'مجتمع Sovexa' : esc(handleOf(o))}</span>
-        </div>
+        <b class="text-sm">${isGlobal ? "الدردشة العامة" : esc(nameOf(o))}</b>
       </div>
-      <div id="msgs" class="flex-1 overflow-y-auto px-3 py-3 space-y-2 bg-[#0b0f17]"></div>
+      <div id="msgs" class="flex-1 overflow-y-auto p-3 space-y-2 bg-[#0b0f17]"></div>
+      <div id="chatImgPrev" class="px-3"></div>
       <form data-form="msg" data-id="${cid}" class="p-2 flex items-center gap-2 border-t border-gray-800 bg-[#111827]">
-        <input name="t" autocomplete="off" placeholder="اكتب رسالة..." class="flex-1 bg-gray-800 rounded-full px-4 py-2.5 text-sm outline-none">
-        <button class="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-600 to-pink-600 flex items-center justify-center shrink-0"><i class="fa-solid fa-paper-plane text-sm"></i></button>
+        <label class="text-emerald-400 cursor-pointer p-2"><i class="fa-solid fa-image"></i><input type="file" id="chatImgIn" accept="image/*" class="hidden"></label>
+        <input name="t" autocomplete="off" placeholder="اكتب رسالة..." class="flex-1 bg-gray-800 rounded-full px-4 py-2 text-sm outline-none">
+        <button class="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white"><i class="fa-solid fa-paper-plane"></i></button>
       </form>
     </div>`;
-  unsubs.push(onSnapshot(query(collection(db, "chats", cid, "messages"), orderBy("createdAt", "asc"), limit(200)), (snap) => {
+  unsubs.push(onSnapshot(query(collection(db, "chats", cid, "messages"), orderBy("createdAt", "asc"), limit(100)), (snap) => {
     const el = $('msgs');
     if (!el) return;
-    if (snap.empty) {
-      el.innerHTML = '<p class="text-center text-gray-500 text-xs py-10">ابدأ المحادثة الآن</p>';
-      return;
-    }
     el.innerHTML = snap.docs.map(d => {
       const m = d.data();
       const mine = m.senderId === uid();
-      const sender = allUsers[m.senderId];
-      const senderLine = (!mine && isGlobal)
-        ? `<div class="text-[11px] text-indigo-300 mb-0.5 px-1">${esc(sender ? nameOf(sender) : (m.senderName || ''))}${badgeHTML(badgeKind(sender))}</div>` : '';
       return `
-        <div class="flex items-end gap-2 ${mine ? 'justify-end' : 'justify-start'}">
-          ${!mine ? avatarHTML(sender ? nameOf(sender) : (m.senderName || '?'), sender?.photoURL, 'w-7 h-7 text-[10px]') : ''}
-          <div class="max-w-[75%]">
-            ${senderLine}
-            <div class="${mine ? 'bubble-me' : 'bubble-other'} px-3 py-2 text-sm whitespace-pre-wrap break-words">${esc(m.text)}</div>
+        <div class="flex ${mine ? 'justify-end' : 'justify-start'}">
+          <div class="${mine ? 'bubble-me' : 'bubble-other'} px-3 py-2 text-sm max-w-[75%] rounded-2xl">
+            ${m.text ? `<p>${esc(m.text)}</p>` : ''}
+            ${m.image ? `<img src="${esc(m.image)}" class="mt-1 rounded-xl max-h-48 object-cover">` : ''}
           </div>
         </div>`;
     }).join('');
@@ -646,43 +478,44 @@ function viewChat(otherId) {
   }));
 }
 
+// --- الملف الشخصي وتنسيق فيسبوك للأزرار الوسطى ---
 function viewProfile(id) {
   const target = id || uid();
   profileTarget = target;
   const u = allUsers[target] || { uid: target, name: "مستخدم" };
   const own = target === uid();
   const followers = Object.values(allUsers).filter(x => (x.following || []).includes(target)).length;
-  const following = (u.following || []).length;
-  const postsCount = Object.values(postsCache).filter(p => p.userId === target).length;
+  
   V().innerHTML = `
-    <div class="h-32 bg-gradient-to-r from-indigo-700 via-purple-700 to-pink-600 bg-cover bg-center" style="${u.coverURL ? `background-image:url('${esc(u.coverURL)}')` : ''}"></div>
+    <div class="h-32 bg-gradient-to-r from-indigo-700 to-pink-600 bg-cover bg-center" style="${u.coverURL ? `background-image:url('${esc(u.coverURL)}')` : ''}"></div>
     <div class="px-4 -mt-12 text-center">
       <div class="inline-block ring-4 ring-[#0b0f17] rounded-full">${avatarHTML(nameOf(u), u.photoURL, 'w-24 h-24 text-3xl')}</div>
       <h2 class="text-xl font-black mt-2">${esc(nameOf(u))}${badgeHTML(badgeKind(u))}</h2>
       <p class="text-xs text-indigo-300">${esc(handleOf(u))}</p>
       <p class="text-sm text-gray-400 mt-1">${esc(u.bio || '')}</p>
-      <p class="text-xs text-gray-500 mt-1">${postsCount} منشور · ${followers} متابع · ${following} يتابع</p>
       <div class="flex gap-2 justify-center mt-3">
-        ${own
-          ? `<button data-go="edit" class="flex-1 py-2 rounded-lg bg-[#1E2235] text-sm font-bold text-white border border-gray-700">تعديل الملف الشخصي</button>
-             <button data-go="menu" class="px-4 py-2 rounded-lg bg-[#1E2235] text-sm font-bold text-white border border-gray-700"><i class="fa-solid fa-bars"></i></button>`
-          : `${followBtn(target)}<button data-go="chat" data-id="${target}" class="px-4 py-2 rounded-lg bg-gray-700 text-xs font-bold">مراسلة</button>`}
+        ${own ? `<button data-go="edit" class="px-6 py-2 rounded-lg bg-[#1E2235] text-sm font-bold text-white border border-gray-700">تعديل الملف الشخصي</button>` : followBtn(target)}
       </div>
     </div>
 
-    <!-- قسم التفاصيل الشخصية (على غرار فيسبوك) -->
-    <div class="p-3 max-w-xl mx-auto space-y-3 mt-2">
+    <!-- صندوق التفاصيل الشخصية -->
+    <div class="p-3 max-w-xl mx-auto">
       <div class="card rounded-2xl p-4 space-y-3">
         <h3 class="font-bold text-sm text-white">التفاصيل الشخصية</h3>
         <div class="flex items-center gap-3 text-xs text-gray-300">
-          <i class="fa-solid fa-location-dot text-gray-500 w-4"></i>
-          <span>يقيم في الجزائر</span>
+          <i class="fa-solid fa-location-dot text-gray-500"></i><span>يقيم في الجزائر</span>
         </div>
         <div class="flex items-center gap-3 text-xs text-gray-300">
-          <i class="fa-solid fa-link text-gray-500 w-4"></i>
-          <span>يتابعه ${followers} شخصاً</span>
+          <i class="fa-solid fa-link text-gray-500"></i><span>يتابعه ${followers} شخصاً</span>
         </div>
       </div>
+    </div>
+
+    <!-- أزرار النشر والفيديو والبث المباشر (مثل فيسبوك تماماً بين التفاصيل والمنشورات) -->
+    <div class="p-3 max-w-xl mx-auto grid grid-cols-3 gap-2">
+      <button data-go="create" class="card py-2.5 rounded-xl text-xs font-bold text-emerald-400 flex items-center justify-center gap-1.5"><i class="fa-solid fa-pen-to-square"></i> منشور</button>
+      <button data-go="reels" class="card py-2.5 rounded-xl text-xs font-bold text-pink-400 flex items-center justify-center gap-1.5"><i class="fa-solid fa-video"></i> فيديو</button>
+      <button data-go="live" class="card py-2.5 rounded-xl text-xs font-bold text-red-400 flex items-center justify-center gap-1.5"><i class="fa-solid fa-tower-broadcast"></i> بث مباشر</button>
     </div>
 
     <div id="uposts" class="p-3 space-y-3 max-w-xl mx-auto"></div>`;
@@ -691,1055 +524,158 @@ function viewProfile(id) {
 
 function viewEdit() {
   const u = me();
-  pendingPhoto = null;
-  pendingCover = null;
   V().innerHTML = `
     <form data-form="edit" class="p-4 space-y-4 max-w-md mx-auto">
       <h2 class="text-lg font-bold">تعديل الملف الشخصي</h2>
-      <div class="flex flex-col items-center gap-2">
-        <div id="photoPrev">${avatarHTML(nameOf(u), u.photoURL, 'w-24 h-24 text-3xl')}</div>
-        <label class="text-indigo-400 text-sm cursor-pointer">تغيير الصورة الشخصية
-          <input type="file" id="photoIn" accept="image/*" class="hidden">
-        </label>
-      </div>
-      <label class="block text-xs text-gray-400">صورة الغلاف
-        <input type="file" id="coverIn" accept="image/*" class="mt-1 w-full text-xs">
-      </label>
-      <label class="block text-xs text-gray-400">الاسم المعروض (يمكن تكراره)
-        <input name="name" required value="${esc(nameOf(u))}" class="mt-1 w-full bg-gray-800 rounded-lg px-3 py-2 text-sm outline-none">
-      </label>
-      <label class="block text-xs text-gray-400">اسم المستخدم الفريد (إنجليزي وأرقام و _ و .)
-        <input name="username" required dir="ltr" value="${esc(u.username || '')}" class="mt-1 w-full bg-gray-800 rounded-lg px-3 py-2 text-sm outline-none">
-      </label>
-      <label class="block text-xs text-gray-400">النبذة
-        <textarea name="bio" rows="3" class="mt-1 w-full bg-gray-800 rounded-lg px-3 py-2 text-sm outline-none">${esc(u.bio || '')}</textarea>
-      </label>
-      <button id="saveBtn" class="w-full py-2.5 rounded-lg bg-gradient-to-r from-indigo-600 to-pink-600 font-bold text-sm">حفظ</button>
-      <button type="button" data-go="profile" data-id="${uid()}" class="w-full py-2 text-sm text-gray-400">إلغاء</button>
+      <input name="name" required value="${esc(nameOf(u))}" class="w-full bg-gray-800 rounded-lg px-3 py-2 text-sm outline-none">
+      <textarea name="bio" rows="3" class="w-full bg-gray-800 rounded-lg px-3 py-2 text-sm outline-none">${esc(u.bio || '')}</textarea>
+      <button class="w-full py-2.5 rounded-lg bg-gradient-to-r from-indigo-600 to-pink-600 font-bold text-sm text-white">حفظ</button>
     </form>`;
-}
-
-const MENU_GROUPS = [
-  { title: "حسابي", items: [
-    ['fa-user', 'الملف الشخصي', 'profile'],
-    ['fa-pen', 'تعديل الملف الشخصي', 'data-go="edit"'],
-    ['fa-gear', 'الإعدادات', 'data-go="settings"'],
-  ]},
-  { title: "الاشتراك", items: [
-    ['fa-crown', 'الاشتراك في التوثيق', 'data-act="subscribe"'],
-  ]},
-  { title: "التواصل", items: [
-    ['fa-user-group', 'الأصدقاء', 'data-go="friends"'],
-    ['fa-comments', 'الدردشات', 'data-go="chats"'],
-    ['fa-magnifying-glass', 'البحث', 'data-go="search"'],
-    ['fa-bell', 'الإشعارات', 'data-go="notifications"'],
-  ]},
-  { title: "المزيد", items: [
-    ['fa-tower-broadcast', 'البث المباشر', 'data-go="live"'],
-    ['fa-clapperboard', 'الريلز', 'data-go="reels"'],
-    ['fa-bookmark', 'المحفوظات', 'data-go="saved"'],
-    ['fa-clock-rotate-left', 'الأرشيف', 'data-go="archive"'],
-    ['fa-circle-question', 'المساعدة والدعم', 'data-go="help"'],
-    ['fa-circle-info', 'عن Sovexa', 'data-go="about"'],
-  ]},
-  { title: "الحساب", items: [
-    ['fa-right-left', 'تبديل الحساب', 'data-act="logout-menu"'],
-    ['fa-right-from-bracket', 'تسجيل الخروج', 'data-act="logout-menu"'],
-  ]},
-];
-
-const ADMIN_GROUP = { title: "الإدارة", items: [['fa-shield-halved', 'لوحة الإدارة', 'data-go="admin"']] };
-
-function viewMenu() {
-  const u = me();
-  const groups = (isAdmin() ? [...MENU_GROUPS, ADMIN_GROUP] : MENU_GROUPS).map((g) => {
-    const items = g.items.map(([icon, label, attrs], i) => {
-      const actionAttrs = attrs === 'profile' ? `data-go="profile" data-id="${uid()}"` : attrs;
-      const danger = label === 'تسجيل الخروج';
-      return `
-        <button ${actionAttrs} class="w-full flex items-center gap-3 px-4 py-3 text-right ${i ? 'border-t border-gray-800' : ''}">
-          <span class="w-8 h-8 rounded-lg flex items-center justify-center ${danger ? 'bg-red-600/20 text-red-400' : 'bg-gray-800 text-indigo-300'}"><i class="fa-solid ${icon} text-sm"></i></span>
-          <span class="text-sm flex-1 ${danger ? 'text-red-400' : ''}">${label}</span>
-          <i class="fa-solid fa-chevron-left text-[10px] text-gray-600"></i>
-        </button>`;
-    }).join('');
-    return `<div class="card rounded-xl overflow-hidden"><p class="px-4 pt-3 pb-1 text-[11px] text-gray-500">${g.title}</p>${items}</div>`;
-  }).join('');
-  V().innerHTML = `
-    <div class="p-3 space-y-3 max-w-xl mx-auto">
-      <button data-go="profile" data-id="${uid()}" class="card rounded-xl p-4 w-full flex items-center gap-3 text-right">
-        ${avatarHTML(nameOf(u), u.photoURL, 'w-14 h-14 text-lg')}
-        <div class="flex-1 min-w-0">
-          <b class="block truncate">${esc(nameOf(u))}${badgeHTML(badgeKind(u))}</b>
-          <span class="text-xs text-indigo-300">${esc(handleOf(u) || 'عرض الملف الشخصي')}</span>
-        </div>
-        <i class="fa-solid fa-chevron-left text-xs text-gray-500"></i>
-      </button>
-      ${groups}
-    </div>`;
-}
-
-function viewHelp() {
-  const faqs = [
-    ["كيف يمكنني تعديل الملف الشخصي؟", "يمكنك الانتقال إلى إعدادات الحساب وتحديث صورتك واسمك بكل سهولة."],
-    ["تواجه مشكلة في إرسال أو استقبال الرسائل؟", "تأكد من اتصالك بالإنترنت، أو قم بتحديث التطبيق لأحدث نسخة."],
-    ["كيف أبلغ عن محتوى غير لائق؟", "نحن نُهتم بأمان مجتمعنا؛ يمكنك النقر على خيار \"إبلاغ\" بجانب أي منشور أو محتوى مخالف."],
-  ];
-  V().innerHTML = `
-    <div class="p-3 space-y-3 max-w-xl mx-auto">
-      ${backHeader("مركز المساعدة والدعم 🛠️")}
-      <div class="card rounded-xl p-4 text-sm leading-7 text-gray-300">
-        مرحباً بك في مركز المساعدة والدعم لمنصة Sovexa. نحن هنا لضمان حصولك على أفضل تجربة ممكنة في التواصل، الدردشة، ومشاهدة الفيديوهات.
-      </div>
-      <h3 class="font-bold text-sm text-gray-400 pt-2">الأسئلة الشائعة</h3>
-      ${faqs.map(([q, a]) => `
-        <details class="card rounded-xl p-3">
-          <summary class="text-sm font-bold cursor-pointer">${q}</summary>
-          <p class="text-xs text-gray-400 mt-2 leading-6">${a}</p>
-        </details>`).join('')}
-      <div class="card rounded-xl p-4 text-sm leading-7 text-gray-300">
-        إذا لم تجد إجابة لسؤالك، فريق الدعم لدينا جاهز لمساعدتك على مدار الساعة. تواصل معنا عبر البريد الإلكتروني أو من خلال قنوات التواصل الخاصة بنا.
-        <p dir="ltr" class="text-indigo-300 text-xs mt-2">support@sovexa.app</p>
-      </div>
-    </div>`;
-}
-
-function viewAbout() {
-  V().innerHTML = `
-    <div class="p-3 space-y-3 max-w-xl mx-auto">
-      ${backHeader("عن منصة Sovexa 🌌")}
-      <div class="card rounded-xl p-4 text-sm leading-7 text-gray-300">
-        تعتبر منصة Sovexa وجهتك الرقمية المتكاملة والمبتكرة للتواصل الاجتماعي، الدردشة الحية، واستكشاف أحدث الفيديوهات والمحتوى الترفيهي.
-      </div>
-      <div class="card rounded-xl p-4 space-y-2 text-sm leading-7 text-gray-300">
-        <b class="text-white">رؤيتنا:</b>
-        <p>نهدف إلى بناء مجتمع رقمي تفاعلي يجمع الأصدقاء والعائلات في بيئة آمنة، سريعة، وذات تصميم عصري يجمع بين الإبداع وسهولة الاستخدام.</p>
-      </div>
-      <div class="card rounded-xl p-4 space-y-3 text-sm leading-7 text-gray-300">
-        <b class="text-white">لماذا Sovexa؟</b>
-        <p><b class="text-indigo-300">تواصل بلا حدود:</b> دردش مع أصدقائك وشاركهم لحظاتك اليومية لحظة بلحظة.</p>
-        <p><b class="text-indigo-300">مشاهدة ممتعة:</b> استمتع بمقاطع الفيديو والريلز المتنوعة التي تناسب اهتماماتك.</p>
-        <p><b class="text-indigo-300">تصميم فريد:</b> واجهة مستخدم أنيقة وسلسة تمنحك تجربة مريحة ومميزة.</p>
-      </div>
-      <div class="card rounded-xl p-4 text-center text-sm text-indigo-200">
-        شكراً لانضمامك إلى عائلة Sovexa.. رحلتك معنا للترفيه والتواصل تبدأ من هنا!
-      </div>
-      <p dir="ltr" class="text-center text-[11px] text-gray-500">${BUILD}</p>
-    </div>`;
-}
-
-function viewSaved() {
-  V().innerHTML = `
-    <div class="p-3 space-y-3 max-w-xl mx-auto">
-      ${backHeader("المحفوظات")}
-      <div id="savedList" class="space-y-3"></div>
-    </div>`;
-  renderSavedList();
-}
-
-function renderSavedList() {
-  const box = $('savedList');
-  if (!box) return;
-  const list = [...savedIds].map(id => postsCache[id] ? { id, ...postsCache[id] } : null).filter(Boolean);
-  box.innerHTML = list.length
-    ? list.map(postCard).join('')
-    : '<p class="text-center text-gray-500 py-10 text-sm">لا توجد منشورات محفوظة بعد</p>';
-  restoreOpenComments();
-}
-
-function viewArchive() {
-  const mine = Object.entries(postsCache)
-    .map(([id, p]) => ({ id, ...p }))
-    .filter(p => p.userId === uid())
-    .sort((a, b) => (a.createdAt?.seconds ?? 0) - (b.createdAt?.seconds ?? 0));
-  V().innerHTML = `
-    <div class="p-3 space-y-3 max-w-xl mx-auto">
-      ${backHeader("الأرشيف")}
-      <p class="text-xs text-gray-500">منشوراتك جميعها، من الأقدم إلى الأحدث.</p>
-      ${mine.length ? mine.map(p => `
-        <div class="card rounded-xl p-3 space-y-2">
-          <p class="text-sm whitespace-pre-wrap">${esc(p.text || '(صورة فقط)')}</p>
-          <div class="flex items-center justify-between text-xs text-gray-500">
-            <span>${timeAgo(p.createdAt)} · ${(p.likes || []).length} إعجاب</span>
-            <button data-act="delpost" data-id="${p.id}" class="text-red-400"><i class="fa-solid fa-trash"></i> حذف</button>
-          </div>
-        </div>`).join('') : '<p class="text-center text-gray-500 py-10 text-sm">لم تنشر أي منشور بعد</p>'}
-    </div>`;
 }
 
 function viewReels() {
-  V().innerHTML = `
-    <div class="p-6 text-center mt-16 space-y-3">
-      <i class="fa-solid fa-clapperboard text-5xl text-indigo-400"></i>
-      <h2 class="text-lg font-bold">الريلز</h2>
-      <p class="text-sm text-gray-400">رفع الفيديوهات يحتاج Firebase Storage، وهي المرحلة التالية.</p>
-    </div>`;
+  V().innerHTML = `<div class="p-6 text-center mt-16"><h2 class="text-lg font-bold">الريلز وفيديوهات Sovexa</h2></div>`;
 }
-
-function viewSettings() {
-  V().innerHTML = `
-    <div class="p-3 space-y-3 max-w-xl mx-auto">
-      <h2 class="text-lg font-bold">الإعدادات</h2>
-      <div class="card rounded-xl p-4 space-y-1 text-sm">
-        <p class="text-gray-400 text-xs">الحساب المسجّل</p>
-        <p dir="ltr" class="text-right">${esc(currentUser?.email || currentUser?.phoneNumber || '')}</p>
-        <p class="text-indigo-300 text-xs">${esc(handleOf(me()))}</p>
-      </div>
-      <div class="card rounded-xl overflow-hidden text-sm">
-        <button data-go="edit" class="w-full px-4 py-3 text-right flex justify-between"><span>تعديل الملف الشخصي</span><i class="fa-solid fa-chevron-left text-xs text-gray-500"></i></button>
-        <button data-act="soon" class="w-full px-4 py-3 text-right flex justify-between border-t border-gray-800"><span>الخصوصية</span><i class="fa-solid fa-chevron-left text-xs text-gray-500"></i></button>
-        <button data-act="soon" class="w-full px-4 py-3 text-right flex justify-between border-t border-gray-800"><span>الإشعارات</span><i class="fa-solid fa-chevron-left text-xs text-gray-500"></i></button>
-        <button data-act="soon" class="w-full px-4 py-3 text-right flex justify-between border-t border-gray-800"><span>اللغة</span><span class="text-gray-500 text-xs">العربية</span></button>
-      </div>
-      <button data-act="logout-menu" class="w-full rounded-xl p-3 bg-red-600/20 border border-red-500/30 text-red-300 text-sm font-bold">تسجيل الخروج</button>
-    </div>`;
-}
-
-function renderUsersLive() {
-  if (!currentUser) return;
-  if (currentView === 'search') renderSearch($('q')?.value || '');
-  else if (['friends', 'chats', 'profile', 'menu', 'settings'].includes(currentView)) go(currentView, currentId);
-}
-
-// ---------- single post ----------
-function viewPost(id) {
-  V().innerHTML = `
-    <div class="p-3 space-y-3 max-w-xl mx-auto">
-      <div class="flex items-center gap-3">
-        <button data-go="notifications" class="w-9 h-9 rounded-full bg-gray-800 flex items-center justify-center"><i class="fa-solid fa-arrow-right"></i></button>
-        <h2 class="font-bold text-lg">المنشور</h2>
-      </div>
-      <div id="single"></div>
-    </div>`;
-  openSet.add(id);
-  renderSingle();
-}
-
-function renderSingle() {
-  const box = $('single');
-  if (!box) return;
-  const p = postsCache[currentId];
-  box.innerHTML = p && !hiddenPosts.has(currentId)
-    ? postCard({ id: currentId, ...p })
-    : '<p class="text-center text-gray-500 py-10 text-sm">هذا المنشور غير متوفر</p>';
-  restoreOpenComments();
-}
-
-// ---------- admin ----------
-const REPORT_REASONS = [
-  ['spam', 'محتوى مزعج أو إعلانات'],
-  ['abuse', 'إساءة أو تحرش'],
-  ['inappropriate', 'محتوى غير لائق'],
-  ['violence', 'عنف أو تهديد'],
-  ['other', 'سبب آخر']
-];
-const reasonLabel = (k) => (REPORT_REASONS.find(r => r[0] === k) || [0, k])[1];
-
-function viewAdmin() {
-  if (!isAdmin()) { go('home'); return; }
-  V().innerHTML = `
-    <div class="p-3 space-y-3 max-w-xl mx-auto">
-      ${backHeader("لوحة الإدارة")}
-      <h3 class="text-sm text-gray-400">طلبات التوثيق</h3>
-      <div id="admSubs" class="space-y-2"></div>
-      <h3 class="text-sm text-gray-400 pt-2">البلاغات</h3>
-      <div id="admReps" class="space-y-2"></div>
-    </div>`;
-  unsubs.push(onSnapshot(collection(db, "subscriptions"), (s) => {
-    adminData.subs = s.docs.map(d => ({ id: d.id, ...d.data() }));
-    renderAdmin();
-  }, (err) => showToast("تعذر تحميل الطلبات: " + err.message)));
-  unsubs.push(onSnapshot(collection(db, "reports"), (s) => {
-    adminData.reports = s.docs.map(d => ({ id: d.id, ...d.data() }));
-    renderAdmin();
-  }, (err) => showToast("تعذر تحميل البلاغات: " + err.message)));
-}
-
-function renderAdmin() {
-  const sb = $('admSubs'), rb = $('admReps');
-  if (!sb || !rb) return;
-  const subs = adminData.subs.filter(x => x.status === 'pending');
-  sb.innerHTML = subs.length ? subs.map(x => {
-    const u = allUsers[x.id] || {};
-    return `
-    <div class="card rounded-xl p-3 space-y-2">
-      <div class="flex items-center gap-3">${avatarHTML(nameOf(u), u.photoURL, 'w-9 h-9 text-xs')}
-        <div class="min-w-0"><b class="block text-sm truncate">${esc(x.userName || nameOf(u))}</b><span class="text-xs text-gray-500 block truncate" dir="ltr">${esc(x.email || '')}</span></div>
-        <span class="text-xs text-indigo-300 mr-auto">${esc(x.price || '')}</span></div>
-      <div class="flex gap-2">
-        <button data-act="sub-approve" data-id="${x.id}" class="flex-1 py-2 rounded-lg bg-emerald-600 text-xs font-bold">تفعيل 30 يوماً</button>
-        <button data-act="sub-reject" data-id="${x.id}" class="flex-1 py-2 rounded-lg bg-gray-700 text-xs font-bold">رفض</button>
-      </div>
-    </div>`;
-  }).join('') : '<p class="text-xs text-gray-500">لا توجد طلبات</p>';
-  const reps = adminData.reports.filter(x => x.status === 'pending')
-    .sort((a, b) => (b.createdAt?.seconds ?? 0) - (a.createdAt?.seconds ?? 0));
-  rb.innerHTML = reps.length ? reps.map(x => `
-    <div class="card rounded-xl p-3 space-y-2">
-      <div class="text-xs text-gray-400">${x.targetType === 'comment' ? 'تعليق' : 'منشور'} · ${esc(reasonLabel(x.reason))} · من ${esc(x.reporterName || '')}</div>
-      <p class="text-sm whitespace-pre-wrap break-words">${esc(x.snippet || '(بدون نص)')}</p>
-      <div class="flex gap-2">
-        <button data-act="rep-delete" data-id="${x.id}" class="flex-1 py-2 rounded-lg bg-red-600/30 text-red-300 text-xs font-bold">حذف المحتوى</button>
-        <button data-act="rep-dismiss" data-id="${x.id}" class="flex-1 py-2 rounded-lg bg-gray-700 text-xs font-bold">تجاهل</button>
-      </div>
-    </div>`).join('') : '<p class="text-xs text-gray-500">لا توجد بلاغات</p>';
-}
-
-// ---------- report sheet ----------
-function showReportSheet() {
-  document.getElementById('reportSheet')?.remove();
-  const sheet = document.createElement('div');
-  sheet.id = 'reportSheet';
-  sheet.className = 'fixed inset-0 z-[70] bg-black/60 flex items-end justify-center';
-  sheet.innerHTML = `
-    <div class="card w-full max-w-md rounded-t-3xl p-4 space-y-2 safe-bottom">
-      <div class="mx-auto w-12 h-1.5 rounded-full bg-gray-600 mb-2"></div>
-      <h3 class="text-center font-bold">إبلاغ عن محتوى</h3>
-      <p class="text-center text-xs text-gray-400 mb-1">اختر سبب البلاغ، وسيراجعه فريق Sovexa</p>
-      ${REPORT_REASONS.map(([k, label]) => `<button data-act="report-send" data-reason="${k}" class="w-full py-3 rounded-xl bg-gray-800 text-sm font-bold">${label}</button>`).join('')}
-      <button data-act="report-cancel" class="w-full py-3 rounded-xl bg-gray-900 text-sm text-gray-400">إلغاء</button>
-    </div>`;
-  sheet.addEventListener('click', (e) => { if (e.target === sheet) sheet.remove(); });
-  document.body.appendChild(sheet);
-}
-
-// ---------- live streaming (WebRTC + Firestore signaling) ----------
-const ICE_SERVERS = [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }];
-
-function liveCleanup() {
-  const L = liveState;
-  if (!L) return;
-  liveState = null;
-  try { (L.timers || []).forEach(t => clearInterval(t)); } catch (_) {}
-  try { (L.unsubs || []).forEach(f => f()); } catch (_) {}
-  try { Object.values(L.pcs || {}).forEach(pc => pc.close()); } catch (_) {}
-  try { L.pc && L.pc.close(); } catch (_) {}
-  try { L.stream && L.stream.getTracks().forEach(t => t.stop()); } catch (_) {}
-  if (L.role === 'host' && L.started) updateDoc(doc(db, 'lives', L.hostId), { status: 'ended', viewerCount: 0 }).catch(() => {});
-  if (L.role === 'viewer' && L.viewerDoc) deleteDoc(L.viewerDoc).catch(() => {});
-}
-window.addEventListener('pagehide', () => liveCleanup());
-
-function addCand(pc, pend, c) {
-  if (pc.remoteDescription) pc.addIceCandidate(c).catch(() => {});
-  else pend.push(c);
-}
-function flushCand(pc, pend) {
-  pend.splice(0).forEach(c => pc.addIceCandidate(c).catch(() => {}));
-}
-
-function liveHeader(title) {
-  return `
-    <div class="flex items-center gap-3">
-      <button data-go="live" class="w-9 h-9 rounded-full bg-gray-800 flex items-center justify-center"><i class="fa-solid fa-arrow-right"></i></button>
-      <h2 class="font-bold text-lg flex-1 truncate">${title}</h2>
-    </div>`;
-}
-function chatBlock(hostId) {
-  return `
-    <div id="liveChat" class="h-40 overflow-y-auto space-y-1 card rounded-xl p-2 text-sm"></div>
-    <form data-form="livechat" data-id="${hostId}" class="flex gap-2">
-      <input name="t" autocomplete="off" placeholder="اكتب تعليقاً..." class="flex-1 bg-gray-800 rounded-full px-4 py-2.5 text-sm outline-none">
-      <button class="px-4 rounded-full bg-gradient-to-r from-indigo-600 to-pink-600 text-sm font-bold">إرسال</button>
-    </form>`;
-}
-function watchLiveChat(hostId) {
-  const L = liveState;
-  if (!L) return;
-  L.unsubs.push(onSnapshot(query(collection(db, 'lives', hostId, 'chat'), orderBy('createdAt', 'asc'), limit(100)), (snap) => {
-    const el = $('liveChat');
-    if (!el) return;
-    el.innerHTML = snap.docs.map(d => {
-      const m = d.data();
-      return `<div><b class="text-indigo-300">${esc(m.userName)}${badgeHTML(vOf(m.userId, false))}</b> <span class="break-words">${esc(m.text)}</span></div>`;
-    }).join('') || '<p class="text-center text-gray-500 text-xs py-4">لا توجد تعليقات بعد</p>';
-    el.scrollTop = el.scrollHeight;
-  }));
-}
-
-// ----- hub -----
 function viewLive() {
+  V().innerHTML = `<div class="p-6 text-center mt-16"><h2 class="text-lg font-bold">البث المباشر</h2></div>`;
+}
+function viewSaved() {
+  V().innerHTML = `<div class="p-3 max-w-xl mx-auto"><h2 class="font-bold mb-3">المحفوظات</h2><div id="savedList" class="space-y-3"></div></div>`;
+  const box = $('savedList');
+  if (box) box.innerHTML = [...savedIds].map(id => postsCache[id] ? postCard({id, ...postsCache[id]}) : '').join('');
+}
+function viewMenu() {
   V().innerHTML = `
-    <div class="p-3 space-y-3 max-w-xl mx-auto">
-      ${backHeader("البث المباشر")}
-      <button data-go="golive" class="w-full py-3 rounded-xl bg-red-600 font-bold text-sm flex items-center justify-center gap-2"><i class="fa-solid fa-tower-broadcast"></i> ابدأ بثاً مباشراً</button>
-      <h3 class="text-sm text-gray-400 pt-1">المباشر الآن</h3>
-      <div id="liveList" class="space-y-2"></div>
+    <div class="p-3 space-y-2 max-w-xl mx-auto">
+      <button data-go="profile" data-id="${uid()}" class="card p-3 w-full text-right font-bold">الملف الشخصي</button>
+      <button data-go="saved" class="card p-3 w-full text-right font-bold">المحفوظات</button>
+      <button data-act="logout" class="card p-3 w-full text-right text-red-400 font-bold">تسجيل الخروج</button>
     </div>`;
-  unsubs.push(onSnapshot(collection(db, 'lives'), (s) => {
-    liveList = s.docs.map(d => ({ id: d.id, ...d.data() }));
-    renderLiveList();
-  }, (err) => showToast("تعذر تحميل البثوث: " + err.message)));
-  const t = setInterval(renderLiveList, 15000);
-  unsubs.push(() => clearInterval(t));
 }
-function renderLiveList() {
-  const box = $('liveList');
-  if (!box) return;
-  const now = Date.now();
-  const list = liveList.filter(l => l.status === 'live' && l.hostId !== uid() && (now - (l.lastBeat?.toMillis?.() ?? now)) < 120000);
-  box.innerHTML = list.length ? list.map(l => {
-    const h = allUsers[l.hostId] || {};
-    return `
-      <button data-go="watch" data-id="${l.hostId}" class="card rounded-xl p-3 w-full flex items-center gap-3 text-right">
-        ${avatarHTML(l.hostName, l.hostPhoto || h.photoURL)}
-        <div class="flex-1 min-w-0">
-          <b class="block text-sm truncate">${esc(l.hostName || nameOf(h))}${badgeHTML(vOf(l.hostId, false))}</b>
-          <span class="text-xs text-gray-400 truncate block">${esc(l.title || 'بث مباشر')}</span>
-        </div>
-        <div class="text-xs text-red-400 font-bold">● مباشر<div class="text-gray-400 font-normal"><i class="fa-regular fa-eye"></i> ${l.viewerCount || 0}</div></div>
-      </button>`;
-  }).join('') : '<p class="text-center text-gray-500 py-8 text-sm">لا يوجد بث مباشر حالياً</p>';
-}
+function viewHelp() { V().innerHTML = `<div class="p-3 max-w-xl mx-auto"><h2 class="font-bold">المساعدة</h2></div>`; }
+function viewAbout() { V().innerHTML = `<div class="p-3 max-w-xl mx-auto"><h2 class="font-bold">عن التطبيق</h2></div>`; }
 
-// ----- broadcaster -----
-async function viewGoLive() {
-  V().innerHTML = `
-    <div class="p-3 space-y-3 max-w-xl mx-auto">
-      ${liveHeader('بث مباشر')}
-      <div class="relative rounded-xl overflow-hidden bg-black mx-auto" style="aspect-ratio:3/4;max-height:58vh">
-        <video id="localVid" autoplay muted playsinline class="w-full h-full object-cover"></video>
-        <div id="liveTag" class="hidden absolute top-2 right-2 px-2 py-0.5 rounded bg-red-600 text-xs font-bold">● مباشر</div>
-        <div id="liveCount" class="hidden absolute top-2 left-2 px-2 py-0.5 rounded bg-black/60 text-xs"><i class="fa-regular fa-eye"></i> <span id="liveViewerCount">0</span></div>
-      </div>
-      <div id="liveControls" class="space-y-2">
-        <input id="liveTitle" maxlength="80" placeholder="عنوان البث (اختياري)" class="w-full bg-gray-800 rounded-xl px-3 py-2.5 text-sm outline-none">
-        <button data-act="live-start" class="w-full py-3 rounded-xl bg-red-600 font-bold text-sm">ابدأ البث الآن</button>
-      </div>
-      <div id="liveChatWrap" class="hidden space-y-2"></div>
-    </div>`;
-  const L = liveState = { role: 'host', hostId: uid(), pcs: {}, pend: {}, unsubs: [], timers: [], facing: 'user', started: false, lastCount: 0 };
-  if (!navigator.mediaDevices?.getUserMedia) { showToast("هذا المتصفح لا يدعم الكاميرا"); return; }
-  try {
-    L.stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: true });
-  } catch (err) { showToast("تعذر فتح الكاميرا أو الميكروفون: " + err.message); return; }
-  if (liveState !== L) { L.stream.getTracks().forEach(t => t.stop()); return; }
-  const v = $('localVid');
-  if (v) v.srcObject = L.stream;
-}
-
-async function startLive() {
-  const L = liveState;
-  if (!L || L.role !== 'host' || L.started || !L.stream) return showToast("انتظر حتى تعمل الكاميرا");
-  const hostId = L.hostId;
-  const title = ($('liveTitle')?.value || '').trim().slice(0, 80);
-  L.started = true;
-  try {
-    for (const sub of ['viewers', 'chat']) {
-      const old = await getDocs(collection(db, 'lives', hostId, sub));
-      await Promise.all(old.docs.map(d => deleteDoc(d.ref).catch(() => {})));
-    }
-    await setDoc(doc(db, 'lives', hostId), {
-      hostId, hostName: nameOf(me()), hostPhoto: me().photoURL || '', title,
-      status: 'live', viewerCount: 0, createdAt: serverTimestamp(), lastBeat: serverTimestamp()
-    });
-  } catch (err) { L.started = false; showToast("تعذر بدء البث: " + err.message); return; }
-  L.timers.push(setInterval(() => updateDoc(doc(db, 'lives', hostId), { lastBeat: serverTimestamp() }).catch(() => {}), 20000));
-  L.unsubs.push(onSnapshot(collection(db, 'lives', hostId, 'viewers'), (snap) => {
-    snap.docChanges().forEach(ch => {
-      if (ch.type === 'added') hostAccept(ch.doc);
-      if (ch.type === 'removed' && L.pcs[ch.doc.id]) { try { L.pcs[ch.doc.id].close(); } catch (_) {} delete L.pcs[ch.doc.id]; hostCount(); }
-    });
-  }));
-  $('liveControls').innerHTML = `
-    <div class="flex gap-2">
-      <button data-act="live-flip" class="flex-1 py-2.5 rounded-xl bg-gray-800 text-sm"><i class="fa-solid fa-camera-rotate"></i> قلب</button>
-      <button data-act="live-mic" id="micBtn" class="flex-1 py-2.5 rounded-xl bg-gray-800 text-sm"><i class="fa-solid fa-microphone"></i> الصوت</button>
-      <button data-act="live-end" class="flex-1 py-2.5 rounded-xl bg-red-600 text-sm font-bold">إنهاء</button>
-    </div>`;
-  $('liveTag')?.classList.remove('hidden');
-  $('liveCount')?.classList.remove('hidden');
-  const w = $('liveChatWrap');
-  if (w) { w.innerHTML = chatBlock(hostId); w.classList.remove('hidden'); }
-  watchLiveChat(hostId);
-  showToast("بدأ البث 🔴");
-}
-
-async function hostAccept(d) {
-  const L = liveState;
-  if (!L || L.role !== 'host') return;
-  const vid = d.id, data = d.data();
-  if (!data.offer || L.pcs[vid]) return;
-  const pc = new RTCPeerConnection({ iceServers: ICE_SERVERS });
-  const pend = [];
-  L.pcs[vid] = pc;
-  L.stream.getTracks().forEach(t => pc.addTrack(t, L.stream));
-  pc.onicecandidate = (e) => { if (e.candidate) addDoc(collection(d.ref, 'hostCandidates'), e.candidate.toJSON()).catch(() => {}); };
-  pc.onconnectionstatechange = () => {
-    if (pc.connectionState === 'failed' || pc.connectionState === 'closed') { try { pc.close(); } catch (_) {} delete L.pcs[vid]; }
-    hostCount();
-  };
-  L.unsubs.push(onSnapshot(collection(d.ref, 'viewerCandidates'), (snap) => {
-    snap.docChanges().forEach(ch => { if (ch.type === 'added') addCand(pc, pend, ch.doc.data()); });
-  }));
-  try {
-    await pc.setRemoteDescription(data.offer);
-    flushCand(pc, pend);
-    const ans = await pc.createAnswer();
-    await pc.setLocalDescription(ans);
-    await updateDoc(d.ref, { answer: { type: ans.type, sdp: ans.sdp } });
-  } catch (_) { try { pc.close(); } catch (e) {} delete L.pcs[vid]; }
-}
-
-function hostCount() {
-  const L = liveState;
-  if (!L || !L.started) return;
-  const n = Object.values(L.pcs).filter(pc => pc.connectionState === 'connected').length;
-  const el = $('liveViewerCount');
-  if (el) el.textContent = n;
-  if (n !== L.lastCount) { L.lastCount = n; updateDoc(doc(db, 'lives', L.hostId), { viewerCount: n }).catch(() => {}); }
-}
-
-async function flipCamera() {
-  const L = liveState;
-  if (!L || !L.stream) return;
-  L.facing = L.facing === 'user' ? 'environment' : 'user';
-  try {
-    L.stream.getVideoTracks().forEach(t => { t.stop(); L.stream.removeTrack(t); });
-    const ns = await navigator.mediaDevices.getUserMedia({ video: { facingMode: L.facing }, audio: false });
-    const nt = ns.getVideoTracks()[0];
-    L.stream.addTrack(nt);
-    Object.values(L.pcs).forEach(pc => { const sd = pc.getSenders().find(x => x.track && x.track.kind === 'video'); if (sd) sd.replaceTrack(nt).catch(() => {}); });
-    const v = $('localVid');
-    if (v) v.srcObject = L.stream;
-  } catch (err) { showToast("تعذر تبديل الكاميرا"); }
-}
-
-function toggleMic() {
-  const L = liveState;
-  if (!L || !L.stream) return;
-  const tracks = L.stream.getAudioTracks();
-  const on = !(tracks[0] && tracks[0].enabled);
-  tracks.forEach(t => { t.enabled = on; });
-  const b = $('micBtn');
-  if (b) b.innerHTML = on ? '<i class="fa-solid fa-microphone"></i> الصوت' : '<i class="fa-solid fa-microphone-slash text-red-400"></i> مكتوم';
-}
-
-// ----- viewer -----
-async function viewWatch(hostId) {
-  const h = allUsers[hostId] || {};
-  V().innerHTML = `
-    <div class="p-3 space-y-3 max-w-xl mx-auto">
-      ${liveHeader(esc(nameOf(h)) + badgeHTML(badgeKind(h)))}
-      <div class="relative rounded-xl overflow-hidden bg-black mx-auto" style="aspect-ratio:3/4;max-height:58vh">
-        <video id="remoteVid" autoplay playsinline class="w-full h-full object-cover"></video>
-        <div id="watchTag" class="absolute top-2 right-2 px-2 py-0.5 rounded bg-red-600 text-xs font-bold">● مباشر</div>
-        <div class="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/60 text-xs"><i class="fa-regular fa-eye"></i> <span id="watchCount">0</span></div>
-        <div id="watchStatus" class="absolute inset-0 flex items-center justify-center text-sm text-gray-200 bg-black/50 text-center px-4">جاري الاتصال بالبث...</div>
-        <button id="tapPlay" data-act="live-play" class="hidden absolute inset-0 flex items-center justify-center bg-black/50 text-white text-sm font-bold">اضغط للتشغيل ▶</button>
-      </div>
-      <p id="watchTitle" class="text-sm text-gray-300"></p>
-      ${chatBlock(hostId)}
-    </div>`;
-  const L = liveState = { role: 'viewer', hostId, unsubs: [], timers: [] };
-  const setStatus = (txt) => {
-    const el = $('watchStatus');
-    if (!el) return;
-    if (txt) { el.textContent = txt; el.classList.remove('hidden'); } else el.classList.add('hidden');
-  };
-  L.unsubs.push(onSnapshot(doc(db, 'lives', hostId), (sn) => {
-    const d = sn.data();
-    if (!d || d.status !== 'live') { setStatus('انتهى البث'); $('watchTag')?.classList.add('hidden'); return; }
-    const c = $('watchCount'); if (c) c.textContent = d.viewerCount || 0;
-    const t = $('watchTitle'); if (t) t.textContent = d.title || '';
-  }));
-  watchLiveChat(hostId);
-  try {
-    const pc = new RTCPeerConnection({ iceServers: ICE_SERVERS });
-    L.pc = pc;
-    const pend = [];
-    const stream = new MediaStream();
-    pc.addTransceiver('video', { direction: 'recvonly' });
-    pc.addTransceiver('audio', { direction: 'recvonly' });
-    pc.ontrack = (e) => {
-      stream.addTrack(e.track);
-      const v = $('remoteVid');
-      if (v) { v.srcObject = stream; v.play().catch(() => $('tapPlay')?.classList.remove('hidden')); }
-    };
-    const vref = doc(db, 'lives', hostId, 'viewers', `${uid()}_${Date.now()}`);
-    L.viewerDoc = vref;
-    pc.onicecandidate = (e) => { if (e.candidate) addDoc(collection(vref, 'viewerCandidates'), e.candidate.toJSON()).catch(() => {}); };
-    pc.onconnectionstatechange = () => {
-      if (pc.connectionState === 'connected') setStatus('');
-      else if (pc.connectionState === 'failed') setStatus('تعذر الاتصال بالبث. قد تحتاج شبكتك إلى خادم TURN.');
-    };
-    const offer = await pc.createOffer();
-    await pc.setLocalDescription(offer);
-    await setDoc(vref, { viewerId: uid(), offer: { type: offer.type, sdp: offer.sdp }, ts: Date.now() });
-    L.unsubs.push(onSnapshot(vref, (sn) => {
-      const d = sn.data();
-      if (d && d.answer && !L.answered) {
-        L.answered = true;
-        pc.setRemoteDescription(d.answer).then(() => flushCand(pc, pend)).catch(() => {});
-      }
-    }));
-    L.unsubs.push(onSnapshot(collection(vref, 'hostCandidates'), (snap) => {
-      snap.docChanges().forEach(ch => { if (ch.type === 'added') addCand(pc, pend, ch.doc.data()); });
-    }));
-    L.timers.push(setTimeout(() => { if (pc.connectionState !== 'connected') setStatus('لم يتم الاتصال بعد... تأكد أن البث ما زال مستمراً.'); }, 25000));
-  } catch (err) { setStatus('تعذر الاتصال: ' + err.message); }
-}
-
-// ---------- logout sheet ----------
-function showLogoutSheet() {
-  document.getElementById('logoutSheet')?.remove();
-  const sheet = document.createElement('div');
-  sheet.id = 'logoutSheet';
-  sheet.className = 'fixed inset-0 z-[70] bg-black/60 flex items-end justify-center';
-  sheet.innerHTML = `
-    <div class="card w-full max-w-md rounded-t-3xl p-4 space-y-2 safe-bottom">
-      <div class="mx-auto w-12 h-1.5 rounded-full bg-gray-600 mb-2"></div>
-      <p dir="ltr" class="text-center text-sm text-gray-400 mb-2">${esc(currentUser?.email || currentUser?.phoneNumber || '')}</p>
-      <button data-act="logout-confirm" class="w-full py-3 rounded-xl bg-red-600/20 border border-red-500/30 text-red-300 font-bold text-sm">تسجيل الخروج من هذا الحساب</button>
-      <button data-act="logout-switch" class="w-full py-3 rounded-xl bg-gray-800 text-sm font-bold">تبديل الحساب</button>
-      <button data-act="logout-cancel" class="w-full py-3 rounded-xl bg-gray-900 text-sm text-gray-400">إلغاء</button>
-    </div>`;
-  sheet.addEventListener('click', (e) => { if (e.target === sheet) sheet.remove(); });
-  document.body.appendChild(sheet);
-}
-
-// ---------- subscription sheet ----------
-function showSubscribeSheet() {
-  document.getElementById('subSheet')?.remove();
-  const sheet = document.createElement('div');
-  sheet.id = 'subSheet';
-  sheet.className = 'fixed inset-0 z-[70] bg-black/60 flex items-end justify-center';
-  const verified = isVerified(me());
-  const pending = mySub?.status === 'pending';
-  const until = me().verifiedUntil?.toDate?.();
-  sheet.innerHTML = `
-    <div class="card w-full max-w-md rounded-t-3xl p-5 space-y-3 safe-bottom">
-      <div class="mx-auto w-12 h-1.5 rounded-full bg-gray-600 mb-2"></div>
-      <div class="text-center">
-        ${badgeSVG(56)}
-        <h3 class="text-lg font-bold mt-2">التوثيق Sovexa</h3>
-        <p class="text-sm text-gray-400 mt-1">${verified ? 'حسابك موثّق بالفعل ✔' : 'علامة زرقاء بجوار اسمك تدل على حساب موثّق'}</p>
-        ${verified && until && !isAdmin() ? `<p class="text-xs text-gray-500 mt-1">ينتهي في ${until.toLocaleDateString('ar')}</p>` : ''}
-      </div>
-      ${verified ? '' : pending
-        ? '<div class="card rounded-xl p-3 text-sm text-center text-indigo-200">طلبك قيد المراجعة ⏳</div>'
-        : `
-        <div class="card rounded-xl p-3 text-sm text-center"><b class="text-indigo-300">${SUB_PRICE}</b></div>
-        <button data-act="subscribe-confirm" class="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-pink-600 font-bold text-sm">طلب الاشتراك</button>
-        <p class="text-[11px] text-gray-500 text-center">سيتم تفعيل التوثيق بعد تأكيد الدفع</p>`}
-      <button data-act="subscribe-cancel" class="w-full py-2 text-sm text-gray-400">إغلاق</button>
-    </div>`;
-  sheet.addEventListener('click', (e) => { if (e.target === sheet) sheet.remove(); });
-  document.body.appendChild(sheet);
-}
-
-// ---------- auth ----------
-function showLogin() {
-  $('loginSection').classList.remove('hidden');
-  $('appSection').classList.add('hidden');
-}
-function showApp() {
-  $('loginSection').classList.add('hidden');
-  $('appSection').classList.remove('hidden');
-}
-
-async function ensureUserProfile(user) {
-  const ref = doc(db, "users", user.uid);
-  const snap = await getDoc(ref);
-  if (!snap.exists()) {
-    await setDoc(ref, {
-      uid: user.uid, name: nameOf(user), username: "",
-      email: user.email || "", phone: user.phoneNumber || "",
-      photoURL: user.photoURL || "", coverURL: "", bio: "",
-      following: [], verified: false, createdAt: serverTimestamp()
-    });
-  } else {
-    await setDoc(ref, { email: user.email || "", phone: user.phoneNumber || "" }, { merge: true });
-  }
-}
-
-setTimeout(() => $('splash')?.remove(), 8000);
+// ---------- Firebase Init & Auth ----------
 onAuthStateChanged(auth, async (user) => {
   currentUser = user;
   $('splash')?.remove();
   if (!user) {
     clearListeners();
-    if (usersUnsub) { usersUnsub(); usersUnsub = null; }
-    if (postsUnsub) { postsUnsub(); postsUnsub = null; }
-    if (savedUnsub) { savedUnsub(); savedUnsub = null; }
-    if (notifUnsub) { notifUnsub(); notifUnsub = null; }
-    if (subUnsub) { subUnsub(); subUnsub = null; }
-    notifs = []; mySub = null; commentsData = {}; replyTo = {};
-    updateNotifBadge();
-    postsCache = {};
-    savedIds = new Set();
-    showLogin();
+    $('loginSection').classList.remove('hidden');
+    $('appSection').classList.add('hidden');
     return;
   }
-  showApp();
-  try { await ensureUserProfile(user); } catch (e) { showToast("تعذر حفظ الملف: " + e.message); }
-  if (!usersUnsub) {
-    usersUnsub = onSnapshot(collection(db, "users"), (s) => {
-      allUsers = {};
-      usersByUsername = {};
-      s.forEach(d => {
-        const data = { uid: d.id, ...d.data() };
-        allUsers[d.id] = data;
-        if (data.username) usersByUsername[data.username] = d.id;
-      });
-      renderUsersLive();
-      refreshPosts();
-    }, (err) => showToast("تعذر تحميل المستخدمين: " + err.message));
-  }
-  if (!postsUnsub) {
-    postsUnsub = onSnapshot(query(collection(db, "posts"), orderBy("createdAt", "desc"), limit(100)), (s) => {
-      postsCache = {};
-      s.forEach(d => postsCache[d.id] = d.data());
-      refreshPosts();
-      if (currentView === 'saved') renderSavedList();
-      if (currentView === 'archive') viewArchive();
-    }, (err) => showToast("تعذر تحميل المنشورات: " + err.message));
-  }
-  if (!savedUnsub) {
-    savedUnsub = onSnapshot(collection(db, "users", user.uid, "saved"), (s) => {
-      savedIds = new Set(s.docs.map(d => d.id));
-      refreshPosts();
-      if (currentView === 'saved') renderSavedList();
-    }, () => {});
-  }
-  if (!notifUnsub) {
-    notifUnsub = onSnapshot(query(collection(db, "notifications"), where("toUid", "==", user.uid)), (s) => {
-      notifs = s.docs.map(d => ({ id: d.id, ...d.data() }))
-        .sort((a, b) => (b.createdAt?.seconds ?? Date.now() / 1000) - (a.createdAt?.seconds ?? Date.now() / 1000));
-      updateNotifBadge();
-      if (currentView === 'notifications') viewNotifications();
-    }, () => {});
-  }
-  if (!subUnsub) {
-    subUnsub = onSnapshot(doc(db, "subscriptions", user.uid), (s) => { mySub = s.exists() ? s.data() : null; }, () => {});
-  }
+  $('loginSection').classList.add('hidden');
+  $('appSection').classList.remove('hidden');
+
+  // الاستماع للمستخدمين والمنشورات والإشعارات والدردشات لتحديث العدادات الحمراء
+  usersUnsub = onSnapshot(collection(db, "users"), (s) => {
+    allUsers = {};
+    s.forEach(d => allUsers[d.id] = { uid: d.id, ...d.data() });
+    refreshPosts();
+  });
+  postsUnsub = onSnapshot(query(collection(db, "posts"), orderBy("createdAt", "desc"), limit(50)), (s) => {
+    postsCache = {};
+    s.forEach(d => postsCache[d.id] = d.data());
+    refreshPosts();
+  });
+  notifUnsub = onSnapshot(query(collection(db, "notifications"), where("toUid", "==", user.uid)), (s) => {
+    notifs = s.docs.map(d => ({ id: d.id, ...d.data() }));
+    updateBadges();
+  });
+  chatsUnsub = onSnapshot(query(collection(db, "chats"), where("members", "array-contains", user.uid)), (s) => {
+    chatUnreadCount = s.size; // تحديث عدد المحادثات النشطة/الرسائل
+    updateBadges();
+  });
+
   go('home');
-});
-
-getRedirectResult(auth).catch(err => showToast("خطأ Google: " + err.message));
-const googleProvider = new GoogleAuthProvider();
-googleProvider.setCustomParameters({ prompt: "select_account" });
-
-$('googleLoginBtn').addEventListener('click', async () => {
-  try { await signInWithPopup(auth, googleProvider); }
-  catch (err) {
-    if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') return;
-    if (err.code === 'auth/popup-blocked' || err.code === 'auth/operation-not-supported-in-this-environment') {
-      await signInWithRedirect(auth, googleProvider); return;
-    }
-    showToast("خطأ Google: " + err.message);
-  }
 });
 
 $('emailForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   const email = $('emailInput').value.trim();
   const password = $('passwordInput').value;
-  if (!email || !password) return showToast("أدخل البريد وكلمة المرور");
   try {
     await signInWithEmailAndPassword(auth, email, password);
-  } catch (err) {
-    if (err.code === 'auth/invalid-credential' || err.code === 'auth/user-not-found') {
-      try {
-        await createUserWithEmailAndPassword(auth, email, password);
-        showToast("تم إنشاء حسابك");
-      } catch (e2) {
-        showToast(e2.code === 'auth/email-already-in-use' ? "كلمة المرور غير صحيحة لهذا البريد" : "خطأ: " + e2.message);
-      }
-    } else {
-      showToast("خطأ: " + err.message);
-    }
+  } catch {
+    await createUserWithEmailAndPassword(auth, email, password);
   }
 });
 
-const getRecaptcha = () => {
-  if (!recaptcha) recaptcha = new RecaptchaVerifier(auth, 'recaptcha-container', { size: 'invisible' });
-  return recaptcha;
-};
-$('togglePhoneBtn').addEventListener('click', () => $('phonePanel').classList.toggle('hidden'));
-$('sendCodeBtn').addEventListener('click', async () => {
-  const phone = $('phoneInput').value.trim();
-  if (!/^\+\d{8,15}$/.test(phone)) return showToast("أدخل الرقم بصيغة دولية مثل +966500000000");
-  try {
-    confirmationResult = await signInWithPhoneNumber(auth, phone, getRecaptcha());
-    $('phoneStep').classList.add('hidden');
-    $('codeStep').classList.remove('hidden');
-    showToast("تم إرسال الرمز");
-  } catch (err) {
-    if (recaptcha) { try { recaptcha.clear(); } catch (_) {} }
-    recaptcha = null;
-    $('recaptcha-container').innerHTML = '';
-    showToast("خطأ الهاتف: " + err.message);
-  }
-});
-$('verifyCodeBtn').addEventListener('click', async () => {
-  if (!confirmationResult) return;
-  try { await confirmationResult.confirm($('codeInput').value.trim()); }
-  catch (err) { showToast("رمز غير صحيح"); }
-});
-$('backToPhoneBtn').addEventListener('click', () => {
-  $('codeStep').classList.add('hidden');
-  $('phoneStep').classList.remove('hidden');
-  confirmationResult = null;
-});
-
-// ---------- global events ----------
+// ---------- Events ----------
 document.addEventListener('click', async (e) => {
   const g = e.target.closest('[data-go]');
   if (g) { go(g.dataset.go, g.dataset.id); return; }
   const a = e.target.closest('[data-act]');
   if (!a) return;
-  const { act, id, cid } = a.dataset;
-  try {
-    if (act === 'like') {
-      await toggleLike(id);
-    } else if (act === 'comments') {
-      openComments(id);
-    } else if (act === 'save') {
-      await toggleSave(id);
-    } else if (act === 'share') {
-      const p = postsCache[id] || {};
-      if (navigator.share) {
-        navigator.share({ title: 'Sovexa', text: p.text || 'منشور من Sovexa', url: location.href }).catch(() => {});
-      } else {
-        navigator.clipboard?.writeText(location.href);
-        showToast("تم نسخ رابط التطبيق");
-      }
-    } else if (act === 'delpost') {
-      if (confirm('حذف هذا المنشور؟')) await deleteDoc(doc(db, "posts", id));
-    } else if (act === 'follow') {
-      const isF = (me().following || []).includes(id);
-      await updateDoc(doc(db, "users", uid()), { following: isF ? arrayRemove(id) : arrayUnion(id) });
-      if (!isF) notify(id, 'follow', {}, `follow_${uid()}_${id}`);
-    } else if (act === 'subscribe') {
-      showSubscribeSheet();
-    } else if (act === 'subscribe-confirm') {
-      await setDoc(doc(db, "subscriptions", uid()), {
-        userId: uid(), userName: nameOf(me()), email: currentUser?.email || '', status: "pending", price: SUB_PRICE, createdAt: serverTimestamp()
-      });
-      document.getElementById('subSheet')?.remove();
-      showToast("تم تسجيل طلب الاشتراك، بانتظار تأكيد الدفع");
-    } else if (act === 'subscribe-cancel') {
-      document.getElementById('subSheet')?.remove();
-    } else if (act === 'soon') {
-      showToast("هذه الميزة قريباً");
-    } else if (act === 'logout-menu') {
-      showLogoutSheet();
-    } else if (act === 'logout-confirm') {
-      document.getElementById('logoutSheet')?.remove();
-      await signOut(auth);
-    } else if (act === 'logout-switch') {
-      document.getElementById('logoutSheet')?.remove();
-      await signOut(auth);
-      showToast("سجّل الدخول بالحساب الآخر");
-    } else if (act === 'logout-cancel') {
-      document.getElementById('logoutSheet')?.remove();
-    } else if (act === 'creply') {
-      const c = (commentsData[id] || []).find(x => x.id === cid);
-      if (c) {
-        replyTo[id] = { parentId: c.parentId || c.id, name: c.userName, userId: c.userId };
-        renderComments(id);
-        $('cbox-' + id)?.querySelector('input[name="t"]')?.focus();
-      }
-    } else if (act === 'creply-cancel') {
-      delete replyTo[id];
-      renderComments(id);
-    } else if (act === 'report' || act === 'creport') {
-      reportTarget = { postId: id, commentId: act === 'creport' ? cid : '' };
-      showReportSheet();
-    } else if (act === 'report-cancel') {
-      document.getElementById('reportSheet')?.remove();
-    } else if (act === 'report-send') {
-      const t = reportTarget;
-      if (!t) return;
-      const post = postsCache[t.postId] || {};
-      let target = post;
-      if (t.commentId) target = (commentsData[t.postId] || []).find(x => x.id === t.commentId) || post;
-      const key = `${uid()}_${t.postId}${t.commentId ? '_' + t.commentId : ''}`;
-      try {
-        await setDoc(doc(db, "reports", key), {
-          reporterId: uid(), reporterName: nameOf(me()), postId: t.postId, commentId: t.commentId || '',
-          targetUserId: target.userId || '', targetType: t.commentId ? 'comment' : 'post',
-          reason: a.dataset.reason, snippet: String(target.text || '').slice(0, 200),
-          status: 'pending', createdAt: serverTimestamp()
-        });
-      } catch (_) {}
-      document.getElementById('reportSheet')?.remove();
-      reportTarget = null;
-      if (!t.commentId) {
-        hiddenPosts.add(t.postId);
-        saveHidden();
-        if (currentView === 'post') go('home'); else refreshPosts();
-      }
-      showToast("تم إرسال البلاغ، شكراً لمساعدتك في إبقاء Sovexa آمناً");
-    } else if (act === 'notif') {
-      const n = notifs.find(x => x.id === id);
-      if (!n) return;
-      if (!n.read) updateDoc(doc(db, "notifications", id), { read: true }).catch(() => {});
-      if (n.postId && postsCache[n.postId]) go('post', n.postId);
-      else if (n.type === 'verified') go('profile', uid());
-      else go('profile', n.fromUid);
-    } else if (act === 'notif-readall') {
-      await Promise.all(notifs.filter(n => !n.read).map(n => updateDoc(doc(db, "notifications", n.id), { read: true }).catch(() => {})));
-    } else if (act === 'sub-approve') {
-      await setDoc(doc(db, "users", id), { verified: true, verifiedUntil: Timestamp.fromMillis(Date.now() + 30 * 86400000) }, { merge: true });
-      await updateDoc(doc(db, "subscriptions", id), { status: 'active', approvedAt: serverTimestamp() });
-      notify(id, 'verified');
-      showToast("تم تفعيل التوثيق لمدة 30 يوماً");
-    } else if (act === 'sub-reject') {
-      await updateDoc(doc(db, "subscriptions", id), { status: 'rejected' });
-      showToast("تم رفض الطلب");
-    } else if (act === 'rep-delete') {
-      const r = adminData.reports.find(x => x.id === id);
-      if (r && confirm('حذف هذا المحتوى نهائياً؟')) {
-        if (r.commentId) {
-          await deleteDoc(doc(db, "posts", r.postId, "comments", r.commentId));
-          updateDoc(doc(db, "posts", r.postId), { commentsCount: increment(-1) }).catch(() => {});
-        } else {
-          await deleteDoc(doc(db, "posts", r.postId));
-        }
-        await updateDoc(doc(db, "reports", id), { status: 'resolved' });
-        showToast("تم حذف المحتوى");
-      }
-    } else if (act === 'live-start') {
-      await startLive();
-    } else if (act === 'live-flip') {
-      await flipCamera();
-    } else if (act === 'live-mic') {
-      toggleMic();
-    } else if (act === 'live-end') {
-      go('live');
-      showToast("انتهى البث");
-    } else if (act === 'live-play') {
-      $('remoteVid')?.play().catch(() => {});
-      $('tapPlay')?.classList.add('hidden');
-    } else if (act === 'rep-dismiss') {
-      await updateDoc(doc(db, "reports", id), { status: 'dismissed' });
-    }
-  } catch (err) {
-    showToast("خطأ: " + err.message);
+  const { act, id } = a.dataset;
+  if (act === 'like') {
+    const p = postsCache[id];
+    if (!p) return;
+    const liked = (p.likes || []).includes(uid());
+    await updateDoc(doc(db, "posts", id), { likes: liked ? arrayRemove(uid()) : arrayUnion(uid()) });
+  } else if (act === 'comments') {
+    openComments(id);
+  } else if (act === 'save') {
+    if (savedIds.has(id)) savedIds.delete(id); else savedIds.add(id);
+    refreshPosts();
+  } else if (act === 'follow') {
+    const isF = (me().following || []).includes(id);
+    await updateDoc(doc(db, "users", uid()), { following: isF ? arrayRemove(id) : arrayUnion(id) });
+  } else if (act === 'logout') {
+    signOut(auth);
   }
-});
-
-document.addEventListener('input', (e) => {
-  if (e.target.id === 'q') renderSearch(e.target.value);
 });
 
 document.addEventListener('change', async (e) => {
   const f = e.target.files?.[0];
   if (!f) return;
-  try {
-    if (e.target.id === 'photoIn') {
-      pendingPhoto = await compressImage(f, 256, 0.7);
-      $('photoPrev').innerHTML = `<img src="${pendingPhoto}" class="w-24 h-24 rounded-full object-cover">`;
-    } else if (e.target.id === 'coverIn') {
-      pendingCover = await compressImage(f, 600, 0.6);
-      showToast("تم اختيار الغلاف");
-    } else if (e.target.id === 'postImg') {
-      pendingPostImg = await compressImage(f, 800, 0.7);
-      pendingPostVideo = null;
-      $('postPrev').innerHTML = `<img src="${pendingPostImg}" class="w-full rounded-xl">`;
-    } else if (e.target.id === 'postVid') {
-      if (!f.type.startsWith('video/')) return showToast("اختر ملف فيديو");
-      if (f.size > 50 * 1024 * 1024) return showToast("حجم الفيديو يجب ألا يتجاوز 50 ميغابايت");
-      pendingPostVideo = f;
-      pendingPostImg = null;
-      $('postPrev').innerHTML = `<video src="${URL.createObjectURL(f)}" controls playsinline class="w-full rounded-xl max-h-80 bg-black"></video>`;
-    }
-  } catch (err) { showToast("تعذر معالجة الملف"); }
+  if (e.target.id === 'postImg') pendingPostImg = await compressImage(f, 800, 0.7);
+  if (e.target.id === 'chatImgIn') pendingChatImg = await compressImage(f, 800, 0.7);
+  if (e.target.classList.contains('comment-img-input')) {
+    pendingCommentImg = await compressImage(f, 800, 0.7);
+    const pid = e.target.dataset.id;
+    const prev = $(`commentPrev-${pid}`);
+    if (prev) prev.innerHTML = `<img src="${pendingCommentImg}" class="w-20 h-20 rounded-lg object-cover mt-1">`;
+  }
 });
 
 document.addEventListener('submit', async (e) => {
+  e.preventDefault();
   const f = e.target;
   const type = f.dataset.form;
-  if (!type) return;
-  e.preventDefault();
   const fd = new FormData(f);
-  const btn = f.querySelector('button[type="submit"], button:not([type])');
-  try {
-    if (type === 'comment') {
-      const t = (fd.get('t') || '').toString().trim();
-      if (!t) return;
-      const postId = f.dataset.id;
-      const rt = replyTo[postId];
-      await addDoc(collection(db, "posts", postId, "comments"), {
-        userId: uid(), userName: nameOf(me()), userPhoto: me().photoURL || '',
-        text: t, verified: isVerified(me()), createdAt: serverTimestamp(),
-        parentId: rt?.parentId || '', replyToName: rt?.name || '', replyToUid: rt?.userId || ''
-      });
-      await updateDoc(doc(db, "posts", postId), { commentsCount: increment(1) });
-      const owner = postsCache[postId]?.userId;
-      if (rt) {
-        notify(rt.userId, 'reply', { postId, text: t });
-        if (owner && owner !== rt.userId) notify(owner, 'comment', { postId, text: t });
-      } else {
-        notify(owner, 'comment', { postId, text: t });
-      }
-      delete replyTo[postId];
-      f.reset();
-      renderComments(postId);
-    } else if (type === 'livechat') {
-      const t = (fd.get('t') || '').toString().trim();
-      if (!t) return;
-      await addDoc(collection(db, "lives", f.dataset.id, "chat"), {
-        userId: uid(), userName: nameOf(me()), text: t.slice(0, 300), createdAt: serverTimestamp()
-      });
-      f.reset();
-    } else if (type === 'msg') {
-      const t = (fd.get('t') || '').toString().trim();
-      if (!t) return;
-      await addDoc(collection(db, "chats", f.dataset.id, "messages"), {
-        text: t, senderId: uid(), senderName: nameOf(me()), createdAt: serverTimestamp()
-      });
-      f.reset();
-    } else if (type === 'create') {
-      const text = (fd.get('text') || '').toString().trim();
-      if (!text && !pendingPostImg && !pendingPostVideo) return showToast("اكتب شيئاً أو أضف صورة أو فيديو");
-      if (btn) { btn.disabled = true; btn.classList.add('btn-busy'); }
-      try {
-        let videoURL = '';
-        if (pendingPostVideo) {
-          const ext = ((pendingPostVideo.name.split('.').pop() || 'mp4').replace(/[^a-z0-9]/gi, '').slice(0, 5)) || 'mp4';
-          const r = sRef(storage, `posts/${uid()}/${Date.now()}.${ext}`);
-          const task = uploadBytesResumable(r, pendingPostVideo, { contentType: pendingPostVideo.type });
-          await new Promise((res, rej) => task.on('state_changed',
-            (sn) => { if (btn) btn.textContent = `جاري الرفع ${Math.round(sn.bytesTransferred / sn.totalBytes * 100)}%`; },
-            rej, res));
-          videoURL = await getDownloadURL(task.snapshot.ref);
-        }
-        await addDoc(collection(db, "posts"), {
-          userId: uid(), userName: nameOf(me()), userPhoto: me().photoURL || '',
-          verified: isVerified(me()),
-          text, image: pendingPostImg || '', video: videoURL, likes: [], commentsCount: 0, createdAt: serverTimestamp()
-        });
-      } finally {
-        if (btn) { btn.disabled = false; btn.textContent = "نشر"; btn.classList.remove('btn-busy'); }
-      }
-      pendingPostImg = null;
-      pendingPostVideo = null;
-      showToast("تم النشر");
-      go('home');
-    } else if (type === 'edit') {
-      if (btn) { btn.disabled = true; btn.textContent = "جاري الحفظ..."; btn.classList.add('btn-busy'); }
-      const name = (fd.get('name') || '').toString().trim();
-      const username = normUser(fd.get('username'));
-      const bio = (fd.get('bio') || '').toString().trim();
-      if (!name) throw new Error("الاسم مطلوب");
-      if (username.length < 3) throw new Error("اسم المستخدم يجب أن يكون 3 أحرف على الأقل");
-      const takenBy = usersByUsername[username];
-      if (takenBy && takenBy !== uid()) throw new Error("اسم المستخدم مستخدم من شخص آخر، اختر اسماً مختلفاً");
-      const data = { name, username, bio };
-      if (pendingPhoto) data.photoURL = pendingPhoto;
-      if (pendingCover) data.coverURL = pendingCover;
-      await withTimeout(setDoc(doc(db, "users", uid()), data, { merge: true }));
-      pendingPhoto = null;
-      pendingCover = null;
-      showToast("تم حفظ التعديلات");
-      go('profile', uid());
-    }
-  } catch (err) {
-    showToast("خطأ: " + err.message);
-    if (type === 'edit' && btn) { btn.disabled = false; btn.textContent = "حفظ"; btn.classList.remove('btn-busy'); }
+  if (type === 'create') {
+    const text = fd.get('text');
+    if (!text && !pendingPostImg) return;
+    await addDoc(collection(db, "posts"), {
+      userId: uid(), userName: nameOf(me()), userPhoto: me().photoURL || '',
+      verified: isVerified(me()), text, image: pendingPostImg || '', likes: [], commentsCount: 0, createdAt: serverTimestamp()
+    });
+    pendingPostImg = null;
+    go('home');
+  } else if (type === 'comment') {
+    const postId = f.dataset.id;
+    const text = fd.get('t');
+    if (!text && !pendingCommentImg) return;
+    await addDoc(collection(db, "posts", postId, "comments"), {
+      userId: uid(), userName: nameOf(me()), userPhoto: me().photoURL || '',
+      text, image: pendingCommentImg || '', verified: isVerified(me()), createdAt: serverTimestamp()
+    });
+    await updateDoc(doc(db, "posts", postId), { commentsCount: increment(1) });
+    pendingCommentImg = null;
+    f.reset();
+  } else if (type === 'msg') {
+    const text = fd.get('t');
+    if (!text && !pendingChatImg) return;
+    await addDoc(collection(db, "chats", f.dataset.id, "messages"), {
+      text, image: pendingChatImg || '', senderId: uid(), senderName: nameOf(me()), createdAt: serverTimestamp()
+    });
+    pendingChatImg = null;
+    f.reset();
+  } else if (type === 'edit') {
+    await updateDoc(doc(db, "users", uid()), { name: fd.get('name'), bio: fd.get('bio') });
+    go('profile', uid());
   }
 });
 </script>
